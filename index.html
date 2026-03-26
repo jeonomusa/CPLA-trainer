@@ -186,6 +186,34 @@
       font-weight: bold;
       color: #2c3e50;
     }
+    /* 답안지 줄 */
+    .answer-line {
+      display: flex;
+      border-bottom: 1px solid #ccc;
+      min-height: 36px;
+    }
+    .answer-line:last-child { border-bottom: none; }
+    .line-num {
+      width: 44px;
+      border-right: 1px solid #ccc;
+      text-align: center;
+      font-size: 11px;
+      color: #aaa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .line-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 15px;
+      font-family: 'Malgun Gothic', '맑은 고딕', sans-serif;
+      padding: 0 8px;
+      height: 36px;
+      color: #1a1a1a;
+    }
 
     /* coming soon */
     .coming-soon {
@@ -290,27 +318,27 @@
         <div id="exam-question-display" style="font-size:15px; line-height:1.8; color:#2c3e50;"></div>
       </div>
 
-      <!-- 답안 작성 -->
-      <div class="char-guide">한 줄 약 28자 기준 · 글자수 <span id="char-count">0</span>자 · 약 <span id="line-count">0</span>줄</div>
-      <div class="answer-sheet">
-        <div class="answer-sheet-title">답 안 지</div>
-        <div class="answer-sheet-body">
-          <div class="answer-line-numbers" id="line-numbers">
-            <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div>
-            <div>6</div><div>7</div><div>8</div><div>9</div><div>10</div>
-            <div>11</div><div>12</div><div>13</div><div>14</div><div>15</div>
-            <div>16</div><div>17</div><div>18</div><div>19</div><div>20</div>
-            <div>21</div><div>22</div><div>23</div><div>24</div><div>25</div>
-            <div>26</div><div>27</div><div>28</div><div>29</div><div>30</div>
-          </div>
-          <textarea id="exam-answer" class="answer-textarea"
-            placeholder="답안을 작성하세요..."
-            oninput="countChars()"></textarea>
+      <!-- 페이지 네비게이션 -->
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+        <button id="prev-page-btn" class="btn" style="background:#ecf0f1; color:#2c3e50; padding:8px 20px;" onclick="changePage(-1)">◀ 이전</button>
+        <div style="font-size:14px; color:#555;">
+          <span id="current-page">1</span> / <span id="total-pages">5</span> 페이지
         </div>
-        <div class="answer-sheet-footer">HRDK 한국산업인력공단</div>
+        <button id="next-page-btn" class="btn" style="background:#ecf0f1; color:#2c3e50; padding:8px 20px;" onclick="changePage(1)">다음 ▶</button>
       </div>
 
-
+      <!-- 답안지 -->
+      <div style="background:white; border:2px solid #222; margin-bottom:16px;">
+        <!-- 헤더 -->
+        <div style="display:flex; border-bottom:2px solid #222;">
+          <div style="width:44px; border-right:1px solid #222; text-align:center; font-size:11px; color:#555; padding:4px 0;">번호</div>
+          <div style="flex:1; text-align:center; font-size:11px; color:#555; padding:4px 0;">답 안 란</div>
+        </div>
+        <!-- 줄 -->
+        <div id="answer-lines"></div>
+        <!-- 푸터 -->
+        <div style="border-top:2px solid #222; text-align:center; font-size:11px; color:#888; padding:5px; letter-spacing:2px;">HRDK 한국산업인력공단</div>
+      </div>
 
       <!-- 제출 버튼 -->
       <button class="btn btn-green" onclick="submitExam()">✅ 답안 제출 및 AI 첨삭 받기</button>
@@ -407,6 +435,10 @@
     // 모의고사
     let timerInterval = null;
     let remainSeconds = 0;
+    let totalPages = 5;
+    let currentPage = 1;
+    const LINES_PER_PAGE = 22;
+    let allLines = {}; // { 페이지: { 줄: 내용 } }
 
     function startExam() {
       const question = document.getElementById('exam-question').value;
@@ -416,15 +448,26 @@
       const minutes = parseInt(document.getElementById('exam-time').value);
       remainSeconds = minutes * 60;
 
+      // 시간별 페이지 수
+      if (minutes === 25) totalPages = 5;
+      else if (minutes === 50) totalPages = 10;
+      else if (minutes === 75) totalPages = 15;
+      else if (minutes === 100) totalPages = 20;
+
+      currentPage = 1;
+      allLines = {};
+
       document.getElementById('exam-subject-display').textContent = subject;
       document.getElementById('exam-question-display').textContent = question;
-      document.getElementById('exam-answer').value = '';
-      document.getElementById('char-count').textContent = '0';
+      document.getElementById('total-pages').textContent = totalPages;
+      document.getElementById('current-page').textContent = 1;
 
       document.getElementById('exam-setup').style.display = 'none';
       document.getElementById('exam-room').style.display = 'block';
 
+      renderPage(1);
       updateTimer();
+
       timerInterval = setInterval(() => {
         remainSeconds--;
         updateTimer();
@@ -434,6 +477,85 @@
           submitExam();
         }
       }, 1000);
+
+      // 키보드 페이지 넘기기
+      document.addEventListener('keydown', handleKeyPage);
+    }
+
+    function handleKeyPage(e) {
+      // Ctrl + 방향키로 페이지 이동
+      if (e.ctrlKey && e.key === 'ArrowRight') { e.preventDefault(); changePage(1); }
+      if (e.ctrlKey && e.key === 'ArrowLeft') { e.preventDefault(); changePage(-1); }
+    }
+
+    function saveCurrentPage() {
+      const inputs = document.querySelectorAll('.line-input');
+      if (!allLines[currentPage]) allLines[currentPage] = {};
+      inputs.forEach((input, i) => {
+        allLines[currentPage][i + 1] = input.value;
+      });
+    }
+
+    function renderPage(page) {
+      const container = document.getElementById('answer-lines');
+      container.innerHTML = '';
+      for (let i = 1; i <= LINES_PER_PAGE; i++) {
+        const lineDiv = document.createElement('div');
+        lineDiv.className = 'answer-line';
+
+        const numDiv = document.createElement('div');
+        numDiv.className = 'line-num';
+        numDiv.textContent = i;
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'line-input';
+        input.value = (allLines[page] && allLines[page][i]) ? allLines[page][i] : '';
+        input.addEventListener('input', countChars);
+
+        // 엔터키로 다음 줄 이동
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            const inputs = document.querySelectorAll('.line-input');
+            const idx = Array.from(inputs).indexOf(e.target);
+            if (idx < inputs.length - 1) {
+              inputs[idx + 1].focus();
+            } else {
+              // 마지막 줄이면 다음 페이지
+              changePage(1);
+            }
+          }
+          // 백스페이스로 빈 줄에서 이전 줄 이동
+          if (e.key === 'Backspace' && e.target.value === '') {
+            const inputs = document.querySelectorAll('.line-input');
+            const idx = Array.from(inputs).indexOf(e.target);
+            if (idx > 0) {
+              e.preventDefault();
+              inputs[idx - 1].focus();
+            }
+          }
+        });
+
+        lineDiv.appendChild(numDiv);
+        lineDiv.appendChild(input);
+        container.appendChild(lineDiv);
+      }
+
+      // 저장된 페이지면 첫 줄 포커스
+      const firstInput = container.querySelector('.line-input');
+      if (firstInput) firstInput.focus();
+
+      document.getElementById('current-page').textContent = page;
+    }
+
+    function changePage(dir) {
+      saveCurrentPage();
+      const newPage = currentPage + dir;
+      if (newPage < 1 || newPage > totalPages) return;
+      currentPage = newPage;
+      renderPage(currentPage);
+      countChars();
     }
 
     function updateTimer() {
@@ -447,30 +569,41 @@
     }
 
     function countChars() {
-      const text = document.getElementById('exam-answer').value;
-      const charCount = text.length;
-      const lineCount = Math.ceil(charCount / 28);
-      document.getElementById('char-count').textContent = charCount;
-      document.getElementById('line-count').textContent = lineCount;
-
-      // 줄 수에 따라 번호 자동 추가
-      const lineNumbersEl = document.getElementById('line-numbers');
-      const currentLines = lineNumbersEl.children.length;
-      const neededLines = Math.max(30, lineCount + 5);
-      if (neededLines > currentLines) {
-        for (let i = currentLines + 1; i <= neededLines; i++) {
-          const div = document.createElement('div');
-          div.textContent = i;
-          lineNumbersEl.appendChild(div);
+      let total = 0;
+      // 현재 페이지 입력값 포함
+      document.querySelectorAll('.line-input').forEach(input => {
+        total += input.value.length;
+      });
+      // 다른 페이지 저장값 포함
+      Object.keys(allLines).forEach(page => {
+        if (parseInt(page) !== currentPage) {
+          Object.values(allLines[page]).forEach(val => {
+            total += val.length;
+          });
         }
-      }
+      });
+      document.getElementById('char-count').textContent = total;
     }
 
+    function getAllAnswer() {
+      saveCurrentPage();
+      let result = '';
+      for (let p = 1; p <= totalPages; p++) {
+        if (allLines[p]) {
+          for (let l = 1; l <= LINES_PER_PAGE; l++) {
+            if (allLines[p][l]) result += allLines[p][l] + '\n';
+          }
+        }
+      }
+      return result.trim();
+    }
 
     async function submitExam() {
       clearInterval(timerInterval);
+      document.removeEventListener('keydown', handleKeyPage);
+
       const question = document.getElementById('exam-question-display').textContent;
-      const answer = document.getElementById('exam-answer').value;
+      const answer = getAllAnswer();
       const subject = document.getElementById('exam-subject-display').textContent;
 
       document.getElementById('exam-room').style.display = 'none';
@@ -530,10 +663,12 @@
     }
 
     function resetExam() {
+      document.removeEventListener('keydown', handleKeyPage);
       document.getElementById('exam-result').style.display = 'none';
       document.getElementById('exam-setup').style.display = 'block';
       document.getElementById('exam-question').value = '';
-      document.getElementById('exam-answer').value = '';
+      allLines = {};
+      currentPage = 1;
     }
 
     // 플래시카드 뒤집기
