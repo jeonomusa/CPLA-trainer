@@ -9,53 +9,32 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: #f5f6fa; }
-
-    nav {
-      background: #2c3e50; padding: 0 20px;
-      display: flex; align-items: center; height: 60px;
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    }
+    nav { background: #2c3e50; padding: 0 20px; display: flex; align-items: center; height: 60px; position: fixed; top: 0; left: 0; right: 0; z-index: 100; }
     .nav-logo { color: white; font-size: 18px; font-weight: bold; margin-right: 40px; }
     .nav-menu { display: flex; gap: 5px; list-style: none; }
-    .nav-menu li a {
-      color: #bdc3c7; text-decoration: none;
-      padding: 8px 16px; border-radius: 6px; font-size: 14px; transition: all 0.2s;
-    }
+    .nav-menu li a { color: #bdc3c7; text-decoration: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; transition: all 0.2s; }
     .nav-menu li a:hover { background: #34495e; color: white; }
     .nav-menu li a.active { background: #27ae60; color: white; }
-
     .page { display: none; padding: 80px 20px 20px; max-width: 900px; margin: 0 auto; }
     .page.active { display: block; }
     .page-title { font-size: 24px; font-weight: bold; margin-bottom: 20px; color: #2c3e50; }
-
     .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
     .dashboard-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 20px; }
     .card-title { font-size: 13px; color: #888; margin-bottom: 8px; }
     .card-value { font-size: 32px; font-weight: bold; color: #2c3e50; }
     .card-sub { font-size: 12px; color: #aaa; margin-top: 4px; }
     .dday { color: #27ae60; }
-    .streak { color: #e67e22; }
-
     .exam-setup { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
     .form-group { margin-bottom: 16px; }
     .form-group label { display: block; font-size: 14px; font-weight: bold; color: #555; margin-bottom: 6px; }
-    .form-group select, .form-group textarea {
-      width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;
-      font-family: 'Malgun Gothic', '맑은 고딕', sans-serif;
-    }
+    .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; }
     .form-group textarea { height: 120px; resize: vertical; }
-
     .btn { padding: 12px 24px; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; transition: all 0.2s; }
     .btn-green { background: #27ae60; color: white; width: 100%; }
     .btn-green:hover { background: #219a52; }
     .btn-gray { background: #ecf0f1; color: #2c3e50; padding: 8px 20px; width: auto; }
     .btn-gray:hover { background: #dde1e4; }
-
-    .exam-topbar {
-      background: white; border-radius: 12px; padding: 16px 20px;
-      margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      display: flex; justify-content: space-between; align-items: center;
-    }
+    .exam-topbar { background: white; border-radius: 12px; padding: 16px 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; justify-content: space-between; align-items: center; }
     .exam-subject-name { font-weight: bold; color: #2c3e50; font-size: 16px; }
     .exam-info { display: flex; align-items: center; gap: 20px; }
     .char-info { font-size: 13px; color: #888; }
@@ -64,67 +43,35 @@
     .timer-warning { color: #e67e22 !important; }
     .timer-danger { color: #e74c3c !important; animation: blink 1s infinite; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-
-    .question-box {
-      background: #f8f9fa; border-radius: 12px; padding: 20px;
-      margin-bottom: 16px; border-left: 4px solid #27ae60;
-    }
+    .question-box { background: #f8f9fa; border-radius: 12px; padding: 20px; margin-bottom: 16px; border-left: 4px solid #27ae60; }
     .question-label { font-size: 13px; color: #888; margin-bottom: 8px; }
     .question-text { font-size: 15px; line-height: 1.8; color: #2c3e50; }
-
     .page-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
     .page-nav-info { font-size: 14px; color: #555; }
-
     .answer-sheet-wrap { background: white; border: 2px solid #222; margin-bottom: 16px; }
     .answer-sheet-header { display: flex; border-bottom: 2px solid #222; }
-    .answer-sheet-header .col-num {
-      width: 48px; border-right: 1px solid #222;
-      text-align: center; font-size: 12px; color: #555; padding: 6px 0; flex-shrink: 0;
-    }
+    .answer-sheet-header .col-num { width: 48px; border-right: 1px solid #222; text-align: center; font-size: 12px; color: #555; padding: 6px 0; flex-shrink: 0; }
     .answer-sheet-header .col-ans { flex: 1; text-align: center; font-size: 12px; color: #555; padding: 6px 0; }
     .answer-row { display: flex; border-bottom: 1px solid #ddd; height: 44px; }
     .answer-row:last-child { border-bottom: none; }
-    .row-num {
-      width: 48px; border-right: 1px solid #ddd;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 12px; color: #bbb; flex-shrink: 0;
-    }
-    .row-input {
-      flex: 1; border: none; outline: none;
-      font-size: 16px; font-family: 'Malgun Gothic', '맑은 고딕', sans-serif;
-      padding: 0 10px; color: #1a1a1a; height: 100%;
-    }
-    .answer-sheet-footer {
-      border-top: 2px solid #222; text-align: center;
-      font-size: 11px; color: #888; padding: 6px; letter-spacing: 2px;
-    }
-
+    .row-num { width: 48px; border-right: 1px solid #ddd; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #bbb; flex-shrink: 0; }
+    .row-input { flex: 1; border: none; outline: none; font-size: 16px; font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; padding: 0 10px; color: #1a1a1a; height: 100%; }
+    .answer-sheet-footer { border-top: 2px solid #222; text-align: center; font-size: 11px; color: #888; padding: 6px; letter-spacing: 2px; }
     .result-box { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 16px; }
     .result-title { font-size: 18px; font-weight: bold; color: #2c3e50; margin-bottom: 16px; }
     #exam-result-content { white-space: pre-wrap; line-height: 1.8; font-size: 15px; }
-
-    .flashcard {
-      background: white; border-radius: 16px; padding: 40px; text-align: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08); min-height: 200px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px; color: #2c3e50; margin-bottom: 16px; cursor: pointer;
-    }
+    .flashcard { background: white; border-radius: 16px; padding: 40px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08); min-height: 200px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #2c3e50; margin-bottom: 16px; cursor: pointer; }
     .btn-row { display: flex; gap: 8px; }
     .btn-again { background: #e74c3c; color: white; flex: 1; }
     .btn-hard { background: #e67e22; color: white; flex: 1; }
     .btn-good { background: #3498db; color: white; flex: 1; }
     .btn-easy { background: #27ae60; color: white; flex: 1; }
     .coming-soon { text-align: center; padding: 60px; color: #aaa; font-size: 18px; }
-
     .ai-box { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
     .ai-box textarea { width: 100%; height: 150px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; resize: vertical; margin-bottom: 12px; font-family: 'Malgun Gothic', sans-serif; }
     #ai-loading { text-align: center; color: #888; margin-top: 12px; display: none; }
     #ai-result { background: white; border-radius: 12px; padding: 24px; margin-top: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: none; white-space: pre-wrap; line-height: 1.8; }
-        .upload-area {
-      border: 2px dashed #ddd; border-radius: 12px; padding: 24px;
-      text-align: center; cursor: pointer; transition: all 0.2s; background: #fafafa;
-      position: relative;
-    }
+    .upload-area { border: 2px dashed #ddd; border-radius: 12px; padding: 24px; text-align: center; cursor: pointer; transition: all 0.2s; background: #fafafa; position: relative; }
     .upload-area:hover { border-color: #27ae60; background: #f0faf4; }
     .upload-area.has-file { border-color: #27ae60; background: #f0faf4; }
     .upload-area input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
@@ -134,7 +81,6 @@
     .rubric-badge { font-size: 11px; padding: 2px 8px; border-radius: 20px; display: inline-block; margin-top: 6px; }
     .rubric-badge.yes { background: #e8f8f0; color: #27ae60; }
     .rubric-badge.no { background: #fef3e8; color: #e67e22; }
-
   </style>
 </head>
 <body>
@@ -172,18 +118,15 @@
       <div class="card-sub">직전 모의고사</div>
     </div>
   </div>
-
   <div class="card" style="margin-bottom:16px;">
     <div class="card-title" style="margin-bottom:12px;">📈 점수 추이 (최근 10회)</div>
     <div id="score-chart"></div>
   </div>
-
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
       <div class="card-title">📋 최근 시험 기록</div>
       <button onclick="clearHistory()" style="font-size:12px;padding:4px 12px;border:1px solid #e74c3c;background:white;color:#e74c3c;border-radius:6px;cursor:pointer;">🗑️ 기록 전체 삭제</button>
     </div>
-
     <table style="width:100%;border-collapse:collapse;">
       <thead>
         <tr style="border-bottom:2px solid #f0f0f0;">
@@ -201,11 +144,9 @@
   </div>
 </div>
 
-
 <!-- 모의고사 -->
 <div id="exam" class="page">
   <div class="page-title">⏱️ 모의고사</div>
-
   <div id="exam-setup" class="exam-setup">
     <div class="form-group">
       <label>과목 선택</label>
@@ -237,7 +178,6 @@
         <textarea id="exam-question" placeholder="문제를 직접 입력하세요..." style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:14px;height:120px;resize:vertical;font-family:'Malgun Gothic',sans-serif;"></textarea>
       </div>
     </div>
-
     <div class="form-group">
       <label>시험 시간</label>
       <select id="exam-time">
@@ -269,7 +209,6 @@
     </div>
     <div class="answer-sheet-wrap">
       <div class="answer-sheet-header">
-        
         <div class="col-num">번호</div>
         <div class="col-ans">답 안 란</div>
       </div>
@@ -311,13 +250,9 @@
 <!-- AI 자료 변환 -->
 <div id="convert" class="page">
   <div class="page-title">🤖 AI 자료 변환</div>
-
-  <!-- 업로드 영역 -->
   <div class="card" style="margin-bottom:16px;">
     <div style="font-size:14px;font-weight:bold;color:#555;margin-bottom:16px;">📥 파일 업로드</div>
-
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
-      <!-- 문제 PDF -->
       <div>
         <div style="font-size:13px;font-weight:bold;color:#2c3e50;margin-bottom:8px;">📋 문제 파일</div>
         <div id="upload-q-box" class="upload-area" onclick="document.getElementById('upload-q').click()">
@@ -328,8 +263,6 @@
         </div>
         <div id="status-q" style="font-size:12px;color:#888;margin-top:6px;min-height:18px;"></div>
       </div>
-
-      <!-- 채점기준 PDF -->
       <div>
         <div style="font-size:13px;font-weight:bold;color:#2c3e50;margin-bottom:8px;">📝 채점기준 파일 <span style="font-size:11px;color:#aaa;font-weight:normal;">(선택)</span></div>
         <div id="upload-r-box" class="upload-area" onclick="document.getElementById('upload-r').click()">
@@ -341,8 +274,6 @@
         <div id="status-r" style="font-size:12px;color:#888;margin-top:6px;min-height:18px;"></div>
       </div>
     </div>
-
-    <!-- 과목 선택 -->
     <div style="margin-bottom:16px;">
       <div style="font-size:13px;font-weight:bold;color:#2c3e50;margin-bottom:8px;">📚 과목</div>
       <select id="convert-subject" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
@@ -353,11 +284,8 @@
         <option>민사소송법</option>
       </select>
     </div>
-
     <button onclick="extractAndSave()" id="convert-btn" class="btn btn-green">🤖 AI로 문제 추출 및 저장</button>
   </div>
-
-  <!-- 저장된 문제 목록 -->
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
       <div style="font-size:14px;font-weight:bold;color:#555;">📚 저장된 문제 목록</div>
@@ -387,6 +315,8 @@
 </div>
 
 <script>
+  const API_KEY = 'AIzaSyBMBCS7PgqT0A_KI2e6OPqu-53LVhjLltY';
+
   // 페이지 전환
   function showPage(id, el) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -402,44 +332,30 @@
   const diff = Math.ceil((examDate - today) / (1000*60*60*24));
   document.getElementById('dday').textContent = 'D-' + diff;
 
+  // 대시보드
   function renderDashboard() {
     const history = JSON.parse(localStorage.getItem('examHistory') || '[]');
-
-    // 모의고사 횟수
     document.getElementById('exam-count').textContent = history.length + '회';
-
-    // 최근 점수
     if (history.length > 0) {
       const last = history[history.length - 1];
       document.getElementById('last-score').textContent = last.score ? last.score + '점' : '-';
     }
-
-    // 점수 추이 그래프
     const chartEl = document.getElementById('score-chart');
     if (history.length === 0) {
       chartEl.innerHTML = '<div style="text-align:center;padding:40px;color:#aaa;">모의고사를 응시하면 점수가 표시돼요!</div>';
-      return;
-    }
-
-    const recent = history.slice(-10);
-    const max = 100;
-    const bars = recent.map(r => {
-      const h = r.score ? Math.round((r.score / max) * 120) : 0;
-      const color = r.score >= 80 ? '#27ae60' : r.score >= 60 ? '#3498db' : '#e74c3c';
-      return `
-        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+    } else {
+      const recent = history.slice(-10);
+      const bars = recent.map(r => {
+        const h = r.score ? Math.round((r.score / 100) * 120) : 0;
+        const color = r.score >= 80 ? '#27ae60' : r.score >= 60 ? '#3498db' : '#e74c3c';
+        return `<div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
           <div style="font-size:11px;font-weight:bold;color:${color};">${r.score ?? '-'}점</div>
           <div style="width:36px;height:${h}px;background:${color};border-radius:4px 4px 0 0;"></div>
           <div style="font-size:10px;color:#aaa;writing-mode:vertical-rl;transform:rotate(180deg);height:50px;">${r.date}</div>
         </div>`;
-    }).join('');
-
-    chartEl.innerHTML = `
-      <div style="display:flex;align-items:flex-end;gap:8px;height:180px;padding:0 8px;">
-        ${bars}
-      </div>`;
-
-    // 히스토리 목록
+      }).join('');
+      chartEl.innerHTML = `<div style="display:flex;align-items:flex-end;gap:8px;height:180px;padding:0 8px;">${bars}</div>`;
+    }
     const histEl = document.getElementById('exam-history-list');
     const rows = history.slice().reverse().slice(0, 5).map(r => `
       <tr style="border-bottom:1px solid #f0f0f0;">
@@ -451,7 +367,6 @@
           <button onclick="retryExam(${r.id})" style="font-size:12px;padding:4px 10px;border:1px solid #27ae60;background:white;color:#27ae60;border-radius:6px;cursor:pointer;">재도전</button>
         </td>
       </tr>`).join('');
-
     histEl.innerHTML = rows || '<tr><td colspan="5" style="text-align:center;padding:20px;color:#aaa;">기록 없음</td></tr>';
   }
 
@@ -459,8 +374,7 @@
     const history = JSON.parse(localStorage.getItem('examHistory') || '[]');
     const record = history.find(r => r.id === id);
     if (!record) return;
-    showPage('exam', document.querySelector('.nav-menu a:nth-child(2)'));
-    document.getElementById('exam-question').value = record.question;
+    showPage('exam', document.querySelector('.nav-menu li:nth-child(2) a'));
     document.getElementById('exam-setup').style.display = 'block';
     document.getElementById('exam-result').style.display = 'none';
   }
@@ -473,7 +387,6 @@
 
   renderDashboard();
 
-
   // 모의고사
   let timerInterval = null;
   let remainSeconds = 0;
@@ -481,46 +394,6 @@
   let currentPage = 1;
   const LINES_PER_PAGE = 22;
   let allLines = {};
-
-  function startExam() {
-    const question = document.getElementById('exam-question').value;
-    if (!question.trim()) { alert('문제를 입력해주세요!'); return; }
-
-    const subject = document.getElementById('exam-subject').value;
-    const minutes = parseInt(document.getElementById('exam-time').value);
-    remainSeconds = minutes * 60;
-
-    if (minutes === 25) totalPages = 5;
-    else if (minutes === 50) totalPages = 10;
-    else if (minutes === 75) totalPages = 15;
-    else totalPages = 20;
-
-    currentPage = 1;
-    allLines = {};
-
-    document.getElementById('exam-subject-display').textContent = subject;
-    document.getElementById('exam-question-display').textContent = question;
-    document.getElementById('total-pages').textContent = totalPages;
-    document.getElementById('current-page').textContent = 1;
-
-    document.getElementById('exam-setup').style.display = 'none';
-    document.getElementById('exam-room').style.display = 'block';
-
-    renderPage(1);
-    updateTimer();
-
-    timerInterval = setInterval(() => {
-      remainSeconds--;
-      updateTimer();
-      if (remainSeconds <= 0) {
-        clearInterval(timerInterval);
-        alert('⏰ 시간이 종료되었습니다!');
-        submitExam();
-      }
-    }, 1000);
-
-    document.addEventListener('keydown', handleKeyPage);
-  }
 
   function handleKeyPage(e) {
     if (e.ctrlKey && e.key === 'ArrowRight') { e.preventDefault(); changePage(1); }
@@ -530,29 +403,23 @@
   function saveCurrentPage() {
     const inputs = document.querySelectorAll('.row-input');
     if (!allLines[currentPage]) allLines[currentPage] = {};
-    inputs.forEach((input, i) => {
-      allLines[currentPage][i + 1] = input.value;
-    });
+    inputs.forEach((input, i) => { allLines[currentPage][i + 1] = input.value; });
   }
 
   function renderPage(page) {
     const container = document.getElementById('answer-lines');
     container.innerHTML = '';
-
     for (let i = 1; i <= LINES_PER_PAGE; i++) {
       const row = document.createElement('div');
       row.className = 'answer-row';
-
       const num = document.createElement('div');
       num.className = 'row-num';
       num.textContent = i;
-
       const input = document.createElement('input');
       input.type = 'text';
       input.className = 'row-input';
       input.maxLength = 45;
       input.value = (allLines[page] && allLines[page][i]) ? allLines[page][i] : '';
-
       input.addEventListener('keydown', (e) => {
         const inputs = document.querySelectorAll('.row-input');
         const idx = Array.from(inputs).indexOf(e.target);
@@ -565,7 +432,6 @@
           if (idx > 0) { e.preventDefault(); inputs[idx - 1].focus(); }
         }
       });
-
       input.addEventListener('input', (e) => {
         countChars();
         if (e.target.value.length >= 45) {
@@ -576,12 +442,10 @@
           else changePage(1);
         }
       });
-
       row.appendChild(num);
       row.appendChild(input);
       container.appendChild(row);
     }
-
     document.getElementById('current-page').textContent = page;
     const firstInput = container.querySelector('.row-input');
     if (firstInput) firstInput.focus();
@@ -608,9 +472,7 @@
 
   function countChars() {
     let total = 0;
-    document.querySelectorAll('.row-input').forEach(input => {
-      total += input.value.length;
-    });
+    document.querySelectorAll('.row-input').forEach(input => { total += input.value.length; });
     Object.keys(allLines).forEach(page => {
       if (parseInt(page) !== currentPage) {
         Object.values(allLines[page]).forEach(val => { total += val.length; });
@@ -632,343 +494,6 @@
     return result.trim();
   }
 
-  async function submitExam() {
-    clearInterval(timerInterval);
-    document.removeEventListener('keydown', handleKeyPage);
-    const question = document.getElementById('exam-question-display').textContent;
-    const answer = getAllAnswer();
-    const subject = document.getElementById('exam-subject-display').textContent;
-    const examMinutes = parseInt(document.getElementById('exam-time').value);
-
-    document.getElementById('exam-room').style.display = 'none';
-    document.getElementById('exam-result').style.display = 'block';
-    document.getElementById('exam-result-content').textContent = '⏳ AI 첨삭 중...';
-
-    const API_KEY = 'AIzaSyBMBCS7PgqT0A_KI2e6OPqu-53LVhjLltY';
-    const prompt = `당신은 노무사 2차 시험 전문 채점관입니다.
-
-과목: ${subject}
-문제: ${question}
-수험생 답안: ${answer}
-
-아래 기준으로 채점해주세요:
-
-【채점 기준】
-- 쟁점 파악 (25점): 핵심 쟁점을 정확히 파악했는가
-- 법적 근거 인용 (30점): 관련 법조문/판례를 정확히 인용했는가
-- 논리적 전개 (25점): 논리적으로 체계적으로 서술했는가
-- 결론 명확성 (10점): 결론이 명확한가
-- 답안 형식·구조 (10점): 목차/들여쓰기 등 형식이 적절한가
-
-【출력 형식】
-총점: XX점 / 100점
-
-항목별 점수:
-- 쟁점 파악: XX/25
-- 법적 근거 인용: XX/30
-- 논리적 전개: XX/25
-- 결론 명확성: XX/10
-- 답안 형식·구조: XX/10
-
-✅ 잘한 점:
-(구체적으로)
-
-❌ 누락된 쟁점:
-(구체적으로)
-
-💡 개선 포인트:
-(구체적으로)
-
-📌 다음에 반드시 챙길 것 3가지:
-1.
-2.
-3.`;
-
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-    });
-    const data = await response.json();
-    const result = data.candidates[0].content.parts[0].text;
-    document.getElementById('exam-result-content').textContent = result;
-
-    // 점수 추출 (총점: XX점)
-    const scoreMatch = result.match(/총점[:\s]*(\d+)점/);
-    const score = scoreMatch ? parseInt(scoreMatch[1]) : null;
-
-    // 기록 저장
-    const record = {
-      id: Date.now(),
-      date: new Date().toLocaleDateString('ko-KR'),
-      subject: subject,
-      question: question,
-      answer: answer,
-      score: score,
-      feedback: result,
-      minutes: examMinutes
-    };
-    const history = JSON.parse(localStorage.getItem('examHistory') || '[]');
-    history.push(record);
-    localStorage.setItem('examHistory', JSON.stringify(history));
-    renderDashboard();
-  }
-
-  function resetExam() {
-    document.removeEventListener('keydown', handleKeyPage);
-    document.getElementById('exam-result').style.display = 'none';
-    document.getElementById('exam-setup').style.display = 'block';
-    document.getElementById('exam-question').value = '';
-    allLines = {};
-    currentPage = 1;
-  }
-
-  // 플래시카드
-  let isFlipped = false;
-  function flipCard() {
-    isFlipped = !isFlipped;
-    document.getElementById('flashcard-text').textContent = isFlipped ? '뒷면 내용이에요!' : '카드를 클릭하면 뒤집혀요!';
-  }
-  function nextCard() {
-    isFlipped = false;
-    document.getElementById('flashcard-text').textContent = '카드를 클릭하면 뒤집혀요!';
-  }
-
-  // AI 질문
-  async function askAI() {
-    const question = document.getElementById('ai-question').value;
-    if (!question.trim()) { alert('질문을 입력해주세요!'); return; }
-    document.getElementById('ai-loading').style.display = 'block';
-    document.getElementById('ai-result').style.display = 'none';
-
-    const API_KEY = 'AIzaSyBMBCS7PgqT0A_KI2e6OPqu-53LVhjLltY';
-    const prompt = `당신은 노무사 2차 시험 전문 강사입니다. 다음 질문에 답해주세요:\n\n${question}`;
-
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-    });
-    const data = await response.json();
-    const result = data.candidates[0].content.parts[0].text;
-    document.getElementById('ai-loading').style.display = 'none';
-    document.getElementById('ai-result').style.display = 'block';
-    document.getElementById('ai-result').textContent = result;
-  }
-  // ========== AI 자료 변환 ==========
-  let pdfTextQ = '';   // 문제 PDF 텍스트
-  let pdfTextR = '';   // 채점기준 PDF 텍스트
-
-  async function handleUpload(type, input) {
-    const file = input.files[0];
-    if (!file) return;
-
-    const statusEl = document.getElementById('status-' + type);
-    const boxEl = document.getElementById('upload-' + type + '-box');
-    statusEl.textContent = '⏳ PDF 읽는 중...';
-
-    try {
-      const text = await extractPDFText(file);
-      if (type === 'q') pdfTextQ = text;
-      else pdfTextR = text;
-
-      boxEl.classList.add('has-file');
-      statusEl.textContent = `✅ ${file.name} (${Math.round(text.length/100)/10}KB 추출)`;
-      statusEl.style.color = '#27ae60';
-    } catch(e) {
-      statusEl.textContent = '❌ PDF 읽기 실패';
-      statusEl.style.color = '#e74c3c';
-    }
-  }
-
-  async function extractPDFText(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        try {
-          const typedArray = new Uint8Array(e.target.result);
-          const pdf = await pdfjsLib.getDocument(typedArray).promise;
-          let text = '';
-          for (let i = 1; i <= pdf.numPages; i++) {
-            const page = await pdf.getPage(i);
-            const content = await page.getTextContent();
-            text += content.items.map(item => item.str).join(' ') + '\n';
-          }
-          resolve(text);
-        } catch(e) { reject(e); }
-      };
-      reader.readAsArrayBuffer(file);
-    });
-  }
-
-  async function extractAndSave() {
-    if (!pdfTextQ.trim()) { alert('문제 PDF를 먼저 업로드해주세요!'); return; }
-
-    const subject = document.getElementById('convert-subject').value;
-    const btn = document.getElementById('convert-btn');
-    btn.textContent = '⏳ AI가 문제 추출 중...';
-    btn.disabled = true;
-
-    const API_KEY = 'AIzaSyBMBCS7PgqT0A_KI2e6OPqu-53LVhjLltY';
-
-    // 텍스트 길이 제한 (너무 길면 잘라서 전송)
-    const qText = pdfTextQ.slice(0, 4000);
-    const rText = pdfTextR ? pdfTextR.slice(0, 4000) : '';
-
-    const prompt = `당신은 노무사 2차 시험 전문가입니다.
-아래 자료에서 시험 문제를 추출해주세요.
-
-[문제 자료]
-${qText}
-
-${rText ? `[채점기준/채점평 자료]\n${rText}` : ''}
-
-다음 규칙을 따라주세요:
-1. 문제를 하나씩 추출하세요
-2. 채점기준 자료가 있으면 각 문제에 맞는 채점기준을 매칭해주세요
-3. 채점기준이 없으면 rubric 필드를 빈 문자열로 두세요
-4. 반드시 아래 JSON 형식으로만 답하세요 (다른 텍스트 없이)
-
-[
-  {
-    "subject": "${subject}",
-    "question": "문제 전체 내용",
-    "rubric": "채점기준 및 채점평 내용 (없으면 빈 문자열)",
-    "source": "파일명 또는 출처"
-  }
-]`;
-
-    try {
-      const response = await fetch(
-        'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + API_KEY,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }]
-          })
-        }
-      );
-      
-      const raw = await response.text();
-      console.log('전체 응답:', raw);
-      alert('응답: ' + raw.slice(0, 300));
-      
-      
-      const data = JSON.parse(raw);
-      if (!data.candidates || data.candidates.length === 0) {
-        throw new Error(raw.slice(0, 200));
-      }
-      const result = data.candidates[0].content.parts[0].text;
-
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: { maxOutputTokens: 8192 }
-          })
-        }
-      );
-      const data = await response.json();
-      const result = data.candidates[0].content.parts[0].text;
-
-      // JSON 추출 (```json ``` 제거 후 파싱)
-      let cleaned = result
-        .replace(/```json/gi, '')
-        .replace(/```/g, '')
-        .trim();
-
-      const jsonMatch = cleaned.match(/$$$[\s\S]*$$$/);
-      if (!jsonMatch) throw new Error('JSON 파싱 실패');
-
-      // 잘린 JSON 복구 시도
-      let jsonStr = jsonMatch[0];
-      try {
-        var questions = JSON.parse(jsonStr);
-      } catch(e) {
-        // 마지막 불완전한 객체 제거 후 재시도
-        jsonStr = jsonStr.replace(/,\s*\{[^}]*$/, '') + ']';
-        var questions = JSON.parse(jsonStr);
-      }
-
-      // 저장
-      const db = JSON.parse(localStorage.getItem('questionDB') || '[]');
-      questions.forEach(q => {
-        db.push({
-          id: Date.now() + Math.random(),
-          subject: q.subject || subject,
-          question: q.question,
-          rubric: q.rubric || '',
-          source: q.source || '업로드 자료',
-          createdAt: new Date().toLocaleDateString('ko-KR')
-        });
-      });
-      localStorage.setItem('questionDB', JSON.stringify(db));
-
-      alert(`✅ 문제 ${questions.length}개 저장 완료!`);
-      renderQuestionDB();
-
-      // 초기화
-      pdfTextQ = '';
-      pdfTextR = '';
-      document.getElementById('upload-q').value = '';
-      document.getElementById('upload-r').value = '';
-      document.getElementById('upload-q-box').classList.remove('has-file');
-      document.getElementById('upload-r-box').classList.remove('has-file');
-      document.getElementById('status-q').textContent = '';
-      document.getElementById('status-r').textContent = '';
-
-    } catch(e) {
-      alert('추출 실패! 다시 시도해주세요.\n' + e.message);
-    }
-
-    btn.textContent = '🤖 AI로 문제 추출 및 저장';
-    btn.disabled = false;
-  }
-
-  function renderQuestionDB() {
-    const db = JSON.parse(localStorage.getItem('questionDB') || '[]');
-    const el = document.getElementById('question-db-list');
-    if (db.length === 0) {
-      el.innerHTML = '<div style="text-align:center;padding:40px;color:#aaa;">저장된 문제가 없어요!<br>PDF를 업로드해서 문제를 추출해보세요 😊</div>';
-      return;
-    }
-    el.innerHTML = db.slice().reverse().map((q, i) => `
-      <div class="q-card ${q.rubric ? 'has-rubric' : 'no-rubric'}">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <div style="flex:1;">
-            <div style="font-size:11px;color:#27ae60;font-weight:bold;margin-bottom:6px;">${q.subject}</div>
-            <div style="font-size:14px;color:#2c3e50;line-height:1.7;">${q.question.slice(0, 100)}${q.question.length > 100 ? '...' : ''}</div>
-            <div style="margin-top:8px;">
-              <span class="rubric-badge ${q.rubric ? 'yes' : 'no'}">
-                ${q.rubric ? '✅ 채점기준 있음' : '⚠️ 채점기준 없음 (AI 자동채점)'}
-              </span>
-            </div>
-            <div style="font-size:11px;color:#aaa;margin-top:4px;">${q.source} · ${q.createdAt}</div>
-          </div>
-          <button onclick="deleteQuestion('${q.id}')" style="font-size:11px;padding:4px 8px;border:1px solid #eee;background:white;color:#aaa;border-radius:6px;cursor:pointer;margin-left:8px;flex-shrink:0;">삭제</button>
-        </div>
-      </div>
-    `).join('');
-  }
-
-  function deleteQuestion(id) {
-    let db = JSON.parse(localStorage.getItem('questionDB') || '[]');
-    db = db.filter(q => String(q.id) !== String(id));
-    localStorage.setItem('questionDB', JSON.stringify(db));
-    renderQuestionDB();
-    loadQuestionDB();
-  }
-
-  function clearQuestionDB() {
-    if (!confirm('저장된 문제를 전체 삭제할까요?')) return;
-    localStorage.removeItem('questionDB');
-    renderQuestionDB();
-    loadQuestionDB();
-  }
-
-  // ========== 모의고사 문제 선택 ==========
   function switchQTab(tab) {
     document.getElementById('q-input-saved').style.display = tab === 'saved' ? 'block' : 'none';
     document.getElementById('q-input-direct').style.display = tab === 'direct' ? 'block' : 'none';
@@ -983,7 +508,16 @@ ${rText ? `[채점기준/채점평 자료]\n${rText}` : ''}
   function fillQuestion(val) {
     const preview = document.getElementById('selected-question-preview');
     if (!val) { preview.style.display = 'none'; return; }
-    preview.textContent = val;
+    const db = JSON.parse(localStorage.getItem('questionDB') || '[]');
+    const q = db.find(q => String(q.id) === String(val));
+    if (!q) return;
+    preview.innerHTML = `
+      <div style="font-size:14px;line-height:1.8;color:#2c3e50;">${q.question}</div>
+      <div style="margin-top:8px;">
+        <span class="rubric-badge ${q.rubric ? 'yes' : 'no'}">
+          ${q.rubric ? '✅ 채점기준 있음' : '⚠️ 채점기준 없음 (AI 자동채점)'}
+        </span>
+      </div>`;
     preview.style.display = 'block';
   }
 
@@ -995,32 +529,14 @@ ${rText ? `[채점기준/채점평 자료]\n${rText}` : ''}
     db.forEach(q => {
       const opt = document.createElement('option');
       opt.value = q.id;
-      opt.textContent = `[${q.subject}] ${q.question.slice(0, 30)}...`;
+      opt.textContent = '[' + q.subject + '] ' + q.question.slice(0, 30) + '...';
       select.appendChild(opt);
     });
   }
 
-  function fillQuestion(val) {
-    const preview = document.getElementById('selected-question-preview');
-    if (!val) { preview.style.display = 'none'; return; }
-    const db = JSON.parse(localStorage.getItem('questionDB') || '[]');
-    const q = db.find(q => String(q.id) === String(val));
-    if (!q) return;
-    preview.innerHTML = `
-      <div style="font-size:14px;line-height:1.8;color:#2c3e50;">${q.question}</div>
-      <div style="margin-top:8px;">
-        <span class="rubric-badge ${q.rubric ? 'yes' : 'no'}" style="font-size:11px;padding:2px 8px;border-radius:20px;display:inline-block;">
-          ${q.rubric ? '✅ 채점기준 있음' : '⚠️ 채점기준 없음 (AI 자동채점)'}
-        </span>
-      </div>`;
-    preview.style.display = 'block';
-  }
-
-  // ========== 모의고사 시작 (문제 ID로 가져오기) ==========
   function startExam() {
     let question = '';
     let rubric = '';
-    let questionId = '';
 
     const savedVal = document.getElementById('exam-question-select')?.value;
     const directVal = document.getElementById('exam-question')?.value;
@@ -1028,7 +544,7 @@ ${rText ? `[채점기준/채점평 자료]\n${rText}` : ''}
     if (savedVal) {
       const db = JSON.parse(localStorage.getItem('questionDB') || '[]');
       const q = db.find(q => String(q.id) === String(savedVal));
-      if (q) { question = q.question; rubric = q.rubric || ''; questionId = q.id; }
+      if (q) { question = q.question; rubric = q.rubric || ''; }
     } else if (directVal && directVal.trim()) {
       question = directVal.trim();
       rubric = '';
@@ -1047,8 +563,6 @@ ${rText ? `[채점기준/채점평 자료]\n${rText}` : ''}
 
     currentPage = 1;
     allLines = {};
-
-    // 채점기준 임시 저장
     window._currentRubric = rubric;
     window._currentQuestion = question;
 
@@ -1056,7 +570,6 @@ ${rText ? `[채점기준/채점평 자료]\n${rText}` : ''}
     document.getElementById('exam-question-display').textContent = question;
     document.getElementById('total-pages').textContent = totalPages;
     document.getElementById('current-page').textContent = 1;
-
     document.getElementById('exam-setup').style.display = 'none';
     document.getElementById('exam-room').style.display = 'block';
 
@@ -1076,7 +589,6 @@ ${rText ? `[채점기준/채점평 자료]\n${rText}` : ''}
     document.addEventListener('keydown', handleKeyPage);
   }
 
-  // ========== 답안 제출 및 채점 ==========
   async function submitExam() {
     clearInterval(timerInterval);
     document.removeEventListener('keydown', handleKeyPage);
@@ -1091,9 +603,6 @@ ${rText ? `[채점기준/채점평 자료]\n${rText}` : ''}
     document.getElementById('exam-result').style.display = 'block';
     document.getElementById('exam-result-content').textContent = '⏳ AI 채점 중...';
 
-    const API_KEY = 'AIzaSyBMBCS7PgqT0A_KI2e6OPqu-53LVhjLltY';
-
-    // 채점기준 있으면 사용, 없으면 AI 자동채점
     const prompt = rubric
       ? `당신은 노무사 2차 시험 전문 채점관입니다.
 
@@ -1127,10 +636,7 @@ ${answer}
 1.
 2.
 3.`
-
       : `당신은 노무사 2차 시험 전문 채점관입니다.
-등록된 채점기준이 없으므로 노무사 2차 시험 수준에 맞게 채점해주세요.
-노무사 시험 전문 강사 교재 및 기출 채점 기준을 참고하여 채점합니다.
 
 과목: ${subject}
 문제: ${question}
@@ -1173,7 +679,7 @@ ${answer}
 
     try {
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`,
+        'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + API_KEY,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -1185,18 +691,14 @@ ${answer}
       );
       const data = await response.json();
       if (!data.candidates || data.candidates.length === 0) {
-        const errMsg = data.error ? data.error.message : 'unknown error';
-        throw new Error(errMsg);
+        throw new Error(JSON.stringify(data.error || 'unknown error'));
       }
       const result = data.candidates[0].content.parts[0].text;
-
       document.getElementById('exam-result-content').textContent = result;
 
-      // 점수 추출
       const scoreMatch = result.match(/총점[:\s]*(\d+)점/);
       const score = scoreMatch ? parseInt(scoreMatch[1]) : null;
 
-      // 기록 저장
       const record = {
         id: Date.now(),
         date: new Date().toLocaleDateString('ko-KR'),
@@ -1228,11 +730,224 @@ ${answer}
     window._currentQuestion = '';
   }
 
+  // 플래시카드
+  let isFlipped = false;
+  function flipCard() {
+    isFlipped = !isFlipped;
+    document.getElementById('flashcard-text').textContent = isFlipped ? '뒷면 내용이에요!' : '카드를 클릭하면 뒤집혀요!';
+  }
+  function nextCard() {
+    isFlipped = false;
+    document.getElementById('flashcard-text').textContent = '카드를 클릭하면 뒤집혀요!';
+  }
+
+  // AI 질문
+  async function askAI() {
+    const question = document.getElementById('ai-question').value;
+    if (!question.trim()) { alert('질문을 입력해주세요!'); return; }
+    document.getElementById('ai-loading').style.display = 'block';
+    document.getElementById('ai-result').style.display = 'none';
+
+    const prompt = '당신은 노무사 2차 시험 전문 강사입니다. 다음 질문에 답해주세요:\n\n' + question;
+
+    try {
+      const response = await fetch(
+        'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + API_KEY,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }]
+          })
+        }
+      );
+      const data = await response.json();
+      if (!data.candidates || data.candidates.length === 0) {
+        throw new Error(JSON.stringify(data.error || 'unknown error'));
+      }
+      const result = data.candidates[0].content.parts[0].text;
+      document.getElementById('ai-loading').style.display = 'none';
+      document.getElementById('ai-result').style.display = 'block';
+      document.getElementById('ai-result').textContent = result;
+    } catch(e) {
+      document.getElementById('ai-loading').style.display = 'none';
+      alert('오류가 발생했어요!\n' + e.message);
+    }
+  }
+
+  // AI 자료 변환
+  let pdfTextQ = '';
+  let pdfTextR = '';
+
+  async function handleUpload(type, input) {
+    const file = input.files[0];
+    if (!file) return;
+    const statusEl = document.getElementById('status-' + type);
+    const boxEl = document.getElementById('upload-' + type + '-box');
+    statusEl.textContent = '⏳ PDF 읽는 중...';
+    try {
+      const text = await extractPDFText(file);
+      if (type === 'q') pdfTextQ = text;
+      else pdfTextR = text;
+      boxEl.classList.add('has-file');
+      statusEl.textContent = '✅ ' + file.name + ' (' + Math.round(text.length/100)/10 + 'KB 추출)';
+      statusEl.style.color = '#27ae60';
+    } catch(e) {
+      statusEl.textContent = '❌ PDF 읽기 실패';
+      statusEl.style.color = '#e74c3c';
+    }
+  }
+
+  async function extractPDFText(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const typedArray = new Uint8Array(e.target.result);
+          const pdf = await pdfjsLib.getDocument(typedArray).promise;
+          let text = '';
+          for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const content = await page.getTextContent();
+            text += content.items.map(item => item.str).join(' ') + '\n';
+          }
+          resolve(text);
+        } catch(e) { reject(e); }
+      };
+      reader.readAsArrayBuffer(file);
+    });
+  }
+
+  async function extractAndSave() {
+    if (!pdfTextQ.trim()) { alert('문제 PDF를 먼저 업로드해주세요!'); return; }
+
+    const subject = document.getElementById('convert-subject').value;
+    const btn = document.getElementById('convert-btn');
+    btn.textContent = '⏳ AI가 문제 추출 중...';
+    btn.disabled = true;
+
+    const qText = pdfTextQ.slice(0, 4000);
+    const rText = pdfTextR ? pdfTextR.slice(0, 4000) : '';
+
+    const prompt = '당신은 노무사 2차 시험 전문가입니다.\n아래 자료에서 시험 문제를 추출해주세요.\n\n[문제 자료]\n' + qText + '\n\n' + (rText ? '[채점기준/채점평 자료]\n' + rText + '\n\n' : '') + '다음 규칙을 따라주세요:\n1. 문제를 하나씩 추출하세요\n2. 채점기준 자료가 있으면 각 문제에 맞는 채점기준을 매칭해주세요\n3. 채점기준이 없으면 rubric 필드를 빈 문자열로 두세요\n4. 반드시 아래 JSON 형식으로만 답하세요 (다른 텍스트 없이)\n\n[\n  {\n    "subject": "' + subject + '",\n    "question": "문제 전체 내용",\n    "rubric": "채점기준 내용 (없으면 빈 문자열)",\n    "source": "출처"\n  }\n]';
+
+    try {
+      const response = await fetch(
+        'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + API_KEY,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { maxOutputTokens: 8192 }
+          })
+        }
+      );
+
+      const data = await response.json();
+      if (!data.candidates || data.candidates.length === 0) {
+        throw new Error(JSON.stringify(data.error || 'unknown error'));
+      }
+
+      const result = data.candidates[0].content.parts[0].text;
+
+      let cleaned = result
+        .replace(/```json/gi, '')
+        .replace(/```/g, '')
+        .trim();
+
+      const jsonMatch = cleaned.match(/$$$[\s\S]*$$$/);
+      if (!jsonMatch) throw new Error('JSON 파싱 실패: ' + cleaned.slice(0, 100));
+
+      let jsonStr = jsonMatch[0];
+      let questions;
+      try {
+        questions = JSON.parse(jsonStr);
+      } catch(e) {
+        jsonStr = jsonStr.replace(/,\s*\{[^}]*$/, '') + ']';
+        questions = JSON.parse(jsonStr);
+      }
+
+      const db = JSON.parse(localStorage.getItem('questionDB') || '[]');
+      questions.forEach(q => {
+        db.push({
+          id: Date.now() + Math.random(),
+          subject: q.subject || subject,
+          question: q.question,
+          rubric: q.rubric || '',
+          source: q.source || '업로드 자료',
+          createdAt: new Date().toLocaleDateString('ko-KR')
+        });
+      });
+      localStorage.setItem('questionDB', JSON.stringify(db));
+
+      alert('✅ 문제 ' + questions.length + '개 저장 완료!');
+      renderQuestionDB();
+      loadQuestionDB();
+
+      pdfTextQ = '';
+      pdfTextR = '';
+      document.getElementById('upload-q').value = '';
+      document.getElementById('upload-r').value = '';
+      document.getElementById('upload-q-box').classList.remove('has-file');
+      document.getElementById('upload-r-box').classList.remove('has-file');
+      document.getElementById('status-q').textContent = '';
+      document.getElementById('status-r').textContent = '';
+
+    } catch(e) {
+      alert('추출 실패! 다시 시도해주세요.\n' + e.message);
+    }
+
+    btn.textContent = '🤖 AI로 문제 추출 및 저장';
+    btn.disabled = false;
+  }
+
+  function renderQuestionDB() {
+    const db = JSON.parse(localStorage.getItem('questionDB') || '[]');
+    const el = document.getElementById('question-db-list');
+    if (db.length === 0) {
+      el.innerHTML = '<div style="text-align:center;padding:40px;color:#aaa;">저장된 문제가 없어요!<br>PDF를 업로드해서 문제를 추출해보세요 😊</div>';
+      return;
+    }
+    el.innerHTML = db.slice().reverse().map(q => `
+      <div class="q-card ${q.rubric ? 'has-rubric' : 'no-rubric'}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div style="flex:1;">
+            <div style="font-size:11px;color:#27ae60;font-weight:bold;margin-bottom:6px;">${q.subject}</div>
+            <div style="font-size:14px;color:#2c3e50;line-height:1.7;">${q.question.slice(0,100)}${q.question.length > 100 ? '...' : ''}</div>
+            <div style="margin-top:8px;">
+              <span class="rubric-badge ${q.rubric ? 'yes' : 'no'}">
+                ${q.rubric ? '✅ 채점기준 있음' : '⚠️ 채점기준 없음 (AI 자동채점)'}
+              </span>
+            </div>
+            <div style="font-size:11px;color:#aaa;margin-top:4px;">${q.source} · ${q.createdAt}</div>
+          </div>
+          <button onclick="deleteQuestion('${q.id}')" style="font-size:11px;padding:4px 8px;border:1px solid #eee;background:white;color:#aaa;border-radius:6px;cursor:pointer;margin-left:8px;flex-shrink:0;">삭제</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function deleteQuestion(id) {
+    let db = JSON.parse(localStorage.getItem('questionDB') || '[]');
+    db = db.filter(q => String(q.id) !== String(id));
+    localStorage.setItem('questionDB', JSON.stringify(db));
+    renderQuestionDB();
+    loadQuestionDB();
+  }
+
+  function clearQuestionDB() {
+    if (!confirm('저장된 문제를 전체 삭제할까요?')) return;
+    localStorage.removeItem('questionDB');
+    renderQuestionDB();
+    loadQuestionDB();
+  }
+
   // 페이지 로드시 실행
   renderQuestionDB();
   loadQuestionDB();
- 
 
 </script>
 </body>
 </html>
+
