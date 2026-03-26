@@ -1028,6 +1028,14 @@
       const container = document.getElementById('quiz-lines');
       container.innerHTML = '';
 
+      // 모든 빈칸 중 가장 긴 정답의 글자 수 계산 (길이로 힌트를 얻지 못하도록 통일)
+      const blankLines = blankState.lines.filter(l => l.isBlank);
+      const maxCharLen = blankLines.length > 0
+        ? Math.max(...blankLines.map(l => l.content.length))
+        : 15;
+      // 최소 15자 이상의 너비로 일괄 통일
+      const uniformWidth = `calc(${Math.max(maxCharLen, 15)}ch + 32px)`;
+
       blankState.lines.forEach(line => {
         const row = document.createElement('div');
         // 들여쓰기 유지를 위해 whitespace-pre 속성 적용
@@ -1044,9 +1052,8 @@
           input.className = "blank-input";
           input.dataset.answer = line.content;
           
-          // 정답 길이에 비례하여 동적 너비 설정 (텍스트 잘림 방지)
-          const charLen = line.content.length;
-          input.style.width = `calc(${charLen}ch + 32px)`;
+          // 정답 길이에 상관없이 가장 긴 빈칸에 맞춰 너비 통일 (힌트 방지 및 글자 잘림 방지)
+          input.style.width = uniformWidth;
           
           // 포커스 될 때마다 활성 인풋 기록 (단어 풀 입력을 위해) 및 초기화
           input.addEventListener('focus', (e) => {
