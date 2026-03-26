@@ -362,7 +362,7 @@
       const input = document.createElement('input');
       input.type = 'text';
       input.className = 'row-input';
-      input.maxLength = 28;
+      input.maxLength = 45;
       input.value = (allLines[page] && allLines[page][i]) ? allLines[page][i] : '';
 
       input.addEventListener('keydown', (e) => {
@@ -380,7 +380,7 @@
 
       input.addEventListener('input', (e) => {
         countChars();
-        if (e.target.value.length >= 28) {
+        if (e.target.value.length >= 45) {
           saveCurrentPage();
           const inputs = document.querySelectorAll('.row-input');
           const idx = Array.from(inputs).indexOf(e.target);
