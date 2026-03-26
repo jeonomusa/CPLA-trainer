@@ -139,7 +139,7 @@
       <div class="card">
         <div class="card-title">시험까지</div>
         <div class="card-value dday" id="dday">D-?</div>
-        <div class="card-sub">2026년 노무사 1차</div>
+        <div class="card-sub">2026년 노무사 2차</div>
       </div>
       <div class="card">
         <div class="card-title">연속 학습일</div>
@@ -165,12 +165,15 @@
       <div class="form-group">
         <label>과목 선택</label>
         <select>
-          <option>노동법 1 (개별적 근로관계법)</option>
-          <option>노동법 2 (집단적 노사관계법)</option>
-          <option>인사노무관리론</option>
-          <option>경영조직론</option>
-          <option>노동경제학</option>
-          <option>사회보험법</option>
+          <optgroup label="공통과목">
+            <option>노동법Ⅰ (개별적 근로관계법)</option>
+            <option>노동법Ⅱ (집단적 노사관계법)</option>
+            <option>인사노무관리</option>
+            <option>행정쟁송법</option>
+          </optgroup>
+          <optgroup label="선택과목"></optgroup>
+            <option>민사소송법</option>
+          </optgroup>  
         </select>
       </div>
       <div class="form-group">
@@ -234,7 +237,7 @@
 
     // D-day 계산
     function calcDday() {
-      const exam = new Date('2026-05-09');
+      const exam = new Date('2026-08-29');
       const today = new Date();
       const diff = Math.ceil((exam - today) / (1000 * 60 * 60 * 24));
       document.getElementById('dday').textContent = 'D-' + diff;
