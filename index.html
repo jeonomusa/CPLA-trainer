@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>노무사 아웃풋 트레이너</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: #f5f6fa; }
@@ -129,7 +131,8 @@
     <li><a href="#" onclick="showPage('exam',this)">⏱️ 모의고사</a></li>
     <li><a href="#" onclick="showPage('flashcard',this)">🃏 플래시카드</a></li>
     <li><a href="#" onclick="showPage('blank',this)">📝 빈칸채우기</a></li>
-    <li><a href="#" onclick="showPage('ai',this)">🤖 AI 질문</a></li>
+    <li><a href="#" onclick="showPage('convert',this)">🤖 AI 자료 변환</a></li>
+    <li><a href="#" onclick="showPage('ai',this)">💬 AI 질문</a></li>
     <li><a href="#" onclick="showPage('db',this)">📚 판례·조문</a></li>
   </ul>
 </nav>
@@ -204,9 +207,22 @@
       </select>
     </div>
     <div class="form-group">
-      <label>문제 입력</label>
-      <textarea id="exam-question" placeholder="문제를 직접 입력하세요..."></textarea>
+      <label>문제 선택</label>
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <button id="q-tab-saved" onclick="switchQTab('saved')" style="padding:6px 14px;border-radius:8px;border:none;background:#27ae60;color:white;font-size:13px;cursor:pointer;font-weight:bold;">📚 저장된 문제</button>
+        <button id="q-tab-direct" onclick="switchQTab('direct')" style="padding:6px 14px;border-radius:8px;border:1px solid #ddd;background:white;color:#555;font-size:13px;cursor:pointer;">✏️ 직접 입력</button>
+      </div>
+      <div id="q-input-saved">
+        <select id="exam-question-select" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:8px;" onchange="fillQuestion(this.value)">
+          <option value="">-- 저장된 문제 선택 --</option>
+        </select>
+        <div id="selected-question-preview" style="background:#f8f9fa;border-radius:8px;padding:12px;font-size:14px;color:#555;min-height:60px;line-height:1.8;display:none;"></div>
+      </div>
+      <div id="q-input-direct" style="display:none;">
+        <textarea id="exam-question" placeholder="문제를 직접 입력하세요..." style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:14px;height:120px;resize:vertical;font-family:'Malgun Gothic',sans-serif;"></textarea>
+      </div>
     </div>
+
     <div class="form-group">
       <label>시험 시간</label>
       <select id="exam-time">
@@ -275,6 +291,85 @@
 <div id="blank" class="page">
   <div class="page-title">📝 빈칸채우기</div>
   <div class="coming-soon">🚧 준비 중이에요!</div>
+</div>
+
+<!-- AI 자료 변환 -->
+<div id="convert" class="page">
+  <div class="page-title">🤖 AI 자료 변환</div>
+
+  <div class="card" style="margin-bottom:16px;">
+    <div style="font-size:14px;font-weight:bold;color:#555;margin-bottom:12px;">📥 자료 입력</div>
+
+    <!-- 입력 방식 탭 -->
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <button id="tab-text" onclick="switchTab('text')" style="padding:8px 16px;border-radius:8px;border:none;background:#27ae60;color:white;font-size:13px;cursor:pointer;font-weight:bold;">📝 텍스트</button>
+      <button id="tab-pdf" onclick="switchTab('pdf')" style="padding:8px 16px;border-radius:8px;border:1px solid #ddd;background:white;color:#555;font-size:13px;cursor:pointer;">📄 PDF</button>
+      <button id="tab-image" onclick="switchTab('image')" style="padding:8px 16px;border-radius:8px;border:1px solid #ddd;background:white;color:#555;font-size:13px;cursor:pointer;">🖼️ 이미지</button>
+    </div>
+
+    <!-- 텍스트 입력 -->
+    <div id="input-text">
+      <textarea id="convert-text" placeholder="기출문제, 강사 자료 등 텍스트를 붙여넣으세요..." style="width:100%;height:200px;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:14px;resize:vertical;font-family:'Malgun Gothic',sans-serif;"></textarea>
+    </div>
+
+    <!-- PDF 입력 -->
+    <div id="input-pdf" style="display:none;">
+      <div onclick="document.getElementById('pdf-file').click()" style="border:2px dashed #ddd;border-radius:8px;padding:40px;text-align:center;cursor:pointer;color:#aaa;font-size:14px;">
+        📄 PDF 파일을 클릭해서 업로드하세요
+        <div style="font-size:12px;margin-top:8px;">디지털 PDF / 스캔본 모두 가능</div>
+      </div>
+      <input type="file" id="pdf-file" accept=".pdf" style="display:none;" onchange="handlePDF(this)">
+      <div id="pdf-status" style="margin-top:8px;font-size:13px;color:#888;"></div>
+    </div>
+
+    <!-- 이미지 입력 -->
+    <div id="input-image" style="display:none;">
+      <div onclick="document.getElementById('image-file').click()" style="border:2px dashed #ddd;border-radius:8px;padding:40px;text-align:center;cursor:pointer;color:#aaa;font-size:14px;">
+        🖼️ 이미지 파일을 클릭해서 업로드하세요
+        <div style="font-size:12px;margin-top:8px;">JPG, PNG 등 스캔본 이미지</div>
+      </div>
+      <input type="file" id="image-file" accept="image/*" style="display:none;" onchange="handleImage(this)">
+      <div id="image-preview" style="margin-top:12px;"></div>
+    </div>
+  </div>
+
+  <!-- 변환 설정 -->
+  <div class="card" style="margin-bottom:16px;">
+    <div style="font-size:14px;font-weight:bold;color:#555;margin-bottom:12px;">⚙️ 변환 설정</div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:200px;">
+        <label style="font-size:13px;color:#888;display:block;margin-bottom:6px;">과목</label>
+        <select id="convert-subject" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+          <option>노동법Ⅰ (개별적 근로관계법)</option>
+          <option>노동법Ⅱ (집단적 노사관계법)</option>
+          <option>인사노무관리</option>
+          <option>행정쟁송법</option>
+          <option>민사소송법</option>
+        </select>
+      </div>
+      <div style="flex:1;min-width:200px;">
+        <label style="font-size:13px;color:#888;display:block;margin-bottom:6px;">변환 유형</label>
+        <select id="convert-type" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+          <option value="question">📝 모의고사 문제로 저장</option>
+          <option value="flashcard">🃏 플래시카드로 변환</option>
+          <option value="blank">📋 빈칸 목차로 변환</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <button onclick="convertMaterial()" class="btn btn-green" style="margin-bottom:16px;">🤖 AI 변환 시작</button>
+
+  <!-- 변환 결과 미리보기 -->
+  <div id="convert-result" style="display:none;">
+    <div class="card" style="margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div style="font-size:14px;font-weight:bold;color:#555;">👀 변환 결과 미리보기</div>
+        <button onclick="saveConverted()" style="padding:8px 20px;background:#27ae60;color:white;border:none;border-radius:8px;font-size:13px;font-weight:bold;cursor:pointer;">💾 저장하기</button>
+      </div>
+      <div id="convert-preview"></div>
+    </div>
+  </div>
 </div>
 
 <!-- AI 질문 -->
@@ -663,6 +758,219 @@
     document.getElementById('ai-result').style.display = 'block';
     document.getElementById('ai-result').textContent = result;
   }
+  // AI 자료 변환
+  let convertedData = null;
+  let imageBase64 = null;
+
+  function switchTab(tab) {
+    ['text','pdf','image'].forEach(t => {
+      document.getElementById('input-' + t).style.display = t === tab ? 'block' : 'none';
+      const btn = document.getElementById('tab-' + t);
+      btn.style.background = t === tab ? '#27ae60' : 'white';
+      btn.style.color = t === tab ? 'white' : '#555';
+      btn.style.border = t === tab ? 'none' : '1px solid #ddd';
+    });
+  }
+
+  async function handlePDF(input) {
+    const file = input.files[0];
+    if (!file) return;
+    document.getElementById('pdf-status').textContent = '⏳ PDF 읽는 중...';
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const typedArray = new Uint8Array(e.target.result);
+      const pdf = await pdfjsLib.getDocument(typedArray).promise;
+      let text = '';
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        text += content.items.map(item => item.str).join(' ') + '\n';
+      }
+      if (text.trim().length > 50) {
+        document.getElementById('convert-text').value = text;
+        switchTab('text');
+        document.getElementById('pdf-status').textContent = `✅ 텍스트 추출 완료 (${pdf.numPages}페이지)`;
+      } else {
+        document.getElementById('pdf-status').textContent = '⚠️ 스캔본 감지 → 이미지로 처리합니다';
+        // 스캔본은 이미지로 변환
+        const page = await pdf.getPage(1);
+        const viewport = page.getViewport({ scale: 2 });
+        const canvas = document.createElement('canvas');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+        imageBase64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+        document.getElementById('pdf-status').textContent = `✅ 이미지 변환 완료 (${pdf.numPages}페이지 중 1페이지 처리)`;
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  function handleImage(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      imageBase64 = e.target.result.split(',')[1];
+      document.getElementById('image-preview').innerHTML = `<img src="${e.target.result}" style="max-width:100%;border-radius:8px;max-height:300px;object-fit:contain;">`;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  async function convertMaterial() {
+    const type = document.getElementById('convert-type').value;
+    const subject = document.getElementById('convert-subject').value;
+    const text = document.getElementById('convert-text').value;
+    const API_KEY = 'AIzaSyApB5J0IXoab-iYRyosBvdLkdTDeEWAW5I';
+
+    if (!text.trim() && !imageBase64) { alert('자료를 입력해주세요!'); return; }
+
+    document.getElementById('convert-result').style.display = 'none';
+    document.querySelector('#convert .btn-green').textContent = '⏳ 변환 중...';
+
+    let prompt = '';
+    if (type === 'question') {
+      prompt = `다음 자료에서 노무사 2차 시험 문제를 추출하거나 생성해주세요.
+과목: ${subject}
+자료: ${text}
+
+아래 JSON 형식으로만 답해주세요:
+[
+  {"question": "문제 내용", "subject": "${subject}", "source": "자료명"},
+  {"question": "문제 내용2", "subject": "${subject}", "source": "자료명"}
+]`;
+    } else if (type === 'flashcard') {
+      prompt = `다음 자료에서 노무사 2차 시험 플래시카드를 만들어주세요.
+과목: ${subject}
+자료: ${text}
+
+아래 JSON 형식으로만 답해주세요:
+[
+  {"front": "질문", "back": "답변", "subject": "${subject}"},
+  {"front": "질문2", "back": "답변2", "subject": "${subject}"}
+]`;
+    }
+
+    const body = imageBase64 ? {
+      contents: [{ parts: [
+        { text: prompt || `이 이미지에서 노무사 2차 시험 문제를 추출해주세요. 과목: ${subject}. JSON 형식: [{"question":"문제","subject":"${subject}","source":"스캔본"}]` },
+        { inline_data: { mime_type: 'image/jpeg', data: imageBase64 } }
+      ]}]
+    } : {
+      contents: [{ parts: [{ text: prompt }] }]
+    };
+
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+    });
+    const data = await response.json();
+    let result = data.candidates[0].content.parts[0].text;
+
+    // JSON 추출
+    const jsonMatch = result.match(/$$$[\s\S]*$$$/);
+    if (!jsonMatch) { alert('변환 실패! 다시 시도해주세요.'); document.querySelector('#convert .btn-green').textContent = '🤖 AI 변환 시작'; return; }
+
+    convertedData = JSON.parse(jsonMatch[0]);
+    renderPreview(type, convertedData);
+    document.querySelector('#convert .btn-green').textContent = '🤖 AI 변환 시작';
+    document.getElementById('convert-result').style.display = 'block';
+  }
+
+  function renderPreview(type, data) {
+    const el = document.getElementById('convert-preview');
+    if (type === 'question') {
+      el.innerHTML = data.map((q, i) => `
+        <div style="border:1px solid #eee;border-radius:8px;padding:16px;margin-bottom:12px;">
+          <div style="font-size:12px;color:#27ae60;margin-bottom:6px;">문제 ${i+1} · ${q.subject}</div>
+          <div style="font-size:14px;line-height:1.8;color:#2c3e50;">${q.question}</div>
+        </div>`).join('');
+    } else if (type === 'flashcard') {
+      el.innerHTML = data.map((c, i) => `
+        <div style="border:1px solid #eee;border-radius:8px;padding:16px;margin-bottom:12px;display:flex;gap:16px;">
+          <div style="flex:1;background:#f8f9fa;border-radius:8px;padding:12px;">
+            <div style="font-size:11px;color:#888;margin-bottom:4px;">앞면</div>
+            <div style="font-size:14px;">${c.front}</div>
+          </div>
+          <div style="flex:1;background:#f0faf4;border-radius:8px;padding:12px;">
+            <div style="font-size:11px;color:#888;margin-bottom:4px;">뒷면</div>
+            <div style="font-size:14px;">${c.back}</div>
+          </div>
+        </div>`).join('');
+    }
+  }
+
+  function saveConverted() {
+    const type = document.getElementById('convert-type').value;
+    if (type === 'question') {
+      const db = JSON.parse(localStorage.getItem('questionDB') || '[]');
+      convertedData.forEach(q => db.push({ ...q, id: Date.now() + Math.random() }));
+      localStorage.setItem('questionDB', JSON.stringify(db));
+      alert(`✅ 문제 ${convertedData.length}개 저장 완료!`);
+    } else if (type === 'flashcard') {
+      const db = JSON.parse(localStorage.getItem('flashcardDB') || '[]');
+      convertedData.forEach(c => db.push({ ...c, id: Date.now() + Math.random(), nextReview: Date.now(), interval: 1, easeFactor: 2.5, repetitions: 0 }));
+      localStorage.setItem('flashcardDB', JSON.stringify(db));
+      alert(`✅ 카드 ${convertedData.length}개 저장 완료!`);
+    }
+    document.getElementById('convert-result').style.display = 'none';
+    document.getElementById('convert-text').value = '';
+    imageBase64 = null;
+    convertedData = null;
+  }
+  function switchQTab(tab) {
+    document.getElementById('q-input-saved').style.display = tab === 'saved' ? 'block' : 'none';
+    document.getElementById('q-input-direct').style.display = tab === 'direct' ? 'block' : 'none';
+    document.getElementById('q-tab-saved').style.background = tab === 'saved' ? '#27ae60' : 'white';
+    document.getElementById('q-tab-saved').style.color = tab === 'saved' ? 'white' : '#555';
+    document.getElementById('q-tab-saved').style.border = tab === 'saved' ? 'none' : '1px solid #ddd';
+    document.getElementById('q-tab-direct').style.background = tab === 'direct' ? '#27ae60' : 'white';
+    document.getElementById('q-tab-direct').style.color = tab === 'direct' ? 'white' : '#555';
+    document.getElementById('q-tab-direct').style.border = tab === 'direct' ? 'none' : '1px solid #ddd';
+  }
+
+  function fillQuestion(val) {
+    const preview = document.getElementById('selected-question-preview');
+    if (!val) { preview.style.display = 'none'; return; }
+    preview.textContent = val;
+    preview.style.display = 'block';
+  }
+
+  function loadQuestionDB() {
+    const db = JSON.parse(localStorage.getItem('questionDB') || '[]');
+    const select = document.getElementById('exam-question-select');
+    select.innerHTML = '<option value="">-- 저장된 문제 선택 --</option>';
+    db.forEach(q => {
+      const opt = document.createElement('option');
+      opt.value = q.question;
+      opt.textContent = `[${q.subject}] ${q.question.slice(0, 30)}...`;
+      select.appendChild(opt);
+    });
+  }
+
+  // startExam 함수에서 question 가져오는 부분 수정
+  const _origStartExam = startExam;
+  function startExam() {
+    const savedQ = document.getElementById('exam-question-select')?.value;
+    const directQ = document.getElementById('exam-question')?.value;
+    const question = savedQ || directQ;
+    if (!question || !question.trim()) { alert('문제를 선택하거나 입력해주세요!'); return; }
+    // 직접입력 textarea에 값 세팅 후 기존 함수 호출
+    if (!document.getElementById('exam-question')) {
+      const ta = document.createElement('textarea');
+      ta.id = 'exam-question';
+      ta.value = question;
+      ta.style.display = 'none';
+      document.getElementById('exam-setup').appendChild(ta);
+    } else {
+      document.getElementById('exam-question').value = question;
+    }
+    _origStartExam();
+  }
+
+  // 모의고사 탭 클릭 시 문제 DB 로드
+  document.querySelector('.nav-menu a:nth-child(2)').addEventListener('click', loadQuestionDB);
+
 </script>
 </body>
 </html>
