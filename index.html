@@ -544,6 +544,7 @@
         // 28자 되면 자동 다음 줄
         input.addEventListener('keyup', (e) => {
           if (e.target.value.length >= 28) {
+            saveCurrentPage();
             const inputs = document.querySelectorAll('.line-input');
             const idx = Array.from(inputs).indexOf(e.target);
             if (idx < inputs.length - 1) {
@@ -554,6 +555,7 @@
           }
           countChars();
         });
+
 
 
 
