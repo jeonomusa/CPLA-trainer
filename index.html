@@ -23,6 +23,8 @@
     .page-content { display: none; animation: slideUp 0.3s ease; }
     .page-content.active { display: block; }
     @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    /* Exam Room */
     .answer-row { display: flex; border-bottom: 1px solid #e2e8f0; height: 44px; position: relative; }
     .row-num { width: 44px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #94a3b8; font-weight: 700; border-right: 1px solid #e2e8f0; background: #f8fafc; }
     .row-input-wrapper { flex: 1; position: relative; display: flex; align-items: center; background: white; }
@@ -31,6 +33,8 @@
     .char-indicator { position: absolute; right: 12px; font-size: 10px; font-weight: 800; color: #cbd5e1; pointer-events: none; transition: color 0.2s; }
     .row-input:focus + .char-indicator { color: #10b981; }
     .char-indicator.full { color: #ef4444; }
+    
+    /* SM-2 Flashcard */
     .fc-container { perspective: 1000px; height: 320px; width: 100%; max-width: 600px; margin: 0 auto; }
     .fc-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; cursor: pointer; }
     .fc-inner.flipped { transform: rotateY(180deg); }
@@ -40,6 +44,17 @@
     .sm2-btn:active { transform: scale(0.95); }
     .fc-buttons-wrap { display: none; gap: 12px; max-width: 600px; width: 100%; margin: 0 auto; }
     .fc-buttons-wrap.show { display: flex; }
+    
+    /* Blank Fill (목차 빈칸) Styles */
+    .blank-input { border: none; border-bottom: 2px solid #cbd5e1; background: transparent; width: 160px; text-align: center; font-size: 15px; font-weight: 700; color: #0f172a; outline: none; transition: all 0.2s; padding: 2px 4px; margin: 0 4px; }
+    .blank-input:focus { border-bottom-color: #10b981; background: #f0fdf4; }
+    .blank-input.correct { border-bottom-color: #10b981; color: #10b981; background: #ecfdf5; }
+    .blank-input.wrong { border-bottom-color: #ef4444; color: #ef4444; background: #fef2f2; }
+    .word-chip { padding: 8px 16px; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 20px; font-size: 14px; font-weight: 700; color: #475569; cursor: pointer; transition: all 0.2s; user-select: none; display: inline-block; margin: 4px; }
+    .word-chip:hover { background: #e2e8f0; color: #0f172a; }
+    .word-chip:active { transform: scale(0.95); }
+
+    /* Loading */
     #loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
     .spinner { width: 50px; height: 50px; border: 5px solid #ecfdf5; border-left-color: #10b981; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
@@ -63,7 +78,7 @@
     </div>
     <nav class="hidden md:flex gap-2">
       <button class="desktop-nav-btn active" id="d-nav-dashboard" onclick="navigate('dashboard')">대시보드</button>
-      <button class="desktop-nav-btn" id="d-nav-convert" onclick="navigate('convert')">AI 자료 변환</button>
+      <button class="desktop-nav-btn" id="d-nav-convert" onclick="navigate('convert')">자료 변환</button>
       <button class="desktop-nav-btn" id="d-nav-flashcard" onclick="navigate('flashcard')">플래시카드</button>
       <button class="desktop-nav-btn" id="d-nav-blank" onclick="navigate('blank')">빈칸 채우기</button>
       <button class="desktop-nav-btn" id="d-nav-lawdb" onclick="navigate('lawdb')">판례 DB</button>
@@ -132,13 +147,17 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <label class="border-2 border-dashed border-gray-200 rounded-3xl p-8 flex flex-col items-center justify-center cursor-pointer hover:border-emerald-500 hover:bg-emerald-50 transition-all group">
             <input type="file" id="file-q" class="hidden" accept=".pdf" onchange="handleFileDisplay('q')">
-            <i class="ri-file-pdf-line text-4xl text-gray-300 group-hover:text-emerald-500 mb-3"></i>
-            <span class="font-bold text-slate-700" id="file-q-name">문제 PDF 업로드</span>
+            <div class="relative z-10 pointer-events-none flex flex-col items-center">
+              <i class="ri-file-pdf-line text-4xl text-gray-300 group-hover:text-emerald-500 mb-3"></i>
+              <span class="font-bold text-slate-700" id="file-q-name">문제 PDF 업로드</span>
+            </div>
           </label>
           <label class="border-2 border-dashed border-gray-200 rounded-3xl p-8 flex flex-col items-center justify-center cursor-pointer hover:border-emerald-500 hover:bg-emerald-50 transition-all group">
             <input type="file" id="file-r" class="hidden" accept=".pdf" onchange="handleFileDisplay('r')">
-            <i class="ri-file-list-3-line text-4xl text-gray-300 group-hover:text-emerald-500 mb-3"></i>
-            <span class="font-bold text-slate-700" id="file-r-name">채점기준 PDF (선택)</span>
+            <div class="relative z-10 pointer-events-none flex flex-col items-center">
+              <i class="ri-file-list-3-line text-4xl text-gray-300 group-hover:text-emerald-500 mb-3"></i>
+              <span class="font-bold text-slate-700" id="file-r-name">채점기준 PDF (선택)</span>
+            </div>
           </label>
         </div>
         <div class="grid grid-cols-2 gap-4 mb-6">
@@ -222,18 +241,91 @@
         <div id="fc-empty" class="py-20 text-center">
           <i class="ri-checkbox-circle-fill text-6xl text-emerald-400 mb-4 inline-block"></i>
           <h3 class="text-xl font-extrabold text-slate-800">모든 복습을 완료했습니다!</h3>
-          <p class="text-sm text-gray-500 mt-2">자료 변환 탭에서 새로운 카드를 추가해보세요.</p>
+          <p class="text-sm text-gray-500 mt-2">자료 변환 탭에서 새로운 카드를 추가하거나 직접 만들어보세요.</p>
         </div>
       </div>
     </div>
 
-    <!-- 4. 빈칸 채우기 -->
+    <!-- 4. 빈칸 채우기 (목차 암기) -->
     <div id="page-blank" class="page-content">
-      <h2 class="text-2xl font-extrabold text-slate-800 mb-6 flex items-center gap-2"><i class="ri-edit-2-line"></i> 목차 빈칸 채우기</h2>
-      <div class="neo-card p-10 text-center">
-        <i class="ri-tools-fill text-6xl text-gray-300 mb-4 inline-block"></i>
-        <h3 class="text-xl font-bold text-slate-700">빈칸 채우기 모드 준비 중</h3>
-        <p class="text-gray-500 mt-2">다음 업데이트에서 제공될 예정입니다. 플래시카드를 먼저 활용해주세요!</p>
+      <h2 class="text-2xl font-extrabold text-slate-800 mb-2 flex items-center gap-2"><i class="ri-edit-2-line"></i> 목차 빈칸 뚫기</h2>
+      <p class="text-sm text-gray-500 mb-6">전체적인 구조 암기를 위해 목차의 빈칸을 채워보세요. 단어 풀(Word Bank)을 탭하여 쉽게 입력할 수 있습니다.</p>
+
+      <!-- 목록 및 추가 뷰 -->
+      <div id="blank-list-view">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="font-bold text-slate-800">내 목차 리스트</h3>
+          <button onclick="toggleOutlineAdder()" class="px-4 py-2 bg-slate-800 text-white rounded-lg text-sm font-bold hover:bg-slate-700 transition-all flex items-center gap-1 shadow-sm"><i class="ri-add-line"></i> 새 목차 등록</button>
+        </div>
+
+        <div id="outline-adder" class="hidden neo-card p-6 mb-6 bg-slate-50 border-2 border-slate-200">
+          <h3 class="font-bold text-slate-800 mb-4 text-lg flex items-center gap-2"><i class="ri-file-list-line text-emerald-500"></i> 새 목차 구조 등록</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div class="md:col-span-1">
+              <label class="text-xs font-bold text-gray-500 mb-2 block">과목</label>
+              <select id="outline-subject" class="w-full p-3 bg-white rounded-xl font-bold border border-gray-200 outline-none">
+                <option>민사소송법</option><option>노동법</option><option>인사노무관리</option><option>행정쟁송법</option>
+              </select>
+            </div>
+            <div class="md:col-span-2">
+              <label class="text-xs font-bold text-gray-500 mb-2 block">주제 (제목)</label>
+              <input type="text" id="outline-title" class="w-full p-3 bg-white rounded-xl font-bold border border-gray-200 outline-none" placeholder="예: 변론관할">
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="text-xs font-bold text-gray-500 mb-2 block">목차 내용 (I, 1, (1) 등 번호를 포함해 붙여넣어주세요)</label>
+            <textarea id="outline-content" class="w-full h-40 p-3 bg-white rounded-xl text-sm border border-gray-200 outline-none resize-none font-mono" placeholder="I. 서설\n  1. 의의\n  2. 인정이유\nII. 요건..."></textarea>
+          </div>
+          <div class="flex justify-end gap-2">
+            <button onclick="toggleOutlineAdder()" class="px-5 py-2.5 bg-white border border-gray-200 text-gray-600 rounded-xl text-sm font-bold hover:bg-gray-50 transition-all">취소</button>
+            <button onclick="saveOutline()" class="px-6 py-2.5 bg-emerald-500 text-white rounded-xl text-sm font-bold hover:bg-emerald-600 shadow-md transition-all">등록하기</button>
+          </div>
+        </div>
+
+        <div id="outline-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- JS 렌더링 -->
+        </div>
+      </div>
+
+      <!-- 퀴즈 룸 뷰 -->
+      <div id="blank-quiz-view" class="hidden">
+        <button onclick="closeBlankQuiz()" class="text-sm font-bold text-gray-500 hover:text-gray-800 mb-4 flex items-center gap-1"><i class="ri-arrow-left-line"></i> 목록으로</button>
+        <div class="neo-card p-8 mb-6">
+          <div class="flex justify-between items-end mb-6 border-b border-gray-100 pb-4">
+            <div>
+              <span class="text-[10px] font-bold text-emerald-500 bg-emerald-50 px-2 py-1 rounded-full mb-2 inline-block" id="quiz-subject">과목명</span>
+              <h3 class="text-2xl font-extrabold text-slate-800" id="quiz-title">주제명</h3>
+            </div>
+            <div class="flex items-center gap-2">
+              <select id="quiz-level" class="p-2 border border-gray-200 rounded-lg text-sm font-bold text-slate-700 outline-none">
+                <option value="50">무작위 50% 빈칸</option>
+                <option value="30">무작위 30% 빈칸</option>
+                <option value="main">대목차만 빈칸 (I, 1 등)</option>
+                <option value="all">전체 빈칸 (하드코어)</option>
+              </select>
+              <button onclick="generateBlankQuiz()" class="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-bold hover:bg-slate-800 transition-all">적용</button>
+            </div>
+          </div>
+          
+          <!-- 실제 퀴즈 영역 -->
+          <div id="quiz-lines" class="text-[15px] leading-loose text-slate-700 font-medium mb-8">
+             <!-- JS Rendered lines -->
+          </div>
+
+          <!-- 정답 확인 버튼 -->
+          <div class="text-center mt-8">
+            <button onclick="checkBlankAnswers()" class="px-8 py-3 bg-emerald-500 text-white rounded-xl font-bold text-lg hover:bg-emerald-600 shadow-md transition-all active:scale-95"><i class="ri-check-double-line"></i> 정답 확인하기</button>
+          </div>
+        </div>
+
+        <!-- 단어 풀 (Word Bank) -->
+        <div class="neo-card p-6 bg-slate-50 border-2 border-slate-200 sticky bottom-20 z-40">
+          <h4 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3"><i class="ri-drag-drop-line"></i> Word Bank (단어장)</h4>
+          <p class="text-[11px] text-gray-400 mb-3">위에서 빈칸을 먼저 터치(클릭)한 후, 아래 단어를 누르면 쏙 들어갑니다.</p>
+          <div id="quiz-word-bank" class="flex flex-wrap gap-2">
+            <!-- JS Rendered Chips -->
+          </div>
+        </div>
       </div>
     </div>
 
@@ -411,20 +503,35 @@
     // ==========================================
     // 1. 핵심 전역 상태
     // ==========================================
-    let db = { history: [], questions: [], flashcards: [], lastStudyDate: null, streak: 0 };
+    let db = { history: [], questions: [], flashcards: [], outlines: [], lastStudyDate: null, streak: 0 };
     const LINES_PER_PAGE = 22;
     const MAX_CHARS_PER_LINE = 40;
-    const MODEL_NAME = "gemini-2.5-flash";
+    const MODEL_NAME = "gemini-1.5-flash";
     
     let examState = { subject: '', question: '', rubric: '', time: 0, seconds: 0, totalPage: 5, currPage: 1, timer: null, answers: {} };
     let pdfTextQ = ''; let pdfTextR = ''; let pdfImagesQ = [];
+
+    // 빈칸 채우기 상태
+    let blankState = { outline: null, lines: [], answers: [], activeInput: null };
 
     // ==========================================
     // 2. 초기화 및 공통 유틸
     // ==========================================
     window.onload = () => {
       const saved = localStorage.getItem('nomusa_db_v4');
-      if (saved) db = JSON.parse(saved);
+      if (saved) {
+        db = JSON.parse(saved);
+        if(!db.outlines) db.outlines = []; // 이전 버전 호환
+      }
+
+      // 샘플 목차 데이터 주입 (최초 1회)
+      if (db.outlines.length === 0) {
+        db.outlines.push({
+          id: 'sample-1', subject: '민사소송법', title: '변론관할(b)',
+          content: `I. 서설\n  1. 의의\n  2. 인정이유\nII. 요건\n  1. 관할권 없는 1심법원에의 소제기\n    (1) 의의\n    (2) 토지관할 위반의 경우\n    (3) 사물관할 위반의 경우\n  2. 피고의 관할위반의 항변이 없을 것\n  3. 피고가 이의 없이 본안변론을 하였을 것\nIII. 효과\n  1. 관할의 창설\n  2. 항변권의 상실\n  3. 효력범위\nIV. 적용범위\nV. 결론`
+        });
+        saveDB();
+      }
       
       const savedKey = localStorage.getItem('gemini_api_key');
       if(savedKey) document.getElementById('api-key-input').value = savedKey;
@@ -450,16 +557,18 @@
       if (id === 'dashboard') renderDashboard();
       if (id === 'flashcard') renderDueFlashcards();
       if (id === 'exam') updateExamQList();
+      if (id === 'blank') {
+        document.getElementById('blank-list-view').classList.remove('hidden');
+        document.getElementById('blank-quiz-view').classList.add('hidden');
+        renderOutlineList();
+      }
     }
 
     function showLoading(msg) { 
       document.getElementById('loading-text').textContent = msg; 
       document.getElementById('loading-overlay').style.display = 'flex'; 
     }
-    
-    function hideLoading() { 
-      document.getElementById('loading-overlay').style.display = 'none'; 
-    }
+    function hideLoading() { document.getElementById('loading-overlay').style.display = 'none'; }
     
     function showMsg(text) { 
       const box = document.getElementById('message-box'); 
@@ -472,19 +581,13 @@
       }
     }
     
-    function getToday() { 
-      const d = new Date(); 
-      d.setHours(0,0,0,0); 
-      return d.toISOString().split('T')[0]; 
-    }
+    function getToday() { const d = new Date(); d.setHours(0,0,0,0); return d.toISOString().split('T')[0]; }
 
-    // API Key 관리
     function saveApiKey() {
       const val = document.getElementById('api-key-input').value.trim();
       if(val) { localStorage.setItem('gemini_api_key', val); showMsg('API 키가 저장되었습니다.'); }
       else showMsg('키를 입력해주세요.');
     }
-    
     function getApiKey() {
       const key = localStorage.getItem('gemini_api_key');
       if(!key) { showMsg("설정 탭에서 Gemini API 키를 먼저 입력해주세요!"); throw new Error("No API Key"); }
@@ -492,7 +595,7 @@
     }
 
     // ==========================================
-    // 3. 강력한 Gemini API 호출
+    // 3. Gemini API 호출
     // ==========================================
     async function callGemini(prompt, schema, images = []) {
       const key = getApiKey();
@@ -786,6 +889,232 @@
       if (rating === 1) dueCards.push(currentCard);
       loadNextCard();
     }
+
+    // ==========================================
+    // 7.5 빈칸 채우기 (목차 암기)
+    // ==========================================
+    function toggleOutlineAdder() {
+      const form = document.getElementById('outline-adder');
+      form.classList.toggle('hidden');
+    }
+
+    function saveOutline() {
+      const subject = document.getElementById('outline-subject').value;
+      const title = document.getElementById('outline-title').value.trim();
+      const content = document.getElementById('outline-content').value.trim();
+
+      if (!title || !content) { showMsg("제목과 내용을 모두 입력해주세요."); return; }
+
+      const newOutline = { id: Date.now() + Math.random(), subject, title, content };
+      db.outlines.push(newOutline);
+      saveDB();
+
+      document.getElementById('outline-title').value = '';
+      document.getElementById('outline-content').value = '';
+      toggleOutlineAdder();
+      renderOutlineList();
+      showMsg("새 목차가 등록되었습니다.");
+    }
+
+    function renderOutlineList() {
+      const container = document.getElementById('outline-list');
+      if (!db.outlines || db.outlines.length === 0) {
+        container.innerHTML = '<p class="col-span-2 text-center text-gray-400 py-10">등록된 목차가 없습니다.</p>';
+        return;
+      }
+
+      container.innerHTML = db.outlines.map(o => `
+        <div class="p-6 bg-white border border-gray-200 rounded-xl shadow-sm flex flex-col justify-between hover:border-emerald-500 transition-all">
+          <div>
+            <span class="text-[10px] font-bold text-emerald-500 bg-emerald-50 px-2 py-1 rounded-full">${o.subject}</span>
+            <h4 class="font-extrabold text-slate-800 text-lg mt-3 mb-2">${o.title}</h4>
+          </div>
+          <div class="flex justify-end gap-2 mt-4">
+            <button onclick="deleteOutline('${o.id}')" class="px-3 py-1.5 border border-red-100 text-red-500 rounded-lg text-xs font-bold hover:bg-red-50">삭제</button>
+            <button onclick="startBlankQuiz('${o.id}')" class="px-4 py-1.5 bg-emerald-500 text-white rounded-lg text-xs font-bold hover:bg-emerald-600 shadow-sm">퀴즈 시작</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function deleteOutline(id) {
+      if(!confirm("삭제하시겠습니까?")) return;
+      db.outlines = db.outlines.filter(o => String(o.id) !== String(id));
+      saveDB();
+      renderOutlineList();
+    }
+
+    function startBlankQuiz(id) {
+      blankState.outline = db.outlines.find(o => String(o.id) === String(id));
+      if(!blankState.outline) return;
+
+      document.getElementById('blank-list-view').classList.add('hidden');
+      document.getElementById('blank-quiz-view').classList.remove('hidden');
+      
+      document.getElementById('quiz-subject').textContent = blankState.outline.subject;
+      document.getElementById('quiz-title').textContent = blankState.outline.title;
+
+      generateBlankQuiz();
+    }
+
+    function closeBlankQuiz() {
+      document.getElementById('blank-quiz-view').classList.add('hidden');
+      document.getElementById('blank-list-view').classList.remove('hidden');
+    }
+
+    function generateBlankQuiz() {
+      const level = document.getElementById('quiz-level').value;
+      const lines = blankState.outline.content.split('\n');
+      
+      // 번호 접두사와 내용을 분리하는 정규식 (I., 1., (1), ① 등 매칭)
+      const regex = /^([\s]*[IVX]+\.|[\s]*\d+\.|[\s]*\(\d+\)|[\s]*[①-⑨])(.*)$/;
+      
+      let parsedLines = lines.map((line, idx) => {
+        let prefix = '';
+        let content = line;
+        const match = line.match(regex);
+        
+        if (match) {
+          prefix = match[1];
+          content = match[2].trim();
+        } else {
+          // 접두사가 없으면 앞의 들여쓰기 공백만 분리
+          const spaceMatch = line.match(/^(\s*)(.*)$/);
+          if (spaceMatch) {
+            prefix = spaceMatch[1];
+            content = spaceMatch[2];
+          }
+        }
+        return { id: idx, original: line, prefix, content, isBlank: false };
+      });
+
+      let candidates = parsedLines.filter(l => l.content.length > 0);
+
+      if (level === 'all') {
+        candidates.forEach(l => l.isBlank = true);
+      } else if (level === '50') {
+        candidates.sort(() => Math.random() - 0.5);
+        candidates.slice(0, Math.ceil(candidates.length / 2)).forEach(l => l.isBlank = true);
+      } else if (level === '30') {
+        candidates.sort(() => Math.random() - 0.5);
+        candidates.slice(0, Math.ceil(candidates.length * 0.3)).forEach(l => l.isBlank = true);
+      } else if (level === 'main') {
+        // 대목차 (I. 또는 1. 으로 시작하는 것만 빈칸)
+        candidates.forEach(l => {
+          if (l.prefix.match(/[IVX]+\.|\d+\./)) l.isBlank = true;
+        });
+      }
+
+      // 원래 순서대로 복원
+      parsedLines.sort((a,b) => a.id - b.id);
+      
+      blankState.lines = parsedLines;
+      blankState.answers = parsedLines.filter(l => l.isBlank).map(l => l.content);
+      // 단어 풀 생성을 위해 정답 셔플
+      blankState.answers.sort(() => Math.random() - 0.5); 
+
+      renderBlankQuizRoom();
+    }
+
+    function renderBlankQuizRoom() {
+      const container = document.getElementById('quiz-lines');
+      container.innerHTML = '';
+
+      blankState.lines.forEach(line => {
+        const row = document.createElement('div');
+        // 들여쓰기 유지를 위해 whitespace-pre 속성 적용
+        row.className = "mb-3 whitespace-pre flex items-center"; 
+        
+        const prefixSpan = document.createElement('span');
+        prefixSpan.textContent = line.prefix;
+        prefixSpan.className = "font-bold text-slate-500 mr-2";
+        row.appendChild(prefixSpan);
+
+        if (line.isBlank) {
+          const input = document.createElement('input');
+          input.type = "text";
+          input.className = "blank-input";
+          input.dataset.answer = line.content;
+          
+          // 포커스 될 때마다 활성 인풋 기록 (단어 풀 입력을 위해)
+          input.addEventListener('focus', (e) => {
+            blankState.activeInput = e.target;
+          });
+          
+          row.appendChild(input);
+        } else {
+          const contentSpan = document.createElement('span');
+          contentSpan.textContent = line.content;
+          row.appendChild(contentSpan);
+        }
+        
+        container.appendChild(row);
+      });
+
+      // 단어장 (Word Bank) 렌더링
+      const bankContainer = document.getElementById('quiz-word-bank');
+      bankContainer.innerHTML = '';
+      blankState.answers.forEach(ans => {
+        const chip = document.createElement('div');
+        chip.className = "word-chip";
+        chip.textContent = ans;
+        chip.onclick = () => fillWordChip(ans);
+        bankContainer.appendChild(chip);
+      });
+
+      // 포커스 초기화
+      blankState.activeInput = null;
+      const firstInput = document.querySelector('.blank-input');
+      if(firstInput) firstInput.focus();
+    }
+
+    function fillWordChip(word) {
+      if (blankState.activeInput) {
+        blankState.activeInput.value = word;
+        
+        // 다음 빈칸으로 자동 포커스 이동
+        const inputs = Array.from(document.querySelectorAll('.blank-input'));
+        const currentIndex = inputs.indexOf(blankState.activeInput);
+        
+        // 아직 비어있는 다음 칸 찾기
+        const nextEmpty = inputs.slice(currentIndex + 1).find(i => !i.value) || inputs.find(i => !i.value);
+        if (nextEmpty) {
+          nextEmpty.focus();
+        }
+      } else {
+        showMsg("먼저 채워넣을 빈칸을 터치(클릭)해주세요.");
+      }
+    }
+
+    function checkBlankAnswers() {
+      const inputs = document.querySelectorAll('.blank-input');
+      let correctCount = 0;
+
+      inputs.forEach(input => {
+        const actual = input.dataset.answer.replace(/\s+/g, ''); // 공백 무시 비교
+        const user = input.value.replace(/\s+/g, '');
+        
+        if (actual === user) {
+          input.classList.add('correct');
+          input.classList.remove('wrong');
+          correctCount++;
+        } else {
+          input.classList.add('wrong');
+          input.classList.remove('correct');
+          // 오답인 경우 원래 답을 placeholder로 슬쩍 보여주기 (선택사항)
+          input.value = '';
+          input.placeholder = input.dataset.answer;
+        }
+      });
+
+      if (correctCount === inputs.length) {
+        showMsg("🎉 완벽합니다! 모두 맞혔습니다!");
+        markStudiedToday();
+      } else {
+        showMsg(`${inputs.length}개 중 ${correctCount}개 정답입니다. 붉은 칸을 다시 확인하세요!`);
+      }
+    }
+
 
     // ==========================================
     // 8. 실전 모의고사 (40자 제한 답안지)
