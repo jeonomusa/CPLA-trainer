@@ -851,6 +851,7 @@ ${rText ? `[채점기준/채점평 자료]\n${rText}` : ''}
       );
       
       const raw = await response.text();
+      console.log('전체 응답:', raw);
       alert('응답: ' + raw.slice(0, 300));
       
       const data = JSON.parse(raw);
