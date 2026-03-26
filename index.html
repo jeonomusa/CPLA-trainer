@@ -190,7 +190,7 @@
     .answer-line {
       display: flex;
       border-bottom: 1px solid #ccc;
-      min-height: 36px;
+      min-height: 40px;
     }
     .answer-line:last-child { border-bottom: none; }
     .line-num {
@@ -208,14 +208,15 @@
       width: 100%;
       border: none;
       outline: none;
-      font-size: 17px;
+      font-size: 16px;
       font-family: 'Malgun Gothic', '맑은 고딕', sans-serif;
-      padding: 0 4px;
-      height: 36px;
+      padding: 0 8px;
+      height: 40px;
       color: #1a1a1a;
-      letter-spacing: 6px;
+      letter-spacing: 0;
       box-sizing: border-box;
     }
+
 
 
     /* coming soon */
@@ -497,6 +498,7 @@
       inputs.forEach((input, i) => {
         allLines[currentPage][i + 1] = input.value;
       });
+      console.log('저장됨 페이지', currentPage, allLines[currentPage]);
     }
 
     function renderPage(page) {
@@ -515,6 +517,7 @@
         input.className = 'line-input';
         input.maxLength = 28;
         input.size = 28;
+        input.value = (allLines[page] && allLines[page][i]) ? allLines[page][i] : '';
 
 
         // 엔터키로 다음 줄 이동
