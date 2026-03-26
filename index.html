@@ -1164,7 +1164,12 @@ ${answer}
         }
       );
       const data = await response.json();
+      if (!data.candidates || data.candidates.length === 0) {
+        const errMsg = data.error ? data.error.message : 'unknown error';
+        throw new Error(errMsg);
+      }
       const result = data.candidates[0].content.parts[0].text;
+
       document.getElementById('exam-result-content').textContent = result;
 
       // 점수 추출
