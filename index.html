@@ -17,7 +17,6 @@
     .nav-btn.active { color: #10b981; background: #ecfdf5; font-weight: 800; }
     .nav-btn:hover { color: #10b981; }
     
-    /* Desktop Navigation Refined */
     .desktop-nav-btn { position: relative; padding: 8px 14px; border-radius: 8px; font-size: 14px; font-weight: 600; color: #94a3b8; transition: all 0.2s ease; background: transparent; white-space: nowrap; height: 40px; display: inline-flex; align-items: center; justify-content: center; }
     .desktop-nav-btn:hover { color: #e2e8f0; background: rgba(255, 255, 255, 0.05); }
     .desktop-nav-btn.active { color: #10b981; font-weight: 800; }
@@ -30,7 +29,6 @@
     .page-content.active { display: block; }
     @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     
-    /* Exam Room */
     .answer-row { display: flex; border-bottom: 1px solid #e2e8f0; height: 44px; position: relative; }
     .row-num { width: 44px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #94a3b8; font-weight: 700; border-right: 1px solid #e2e8f0; background: #f8fafc; }
     .row-input-wrapper { flex: 1; position: relative; display: flex; align-items: center; background: white; }
@@ -40,7 +38,6 @@
     .row-input:focus + .char-indicator { color: #10b981; }
     .char-indicator.full { color: #ef4444; }
     
-    /* SM-2 Flashcard */
     .fc-container { perspective: 1000px; height: 320px; width: 100%; max-width: 600px; margin: 0 auto; }
     .fc-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; cursor: pointer; }
     .fc-inner.flipped { transform: rotateY(180deg); }
@@ -51,7 +48,6 @@
     .fc-buttons-wrap { display: none; gap: 12px; max-width: 600px; width: 100%; margin: 0 auto; }
     .fc-buttons-wrap.show { display: flex; }
     
-    /* Blank Fill Styles */
     .blank-input { border: none; border-bottom: 2px solid #cbd5e1; background: transparent; min-width: 80px; max-width: 100%; text-align: center; font-size: 15px; font-weight: 700; color: #0f172a; outline: none; transition: all 0.2s; padding: 2px 8px; margin: 0 4px; }
     .blank-input:focus { border-bottom-color: #10b981; background: #f0fdf4; }
     .blank-input.correct { border-bottom-color: #10b981; color: #10b981; background: #ecfdf5; }
@@ -60,7 +56,6 @@
     .word-chip:hover { background: #e2e8f0; color: #0f172a; }
     .word-chip:active { transform: scale(0.95); }
 
-    /* Loading */
     #loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
     .spinner { width: 50px; height: 50px; border: 5px solid #ecfdf5; border-left-color: #10b981; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
@@ -147,14 +142,14 @@
 
     <div id="page-convert" class="page-content">
       <h2 class="text-2xl font-extrabold text-slate-800 mb-2 flex items-center gap-2"><i class="ri-robot-line"></i> AI 자료 변환</h2>
-      <p class="text-sm text-gray-500 mb-6">문제지나 기본서 PDF를 업로드하면 AI가 분석하여 모의고사용 문제나 플래시카드로 변환합니다.</p>
+      <p class="text-sm text-gray-500 mb-6">문제지나 모범답안 PDF를 업로드하면 AI가 분석하여 모의고사용 문제나 플래시카드로 변환합니다.</p>
       <div class="neo-card p-8">
         <div class="mb-8">
           <label class="border-2 border-dashed border-gray-200 rounded-3xl p-12 flex flex-col items-center justify-center cursor-pointer hover:border-emerald-500 hover:bg-emerald-50 transition-all group">
             <input type="file" id="file-q" class="hidden" accept=".pdf" onchange="handleFileDisplay('q')">
             <div class="relative z-10 pointer-events-none flex flex-col items-center">
               <i class="ri-file-pdf-line text-5xl text-gray-300 group-hover:text-emerald-500 mb-4"></i>
-              <span class="font-bold text-lg text-slate-700" id="file-q-name">문제/기본서 PDF 업로드</span>
+              <span class="font-bold text-lg text-slate-700" id="file-q-name">문제/모범답안 PDF 업로드</span>
             </div>
           </label>
         </div>
@@ -168,7 +163,7 @@
           <div>
             <label class="text-xs font-bold text-gray-500 mb-2 block">변환 유형</label>
             <select id="convert-type" class="w-full p-4 bg-gray-50 rounded-xl font-bold border-none outline-none focus:ring-2 focus:ring-emerald-500">
-              <option value="exam">📝 모의고사 문제 추출</option>
+              <option value="exam">📝 모의고사 문제 + 모범답안 추출</option>
               <option value="flashcard">🃏 핵심 쟁점 플래시카드</option>
             </select>
           </div>
@@ -190,7 +185,16 @@
 
       <div id="fc-manager-view" class="hidden neo-card p-6 mb-8 bg-white border-2 border-slate-200">
         <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
-          <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2"><i class="ri-list-settings-line text-emerald-500"></i> 내 카드 목록</h3>
+          <div class="flex items-center gap-3">
+            <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2"><i class="ri-list-settings-line text-emerald-500"></i> 내 카드 목록</h3>
+            <select id="fc-filter-subject" onchange="renderFcList()" class="p-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold outline-none focus:ring-2 focus:ring-emerald-500">
+              <option value="all">전체 과목</option>
+              <option value="노동법">노동법</option>
+              <option value="인사노무관리">인사노무관리</option>
+              <option value="행정쟁송법">행정쟁송법</option>
+              <option value="민사소송법">민사소송법</option>
+            </select>
+          </div>
           <button onclick="toggleFcManager()" class="text-sm text-gray-400 hover:text-gray-800"><i class="ri-close-line text-xl"></i></button>
         </div>
         <div id="fc-list" class="space-y-3 max-h-96 overflow-y-auto pr-2"></div>
@@ -227,8 +231,7 @@
         </div>
         
         <div id="fc-workspace" class="w-full hidden">
-          
-          <div class="fc-container mb-8 hidden" id="fc-flip-container">
+          <div class="fc-container mb-4 hidden" id="fc-flip-container">
             <div class="fc-inner" id="fc-card" onclick="flipCard()">
               <div class="fc-front">
                 <span class="absolute top-6 text-xs font-bold text-emerald-500 bg-emerald-50 px-3 py-1 rounded-full uppercase" id="fc-front-sub"></span>
@@ -241,20 +244,26 @@
             </div>
           </div>
 
-          <div id="fc-cloze-container" class="hidden w-full text-left mb-8 border-2 border-emerald-100 bg-white rounded-2xl p-6 md:p-8 shadow-md">
+          <div id="fc-cloze-container" class="hidden w-full text-left mb-4 border-2 border-emerald-100 bg-white rounded-2xl p-6 md:p-8 shadow-md">
              <div class="text-xs font-bold text-emerald-500 mb-2 inline-block bg-emerald-50 px-2 py-1 rounded-full" id="fc-cloze-sub"></div>
              <div class="text-xl font-extrabold text-slate-800 mb-6 pb-4 border-b border-gray-100" id="fc-cloze-front"></div>
-             
              <div class="text-[15px] leading-loose text-slate-700 font-medium mb-8" id="fc-cloze-back"></div>
-             
              <div class="text-center mt-4">
                <button id="fc-cloze-check-btn" onclick="checkFcClozeAnswers()" class="px-6 py-2 bg-emerald-500 text-white rounded-xl font-bold hover:bg-emerald-600 shadow-sm transition-all active:scale-95">정답 확인 및 난이도 추천받기</button>
              </div>
-             
              <div id="fc-cloze-word-bank-wrap" class="mt-6 pt-6 border-t border-gray-100">
                <p class="text-[11px] text-gray-400 mb-3 text-center">빈칸을 먼저 클릭하고, 아래 단어를 눌러보세요.</p>
                <div id="fc-cloze-word-bank" class="flex flex-wrap gap-2 justify-center"></div>
              </div>
+          </div>
+
+          <!-- 💡 추가된 기능: AI 힌트 & 암기비법 버튼 영역 -->
+          <div id="fc-ai-tools" class="w-full max-w-[600px] mx-auto mt-4 mb-4">
+            <div class="flex justify-center gap-2 mb-3">
+              <button onclick="getFcHint()" class="px-4 py-1.5 bg-purple-50 border border-purple-100 text-purple-600 rounded-full text-[11px] font-bold hover:bg-purple-100 transition-colors shadow-sm">✨ AI 힌트</button>
+              <button onclick="getFcMnemonic()" class="px-4 py-1.5 bg-indigo-50 border border-indigo-100 text-indigo-600 rounded-full text-[11px] font-bold hover:bg-indigo-100 transition-colors shadow-sm">✨ AI 암기비법</button>
+            </div>
+            <div id="fc-ai-result" class="hidden p-4 bg-white border border-slate-200 rounded-xl text-[13px] leading-relaxed text-slate-700 shadow-inner"></div>
           </div>
 
           <div id="fc-buttons" class="fc-buttons-wrap">
@@ -263,7 +272,6 @@
             <div class="sm2-btn bg-blue-500 hover:bg-blue-600" id="btn-good" onclick="rateCard(3)">보통<div class="text-[10px] mt-1 opacity-90 font-medium" id="fc-btn-good">1일 후</div></div>
             <div class="sm2-btn bg-emerald-500 hover:bg-emerald-600" id="btn-easy" onclick="rateCard(4)">쉬움<div class="text-[10px] mt-1 opacity-90 font-medium" id="fc-btn-easy">4일 후</div></div>
           </div>
-
         </div>
 
         <div id="fc-empty" class="py-20 text-center">
@@ -280,7 +288,16 @@
 
       <div id="blank-list-view">
         <div class="flex justify-between items-center mb-4">
-          <h3 class="font-bold text-slate-800">내 목차 리스트</h3>
+          <div class="flex items-center gap-3">
+            <h3 class="font-bold text-slate-800">내 목차 리스트</h3>
+            <select id="outline-filter-subject" onchange="renderOutlineList()" class="p-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold outline-none focus:ring-2 focus:ring-emerald-500">
+              <option value="all">전체 과목</option>
+              <option value="노동법">노동법</option>
+              <option value="인사노무관리">인사노무관리</option>
+              <option value="행정쟁송법">행정쟁송법</option>
+              <option value="민사소송법">민사소송법</option>
+            </select>
+          </div>
           <button onclick="toggleOutlineAdder()" class="px-4 py-2 bg-slate-800 text-white rounded-lg text-sm font-bold hover:bg-slate-700 transition-all flex items-center gap-1 shadow-sm"><i class="ri-add-line"></i> 새 목차 등록</button>
         </div>
 
@@ -299,7 +316,11 @@
             </div>
           </div>
           <div class="mb-4">
-            <label class="text-xs font-bold text-gray-500 mb-2 block">목차 내용 (I, 1, (1) 등 번호를 포함해 붙여넣어주세요)</label>
+            <!-- 💡 추가된 기능: AI 목차 자동 생성 버튼 -->
+            <div class="flex justify-between items-center mb-2">
+              <label class="text-xs font-bold text-gray-500 block">목차 내용 (I, 1, (1) 등 번호를 포함해 붙여넣어주세요)</label>
+              <button type="button" onclick="generateOutlineWithAI()" class="text-[10px] font-bold text-purple-600 bg-purple-50 border border-purple-100 px-2 py-1 rounded hover:bg-purple-100 transition-colors shadow-sm">✨ AI 목차 자동 생성</button>
+            </div>
             <textarea id="outline-content" class="w-full h-40 p-3 bg-white rounded-xl text-sm border border-gray-200 outline-none resize-none font-mono focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20" placeholder="I. 서설\n  1. 의의\n  2. 인정이유\nII. 요건..."></textarea>
           </div>
           <div class="flex justify-end gap-2">
@@ -356,7 +377,7 @@
 
     <div id="page-exam" class="page-content">
       <h2 class="text-2xl font-extrabold text-slate-800 mb-2 flex items-center gap-2"><i class="ri-edit-box-line"></i> 실전 모의고사</h2>
-      <p class="text-sm text-gray-500 mb-6">실제 답안지와 동일한 글자 수(40자) 제한 환경에서 연습합니다. 완벽한 채점을 위해 채점기준표 원본을 들이밀어 보세요!</p>
+      <p class="text-sm text-gray-500 mb-6">강사님의 채점평 PDF를 업로드하여 가장 깐깐하게 채점받아 보세요!</p>
       
       <div id="exam-setup" class="neo-card p-8 max-w-2xl mx-auto">
         <div class="space-y-6">
@@ -401,8 +422,8 @@
           </div>
           
           <div class="p-4 bg-emerald-50/50 rounded-xl border border-emerald-100">
-            <label class="text-xs font-bold text-emerald-700 mb-2 flex items-center gap-1"><i class="ri-file-text-line"></i> 깐깐한 채점 기준 PDF 업로드 (선택)</label>
-            <p class="text-[11px] text-gray-500 mb-3">AI가 채점할 때 이 파일 원본 전체를 한 줄 한 줄 대조하여 훨씬 정밀하게 피드백합니다.</p>
+            <label class="text-xs font-bold text-emerald-700 mb-2 flex items-center gap-1"><i class="ri-file-text-line"></i> 강사 채점평/피드백 PDF 업로드 (선택)</label>
+            <p class="text-[11px] text-gray-500 mb-3">AI가 DB에 저장된 모범답안과 함께, 이 채점평의 감점 포인트까지 완벽하게 고려하여 채점합니다.</p>
             <label class="border-2 border-dashed border-emerald-200 rounded-lg p-3 flex flex-col items-center justify-center cursor-pointer hover:border-emerald-500 bg-white transition-all">
               <input type="file" id="exam-rubric-file" class="hidden" accept=".pdf" onchange="handleExamRubricUpload(event)">
               <span class="font-bold text-sm text-emerald-600" id="exam-rubric-name"><i class="ri-upload-cloud-2-line mr-1"></i>여기를 눌러 PDF 첨부</span>
@@ -493,6 +514,13 @@
           <h4 class="font-bold text-amber-600 mb-3 flex items-center gap-1"><i class="ri-lightbulb-flash-fill"></i> 다음 시험을 위한 3가지 조언</h4>
           <ul class="text-[13px] leading-relaxed text-slate-700 pl-4 list-disc space-y-2" id="res-next"></ul>
         </div>
+
+        <!-- 💡 추가된 부분: 내가 작성한 답안 섹션 -->
+        <div class="neo-card p-6 border-t-4 border-t-slate-500 bg-slate-50">
+          <h4 class="font-bold text-slate-700 mb-3 flex items-center gap-1"><i class="ri-file-text-line"></i> 내가 작성한 답안</h4>
+          <div class="text-[13px] leading-relaxed text-slate-700 whitespace-pre-wrap bg-white p-4 rounded-lg border border-gray-200 max-h-60 overflow-y-auto" id="res-my-answer"></div>
+        </div>
+
         <button onclick="navigate('dashboard')" class="w-full py-4 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-all">대시보드로 돌아가기</button>
       </div>
     </div>
@@ -547,115 +575,77 @@
     // ==========================================
     let db = { history: [], questions: [], flashcards: [], outlines: [], lastStudyDate: null, streak: 0 };
     
-    let editingFcId = null;
-    let editingOutlineId = null;
-    let editingExamId = null;
+    let editingFcId = null; let editingOutlineId = null; let editingExamId = null;
 
     window.getAppDB = () => db;
     window.setAppDB = (newDB) => { 
       if (!newDB) return;
-      db = {
-        history: newDB.history || [],
-        questions: newDB.questions || [],
-        flashcards: newDB.flashcards || [],
-        outlines: newDB.outlines || [],
-        lastStudyDate: newDB.lastStudyDate || null,
-        streak: newDB.streak || 0
-      };
+      db = { history: newDB.history || [], questions: newDB.questions || [], flashcards: newDB.flashcards || [], outlines: newDB.outlines || [], lastStudyDate: newDB.lastStudyDate || null, streak: newDB.streak || 0 };
     };
 
-    const LINES_PER_PAGE = 22;
-    const MAX_CHARS_PER_LINE = 40;
-    const MODEL_NAME = "gemini-2.5-flash";
-    
+    const LINES_PER_PAGE = 22; const MAX_CHARS_PER_LINE = 40; const MODEL_NAME = "gemini-2.5-flash";
     let examState = { subject: '', question: '', rubric: '', time: 0, seconds: 0, totalPage: 5, currPage: 1, timer: null, answers: {}, uploadedRubricText: '' };
-    let pdfTextQ = ''; let pdfImagesQ = [];
     let blankState = { outline: null, lines: [], answers: [], activeInput: null };
-    let fcClozeState = { activeInput: null, answers: [] }; // 플래시카드 단어장용 상태
+    let fcClozeState = { activeInput: null, answers: [] }; 
+    let currentCard = null;
 
     // ==========================================
-    // 2. 초기화 및 공통 유틸
+    // 2. 초기화 및 스크립트 기능
     // ==========================================
     window.onload = () => {
       const saved = localStorage.getItem('nomusa_db_v4');
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          window.setAppDB(parsed);
-        } catch(e) {}
-      }
-
-      if (db.outlines.length === 0) {
-        db.outlines.push({
-          id: 'sample-1', subject: '민사소송법', title: '변론관할(b)',
-          content: `I. 서설\n  1. 의의\n  2. 인정이유\nII. 요건\n  1. 관할권 없는 1심법원에의 소제기\n    (1) 의의\n    (2) 토지관할 위반의 경우\n    (3) 사물관할 위반의 경우\n  2. 피고의 관할위반의 항변이 없을 것\n  3. 피고가 이의 없이 본안변론을 하였을 것\nIII. 효과\n  1. 관할의 창설\n  2. 항변권의 상실\n  3. 효력범위\nIV. 적용범위\nV. 결론`
-        });
-        saveDB();
-      }
-      
+      if (saved) { try { window.setAppDB(JSON.parse(saved)); } catch(e) {} }
       const savedKey = localStorage.getItem('gemini_api_key');
       if(savedKey) document.getElementById('api-key-input').value = savedKey;
-
-      updateStreak();
-      renderDashboard();
+      updateStreak(); renderDashboard();
     };
 
     function saveDB() { 
-      try {
-        localStorage.setItem('nomusa_db_v4', JSON.stringify(db)); 
-        if (window.triggerCloudSave) window.triggerCloudSave();
-      } catch(e) { console.error('Save failed:', e); }
+      try { localStorage.setItem('nomusa_db_v4', JSON.stringify(db)); if (window.triggerCloudSave) window.triggerCloudSave(); } catch(e) { console.error(e); }
     }
     
     function navigate(id) {
       document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
-      const target = document.getElementById('page-' + id);
-      if(target) target.classList.add('active');
-      
+      const target = document.getElementById('page-' + id); if(target) target.classList.add('active');
       document.querySelectorAll('.nav-btn, .desktop-nav-btn').forEach(a => a.classList.remove('active'));
       
-      const dBtn = document.getElementById('d-nav-' + id);
-      const mBtn = document.getElementById('m-nav-' + id);
-      if(dBtn) dBtn.classList.add('active');
-      if(mBtn) mBtn.classList.add('active');
+      const dBtn = document.getElementById('d-nav-' + id); const mBtn = document.getElementById('m-nav-' + id);
+      if(dBtn) dBtn.classList.add('active'); if(mBtn) mBtn.classList.add('active');
 
       if (id === 'dashboard') renderDashboard();
       if (id === 'flashcard') renderDueFlashcards();
       if (id === 'exam') updateExamQList();
-      if (id === 'blank') {
-        document.getElementById('blank-list-view').classList.remove('hidden');
-        document.getElementById('blank-quiz-view').classList.add('hidden');
-        renderOutlineList();
-      }
+      if (id === 'blank') { document.getElementById('blank-list-view').classList.remove('hidden'); document.getElementById('blank-quiz-view').classList.add('hidden'); renderOutlineList(); }
     }
 
     function showLoading(msg) { document.getElementById('loading-text').textContent = msg; document.getElementById('loading-overlay').style.display = 'flex'; }
     function hideLoading() { document.getElementById('loading-overlay').style.display = 'none'; }
-    function showMsg(text) { 
-      const box = document.getElementById('message-box'); 
-      if (box) { box.textContent = text; box.style.display = 'block'; setTimeout(() => box.style.display = 'none', 3000); } 
-      else { alert(text); }
-    }
+    function showMsg(text) { const box = document.getElementById('message-box'); if (box) { box.textContent = text; box.style.display = 'block'; setTimeout(() => box.style.display = 'none', 3000); } else { alert(text); } }
     
-    function getToday() { const d = new Date(); d.setHours(0,0,0,0); return d.toISOString().split('T')[0]; }
+    // 💡 한국 로컬 시간 기준으로 날짜 가져오기 (시간대 버그 수정)
+    function getLocalYYYYMMDD(d) {
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+    function getToday() { return getLocalYYYYMMDD(new Date()); }
+    function getYesterday() {
+        const d = new Date(); d.setDate(d.getDate() - 1);
+        return getLocalYYYYMMDD(d);
+    }
 
     function saveApiKey() {
       const val = document.getElementById('api-key-input').value.trim();
-      if(val) { localStorage.setItem('gemini_api_key', val); showMsg('API 키가 저장되었습니다.'); }
-      else showMsg('키를 입력해주세요.');
+      if(val) { localStorage.setItem('gemini_api_key', val); showMsg('API 키가 저장되었습니다.'); } else showMsg('키를 입력해주세요.');
     }
     function getApiKey() {
       const key = localStorage.getItem('gemini_api_key');
-      if(!key) { showMsg("설정 탭에서 Gemini API 키를 먼저 입력해주세요!"); throw new Error("No API Key"); }
-      return key;
+      if(!key) { showMsg("설정 탭에서 Gemini API 키를 먼저 입력해주세요!"); throw new Error("No API Key"); } return key;
     }
 
-    // ==========================================
-    // 3. Gemini API
-    // ==========================================
     async function callGemini(prompt, schema, images = []) {
-      const key = getApiKey();
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${key}`;
+      const key = getApiKey(); const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${key}`;
       let parts = [{ text: prompt }];
       if (images && images.length > 0) { images.slice(0, 3).forEach(imgData => { parts.push({ inlineData: { mimeType: "image/jpeg", data: imgData } }); }); }
       const payload = { contents: [{ parts: parts }], generationConfig: { responseMimeType: "application/json", responseSchema: schema } };
@@ -664,12 +654,11 @@
         try {
           const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
           if (!res.ok) {
-            if (res.status === 429) throw new Error("무료 API 호출 한도를 초과했습니다 (429 에러). 약 1~2분 정도 기다린 후 다시 시도해주세요.");
-            if (res.status === 404) throw new Error("404 모델을 찾을 수 없습니다. API 설정이나 모델 이름 오류입니다.");
+            if (res.status === 429) throw new Error("무료 API 호출 한도를 초과했습니다. 잠시 후 시도해주세요.");
+            if (res.status === 404) throw new Error("모델을 찾을 수 없습니다.");
             throw new Error(`HTTP ${res.status}`);
           }
-          const data = await res.json();
-          return parseJSON(data.candidates[0].content.parts[0].text);
+          const data = await res.json(); return parseJSON(data.candidates[0].content.parts[0].text);
         } catch (err) {
           if (i === 3 || err.message.includes('429')) throw err;
           await new Promise(r => setTimeout(r, 1000 * Math.pow(2, i)));
@@ -683,20 +672,14 @@
         const jsonMatch = cleanText.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
         if (!jsonMatch) throw new Error("JSON format not found");
         return JSON.parse(jsonMatch[0]);
-      } catch (e) {
-        console.error("Parse Error:", text);
-        throw new Error("AI 응답 해석 실패");
-      }
+      } catch (e) { throw new Error("AI 응답 해석 실패"); }
     }
 
-    // ==========================================
-    // 4. 대시보드
-    // ==========================================
+    // 💡 Streak 계산 로직 개선
     function updateStreak() {
       const today = getToday();
-      if (db.lastStudyDate === today) return;
-      const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
-      if (db.lastStudyDate === yesterday.toISOString().split('T')[0]) { /* 유지 */ } 
+      const yesterday = getYesterday();
+      if (db.lastStudyDate === today || db.lastStudyDate === yesterday) { /* 유지 */ } 
       else if (db.lastStudyDate !== null) db.streak = 0;
       saveDB();
     }
@@ -704,27 +687,21 @@
     function markStudiedToday() {
       const today = getToday();
       if (db.lastStudyDate !== today) {
-        const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
-        if (db.lastStudyDate === yesterday.toISOString().split('T')[0]) db.streak++;
-        else db.streak = 1;
-        db.lastStudyDate = today;
-        saveDB();
+        const yesterday = getYesterday();
+        if (db.lastStudyDate === yesterday) db.streak++; else db.streak = 1;
+        db.lastStudyDate = today; saveDB();
+        if(window.renderDashboard) window.renderDashboard();
       }
     }
 
     window.renderDashboard = function() {
-      const target = new Date('2026-08-29');
-      const diff = Math.ceil((target - new Date().setHours(0,0,0,0)) / (1000*60*60*24));
+      const target = new Date('2026-08-29'); const diff = Math.ceil((target - new Date().setHours(0,0,0,0)) / (1000*60*60*24));
       document.getElementById('d-day-val').textContent = `D-${diff}`;
       document.getElementById('streak-val').textContent = `${db.streak}일`;
       document.getElementById('total-exams-val').textContent = `${db.history.length}회`;
-      
-      const dueCount = db.flashcards.filter(c => c.nextReview <= getToday()).length;
-      document.getElementById('due-cards-val').textContent = `${dueCount}장`;
-
+      document.getElementById('due-cards-val').textContent = `${db.flashcards.filter(c => c.nextReview <= getToday()).length}장`;
       const tbody = document.getElementById('history-tbody');
       if (db.history.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="py-10 text-center text-gray-400">기록이 없습니다.</td></tr>'; return; }
-
       tbody.innerHTML = db.history.slice(-5).reverse().map(h => `
         <tr class="border-b border-gray-50 hover:bg-gray-50 group">
           <td class="py-3 px-2 text-[12px] text-gray-500">${h.date}</td>
@@ -735,44 +712,29 @@
       `).join('');
     };
 
-    function viewHistory(id) {
-      const record = db.history.find(h => String(h.id) === String(id));
-      if(record) { renderExamResult(record); navigate('result'); }
-    }
+    function viewHistory(id) { const record = db.history.find(h => String(h.id) === String(id)); if(record) { renderExamResult(record); navigate('result'); } }
 
     async function analyzeStudyHistory() {
       if(db.history.length === 0) { showMsg("기록이 없습니다."); return; }
-      showLoading("학습 이력에서 취약점을 스캔 중입니다...");
+      showLoading("취약점 스캔 중...");
       const hist = db.history.slice(-5).map(h => `[${h.subject}] ${h.score}점 - ${h.feedback.missing}`).join('\n');
       const schema = { type: "OBJECT", properties: { analysis: { type: "STRING" } } };
-      const prompt = `다음은 수험생의 최근 모의고사 기록과 지적받은 단점들입니다.\n${hist}\n이 학생의 취약점을 진단하고 개선 공부법을 3문장으로 요약하세요.`;
       try {
-        const res = await callGemini(prompt, schema);
-        document.getElementById('ai-analysis-box').classList.remove('hidden');
-        document.getElementById('ai-analysis-content').textContent = res.analysis;
+        const res = await callGemini(`학생의 최근 모의고사 기록과 단점입니다.\n${hist}\n취약점을 진단하고 개선 공부법을 3문장으로 요약하세요.`, schema);
+        document.getElementById('ai-analysis-box').classList.remove('hidden'); document.getElementById('ai-analysis-content').textContent = res.analysis;
       } catch(e) { showMsg(e.message); } finally { hideLoading(); }
     }
 
-    // ==========================================
-    // 5. 판례 검색
-    // ==========================================
     async function searchLawDB() {
-      const kw = document.getElementById('law-search-input').value;
-      if(!kw) return;
-      const resEl = document.getElementById('law-search-result');
-      resEl.style.display = 'block'; resEl.innerHTML = '<div class="spinner w-6 h-6 mx-auto"></div>';
-      
-      const prompt = `노무사 수험생이 판례나 조문을 검색했습니다. 키워드: [${kw}]. 이에 해당하는 핵심 판례 요지 또는 관련 법조문을 노무사 2차 답안지에 쓸 수 있는 정제된 문장으로 3~4줄 요약해서 알려주세요. JSON 형식: {"content": "답변 내용"}`;
+      const kw = document.getElementById('law-search-input').value; if(!kw) return;
+      const resEl = document.getElementById('law-search-result'); resEl.style.display = 'block'; resEl.innerHTML = '<div class="spinner w-6 h-6 mx-auto"></div>';
       try {
         const schema = { type: "OBJECT", properties: { content: { type: "STRING" } } };
-        const res = await callGemini(prompt, schema);
+        const res = await callGemini(`노무사 수험생이 [${kw}]를 검색했습니다. 핵심 판례 요지 또는 관련 법조문을 노무사 2차 답안지에 쓸 수 있는 정제된 문장으로 3~4줄 요약해서 알려주세요.`, schema);
         resEl.textContent = res.content;
       } catch(e) { resEl.textContent = e.message; }
     }
 
-    // ==========================================
-    // 6. AI 자료 변환 (프롬프트 수정됨)
-    // ==========================================
     function handleFileDisplay(type) {
       const file = document.getElementById('file-'+type).files[0];
       if(file) document.getElementById('file-'+type+'-name').innerHTML = `<span class="text-emerald-500 font-bold">✅ ${file.name}</span>`;
@@ -780,26 +742,20 @@
 
     async function processAIConvert() {
       const fileQ = document.getElementById('file-q').files[0];
-      
-      if (!fileQ) { showMsg('문제 또는 기본서 PDF를 업로드해주세요.'); return; }
-      
-      showLoading('AI가 PDF 텍스트 및 스캔본을 분석 중입니다...');
+      if (!fileQ) { showMsg('문제 또는 모범답안 PDF를 업로드해주세요.'); return; }
+      showLoading('AI가 PDF를 정밀 분석 중입니다...');
       const type = document.getElementById('convert-type').value;
       const subject = document.getElementById('convert-subject').value;
 
       try {
-        const bufQ = await fileQ.arrayBuffer(); 
-        const pdfQ = await pdfjsLib.getDocument(bufQ).promise;
+        const bufQ = await fileQ.arrayBuffer(); const pdfQ = await pdfjsLib.getDocument(bufQ).promise;
         let textQ = ''; let images = [];
         for (let i=1; i<=pdfQ.numPages; i++) {
-          const page = await pdfQ.getPage(i);
-          const content = await page.getTextContent();
-          const pText = content.items.map(it => it.str).join(' ');
-          textQ += pText + '\n';
+          const page = await pdfQ.getPage(i); const content = await page.getTextContent();
+          const pText = content.items.map(it => it.str).join(' '); textQ += pText + '\n';
           if (pText.trim().length < 50 && images.length < 3) {
             const vp = page.getViewport({scale: 1.5}); const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
-            canvas.height = vp.height; canvas.width = vp.width;
-            await page.render({canvasContext: ctx, viewport: vp}).promise;
+            canvas.height = vp.height; canvas.width = vp.width; await page.render({canvasContext: ctx, viewport: vp}).promise;
             images.push(canvas.toDataURL('image/jpeg').split(',')[1]);
           }
         }
@@ -808,12 +764,11 @@
 
         if (type === 'exam') {
           const schema = { type: "ARRAY", items: { type: "OBJECT", properties: { subject: { type: "STRING" }, question: { type: "STRING" }, rubric: { type: "STRING" } }, required: ["subject", "question", "rubric"] } };
-          const res = await callGemini(basePrompt + `\n\n위 자료를 바탕으로 노무사 2차 시험 '문제'와 핵심 '채점기준' 1세트를 추출하세요.`, schema, images);
+          const res = await callGemini(basePrompt + `\n\n위 자료를 바탕으로 노무사 2차 시험 '문제'와 '모범답안' 1세트를 추출하세요. 특히 rubric 필드에는 단순 요약이 아닌, 목차와 배점, 핵심 키워드가 포함된 상세한 모범답안을 최대한 원본에 가깝게 작성해주세요.`, schema, images);
           res.forEach(q => { q.id = Date.now()+Math.random(); db.questions.push(q); });
           saveDB(); updateExamQList(); showMsg(`✅ 모의고사 문제 ${res.length}개 저장!`);
         } else {
           const schema = { type: "ARRAY", items: { type: "OBJECT", properties: { front: { type: "STRING" }, back: { type: "STRING" } }, required: ["front", "back"] } };
-          // 💡 프롬프트 진화: 대괄호 처리 강제
           const res = await callGemini(basePrompt + `\n\n위 자료에서 암기해야 할 핵심 쟁점이나 판례를 안키형 플래시카드(앞면/뒷면) 5~10개로 만들어주세요.\n중요: 뒷면 내용 중 반드시 암기해야 할 핵심 키워드나 문구는 양쪽에 [대괄호]로 묶어주세요. (예: 근로기준법상 [근로자]란...)`, schema, images);
           res.forEach(card => {
             card.id = Date.now()+Math.random(); card.subject = subject;
@@ -822,282 +777,204 @@
           });
           saveDB(); showMsg(`✅ 암기 카드 ${res.length}장 생성!`);
         }
-        
-      } catch(e) { 
-        showMsg(e.message); 
-      } finally { hideLoading(); }
+      } catch(e) { showMsg(e.message); } finally { hideLoading(); }
     }
 
     // ==========================================
-    // 7. 플래시카드 (하이브리드 모드 추가)
+    // 💡 7. 플래시카드 AI 도우미 함수 추가
     // ==========================================
-    function toggleFcManager() {
-      const view = document.getElementById('fc-manager-view');
-      view.classList.toggle('hidden');
-      if (!view.classList.contains('hidden')) {
-        renderFcList();
-        document.getElementById('manual-card-form').classList.add('hidden');
+    async function getFcHint() {
+      if (!currentCard) return;
+      const resEl = document.getElementById('fc-ai-result');
+      resEl.classList.remove('hidden');
+      resEl.innerHTML = '<div class="text-center text-purple-400 font-bold animate-pulse text-[11px] py-2">✨ AI가 힌트를 고민하고 있습니다...</div>';
+      
+      try {
+        const schema = { type: "OBJECT", properties: { hint: { type: "STRING" } } };
+        const prompt = `과목: ${currentCard.subject}\n질문: ${currentCard.front}\n정답: ${currentCard.back}\n\n사용자가 정답을 떠올리지 못하고 있습니다. 정답에 포함된 직접적인 핵심 단어는 절대 노출하지 말고, 정답을 유추할 수 있도록 돕는 아주 결정적인 '힌트'나 '초성'을 1~2문장으로 제공해주세요.`;
+        const res = await callGemini(prompt, schema);
+        resEl.innerHTML = `<strong class="text-purple-600 block mb-1"><i class="ri-lightbulb-flash-line"></i> AI 힌트:</strong> ${res.hint}`;
+      } catch(e) {
+        resEl.innerHTML = `<span class="text-red-500">오류 발생: ${e.message}</span>`;
       }
+    }
+
+    async function getFcMnemonic() {
+      if (!currentCard) return;
+      const resEl = document.getElementById('fc-ai-result');
+      resEl.classList.remove('hidden');
+      resEl.innerHTML = '<div class="text-center text-blue-400 font-bold animate-pulse text-[11px] py-2">✨ AI가 암기 비법을 만들고 있습니다...</div>';
+      
+      try {
+        const schema = { type: "OBJECT", properties: { mnemonic: { type: "STRING" } } };
+        const prompt = `과목: ${currentCard.subject}\n질문: ${currentCard.front}\n정답: ${currentCard.back}\n\n수험생이 위 내용을 쉽게 외울 수 있도록, 각 키워드의 앞글자를 딴 기발하고 재미있는 '두음문자 암기법(연상법)'을 만들어주세요. 1~2문장으로 짧고 강렬하게 설명해주세요.`;
+        const res = await callGemini(prompt, schema);
+        resEl.innerHTML = `<strong class="text-blue-600 block mb-1"><i class="ri-magic-line"></i> AI 암기비법:</strong> ${res.mnemonic}`;
+      } catch(e) {
+        resEl.innerHTML = `<span class="text-red-500">오류 발생: ${e.message}</span>`;
+      }
+    }
+
+
+    function toggleFcManager() {
+      const view = document.getElementById('fc-manager-view'); view.classList.toggle('hidden');
+      if (!view.classList.contains('hidden')) { renderFcList(); document.getElementById('manual-card-form').classList.add('hidden'); }
     }
 
     function renderFcList() {
       const container = document.getElementById('fc-list');
-      if(db.flashcards.length === 0) { 
-        container.innerHTML = '<p class="text-sm text-gray-400 py-4 text-center">등록된 카드가 없습니다.</p>'; 
-        return; 
+      const filter = document.getElementById('fc-filter-subject').value;
+      
+      let filteredCards = db.flashcards;
+      if (filter !== 'all') {
+        filteredCards = filteredCards.filter(c => c.subject === filter);
       }
-      container.innerHTML = db.flashcards.map(c => `
+
+      if(filteredCards.length === 0) { container.innerHTML = '<p class="text-sm text-gray-400 py-4 text-center">등록된 카드가 없습니다.</p>'; return; }
+      container.innerHTML = filteredCards.map(c => `
         <div class="flex justify-between items-center p-3 bg-gray-50 border border-gray-100 rounded-lg hover:border-emerald-300 transition-colors">
-           <div class="flex-1 min-w-0 pr-4">
-             <span class="text-[10px] font-bold text-emerald-500 bg-emerald-50 px-2 py-0.5 rounded">${c.subject}</span>
-             <p class="font-bold text-sm text-slate-800 mt-1 truncate">${c.front}</p>
-           </div>
-           <div class="flex gap-2 shrink-0">
-              <button onclick="editFc('${c.id}')" class="px-3 py-1.5 bg-white border border-gray-200 text-slate-600 rounded text-xs font-bold hover:bg-gray-100">수정</button>
-              <button onclick="deleteFc('${c.id}')" class="px-3 py-1.5 border border-red-100 text-red-500 rounded text-xs font-bold hover:bg-red-50">삭제</button>
-           </div>
+           <div class="flex-1 min-w-0 pr-4"><span class="text-[10px] font-bold text-emerald-500 bg-emerald-50 px-2 py-0.5 rounded">${c.subject}</span><p class="font-bold text-sm text-slate-800 mt-1 truncate">${c.front}</p></div>
+           <div class="flex gap-2 shrink-0"><button onclick="editFc('${c.id}')" class="px-3 py-1.5 bg-white border border-gray-200 text-slate-600 rounded text-xs font-bold hover:bg-gray-100">수정</button><button onclick="deleteFc('${c.id}')" class="px-3 py-1.5 border border-red-100 text-red-500 rounded text-xs font-bold hover:bg-red-50">삭제</button></div>
         </div>
       `).join('');
     }
 
-    function deleteFc(id) {
-      if(!confirm('해당 카드를 삭제하시겠습니까?')) return;
-      db.flashcards = db.flashcards.filter(c => String(c.id) !== String(id));
-      saveDB(); renderFcList(); renderDueFlashcards(); showMsg("카드가 삭제되었습니다.");
-    }
+    function deleteFc(id) { if(!confirm('해당 카드를 삭제하시겠습니까?')) return; db.flashcards = db.flashcards.filter(c => String(c.id) !== String(id)); saveDB(); renderFcList(); renderDueFlashcards(); showMsg("카드가 삭제되었습니다."); }
 
     function editFc(id) {
-      const c = db.flashcards.find(x => String(x.id) === String(id));
-      if(!c) return;
-      editingFcId = c.id;
-      
+      const c = db.flashcards.find(x => String(x.id) === String(id)); if(!c) return; editingFcId = c.id;
       document.getElementById('manual-fc-title').innerHTML = '<i class="ri-edit-2-line text-emerald-500"></i> 플래시카드 수정하기';
-      document.getElementById('manual-fc-subject').value = c.subject;
-      document.getElementById('manual-fc-front').value = c.front;
-      document.getElementById('manual-fc-back').value = c.back;
+      document.getElementById('manual-fc-subject').value = c.subject; document.getElementById('manual-fc-front').value = c.front; document.getElementById('manual-fc-back').value = c.back;
       document.getElementById('manual-fc-save-btn').textContent = '수정 완료';
-      
-      document.getElementById('manual-card-form').classList.remove('hidden');
-      document.getElementById('fc-manager-view').classList.add('hidden');
+      document.getElementById('manual-card-form').classList.remove('hidden'); document.getElementById('fc-manager-view').classList.add('hidden');
     }
 
     function toggleManualCardForm() {
-      editingFcId = null;
-      document.getElementById('manual-fc-title').innerHTML = '<i class="ri-edit-circle-line text-emerald-500"></i> 새 플래시카드 입력';
-      document.getElementById('manual-fc-front').value = '';
-      document.getElementById('manual-fc-back').value = '';
-      document.getElementById('manual-fc-save-btn').textContent = '추가하기';
-      
-      document.getElementById('fc-manager-view').classList.add('hidden');
-      document.getElementById('manual-card-form').classList.toggle('hidden');
+      editingFcId = null; document.getElementById('manual-fc-title').innerHTML = '<i class="ri-edit-circle-line text-emerald-500"></i> 새 플래시카드 입력';
+      document.getElementById('manual-fc-front').value = ''; document.getElementById('manual-fc-back').value = ''; document.getElementById('manual-fc-save-btn').textContent = '추가하기';
+      document.getElementById('fc-manager-view').classList.add('hidden'); document.getElementById('manual-card-form').classList.toggle('hidden');
     }
 
-    function cancelManualFlashcard() {
-      editingFcId = null;
-      document.getElementById('manual-card-form').classList.add('hidden');
-    }
+    function cancelManualFlashcard() { editingFcId = null; document.getElementById('manual-card-form').classList.add('hidden'); }
 
-    // 💡 버그 픽스: 카드 추가 에러 방지 처리 추가
     function addManualFlashcard() {
       try {
-        const subject = document.getElementById('manual-fc-subject').value;
-        const front = document.getElementById('manual-fc-front').value.trim();
-        const back = document.getElementById('manual-fc-back').value.trim();
-
+        const subject = document.getElementById('manual-fc-subject').value; const front = document.getElementById('manual-fc-front').value.trim(); const back = document.getElementById('manual-fc-back').value.trim();
         if (!front || !back) { showMsg('⚠️ 앞면과 뒷면을 모두 입력해주세요.'); return; }
 
         if (editingFcId) {
           const idx = db.flashcards.findIndex(x => String(x.id) === String(editingFcId));
-          if(idx > -1) {
-            db.flashcards[idx].subject = subject;
-            db.flashcards[idx].front = front;
-            db.flashcards[idx].back = back;
-          }
-          editingFcId = null;
-          showMsg('✅ 카드가 성공적으로 수정되었습니다!');
+          if(idx > -1) { db.flashcards[idx].subject = subject; db.flashcards[idx].front = front; db.flashcards[idx].back = back; }
+          editingFcId = null; showMsg('✅ 카드가 수정되었습니다!');
         } else {
           db.flashcards.push({ id: Date.now() + Math.random(), subject, front, back, repetition: 0, interval: 0, efactor: 2.5, nextReview: getToday() });
-          showMsg('✅ 새 플래시카드가 추가되었습니다!');
+          showMsg('✅ 카드가 추가되었습니다!');
         }
-        
-        saveDB();
-        document.getElementById('manual-card-form').classList.add('hidden');
-        renderDueFlashcards();
-      } catch(e) {
-        showMsg("카드 저장 중 오류가 발생했습니다: " + e.message);
-      }
+        saveDB(); document.getElementById('manual-card-form').classList.add('hidden'); renderDueFlashcards();
+      } catch(e) { showMsg("카드 저장 오류: " + e.message); }
     }
 
     window.renderDueFlashcards = function() {
-      const today = getToday();
-      dueCards = db.flashcards.filter(c => c.nextReview <= today);
+      const today = getToday(); dueCards = db.flashcards.filter(c => c.nextReview <= today);
       document.getElementById('fc-due-display').textContent = dueCards.length;
-
-      if (dueCards.length > 0) {
-        document.getElementById('fc-workspace').classList.remove('hidden');
-        document.getElementById('fc-empty').classList.add('hidden');
-        loadNextCard();
-      } else {
-        document.getElementById('fc-workspace').classList.add('hidden');
-        document.getElementById('fc-empty').classList.remove('hidden');
-      }
+      if (dueCards.length > 0) { document.getElementById('fc-workspace').classList.remove('hidden'); document.getElementById('fc-empty').classList.add('hidden'); loadNextCard(); } 
+      else { document.getElementById('fc-workspace').classList.add('hidden'); document.getElementById('fc-empty').classList.remove('hidden'); }
     };
 
     function loadNextCard() {
       if (dueCards.length === 0) { renderDueFlashcards(); return; }
       currentCard = dueCards[0];
       
-      // 공통 버튼 리셋 (깜빡임 애니메이션 제거)
+      // UI 리셋
       document.getElementById('fc-buttons').classList.remove('show');
       document.querySelectorAll('.sm2-btn').forEach(btn => btn.classList.remove('ring-4', 'ring-offset-2', 'ring-rose-400', 'ring-orange-400', 'ring-blue-400', 'ring-emerald-400', 'animate-pulse'));
+      
+      const aiResult = document.getElementById('fc-ai-result');
+      if(aiResult) { aiResult.classList.add('hidden'); aiResult.innerHTML = ''; }
 
       let e = currentCard.efactor || 2.5; let r = currentCard.repetition || 0; let iv = currentCard.interval || 0;
       document.getElementById('fc-btn-good').textContent = (r === 0 ? 1 : r === 1 ? 6 : Math.round(iv * e)) + "일 후";
       document.getElementById('fc-btn-easy').textContent = (r === 0 ? 4 : Math.round(iv * e * 1.3)) + "일 후";
 
-      // 💡 하이브리드 로직: 대괄호 포함 여부에 따라 모드 전환
       const hasCloze = /\[(.*?)\]/.test(currentCard.back);
-      
       if (hasCloze) {
-        // 단어장 모드 (Cloze)
-        document.getElementById('fc-flip-container').classList.add('hidden');
-        document.getElementById('fc-cloze-container').classList.remove('hidden');
+        document.getElementById('fc-flip-container').classList.add('hidden'); document.getElementById('fc-cloze-container').classList.remove('hidden');
         renderFcClozeCard(currentCard);
       } else {
-        // 기존 뒤집기 모드 (Flip)
-        document.getElementById('fc-cloze-container').classList.add('hidden');
-        document.getElementById('fc-flip-container').classList.remove('hidden');
-        
+        document.getElementById('fc-cloze-container').classList.add('hidden'); document.getElementById('fc-flip-container').classList.remove('hidden');
         document.getElementById('fc-card').classList.remove('flipped');
-        document.getElementById('fc-front-sub').textContent = currentCard.subject || '';
-        document.getElementById('fc-front-text').textContent = currentCard.front || '';
-        document.getElementById('fc-back-text').textContent = currentCard.back || '';
+        document.getElementById('fc-front-sub').textContent = currentCard.subject || ''; document.getElementById('fc-front-text').textContent = currentCard.front || ''; document.getElementById('fc-back-text').textContent = currentCard.back || '';
       }
     }
 
-    // 💡 새로운 모드: 플래시카드용 빈칸 채우기 렌더러
     function renderFcClozeCard(card) {
-      document.getElementById('fc-cloze-sub').textContent = card.subject || '';
-      document.getElementById('fc-cloze-front').textContent = card.front || '';
+      document.getElementById('fc-cloze-sub').textContent = card.subject || ''; document.getElementById('fc-cloze-front').textContent = card.front || '';
       document.getElementById('fc-cloze-check-btn').classList.remove('hidden');
       
       const container = document.getElementById('fc-cloze-back');
-      const regex = /\[(.*?)\]/g;
-      let html = '';
-      let match;
-      let lastIdx = 0;
-      fcClozeState.answers = [];
+      const regex = /\[(.*?)\]/g; let html = ''; let match; let lastIdx = 0; fcClozeState.answers = [];
 
-      // 가장 긴 정답 기준 너비 통일
-      let matches = [];
-      let tempMatch;
-      const tempRegex = /\[(.*?)\]/g;
+      let matches = []; let tempMatch; const tempRegex = /\[(.*?)\]/g;
       while ((tempMatch = tempRegex.exec(card.back)) !== null) { matches.push(tempMatch[1]); }
       const maxCharLen = matches.length > 0 ? Math.max(...matches.map(x => x.length)) : 10;
       const uniformWidth = `calc(${Math.max(maxCharLen, 6)}ch + 32px)`;
 
       while ((match = regex.exec(card.back)) !== null) {
         html += card.back.substring(lastIdx, match.index);
-        const ans = match[1].trim();
-        fcClozeState.answers.push(ans);
+        const ans = match[1].trim(); fcClozeState.answers.push(ans);
         html += `<input type="text" class="fc-blank-input blank-input" data-answer="${ans}" style="width: ${uniformWidth};" onclick="setFcActiveInput(this)" placeholder="">`;
         lastIdx = regex.lastIndex;
       }
-      html += card.back.substring(lastIdx);
-      container.innerHTML = html;
+      html += card.back.substring(lastIdx); container.innerHTML = html;
 
-      // 단어장 워드칩 생성
-      const bank = document.getElementById('fc-cloze-word-bank');
-      bank.innerHTML = '';
+      const bank = document.getElementById('fc-cloze-word-bank'); bank.innerHTML = '';
       const shuffled = [...fcClozeState.answers].sort(() => Math.random() - 0.5);
-      shuffled.forEach(ans => {
-        // 홑따옴표 오류 방지용 이스케이프
-        const safeAns = ans.replace(/'/g, "\\'");
-        bank.innerHTML += `<div class="word-chip" onclick="fillFcWordChip('${safeAns}')">${ans}</div>`;
-      });
+      shuffled.forEach(ans => { const safeAns = ans.replace(/'/g, "\\'"); bank.innerHTML += `<div class="word-chip" onclick="fillFcWordChip('${safeAns}')">${ans}</div>`; });
 
-      // 입력창 포커스 이벤트 연동
       const inputs = container.querySelectorAll('.fc-blank-input');
-      inputs.forEach(input => {
-        input.addEventListener('focus', (e) => { setFcActiveInput(e.target); });
-        input.addEventListener('input', (e) => { e.target.classList.remove('correct', 'wrong'); });
-      });
-
-      fcClozeState.activeInput = null;
-      if(inputs.length > 0) inputs[0].focus();
+      inputs.forEach(input => { input.addEventListener('focus', (e) => { setFcActiveInput(e.target); }); input.addEventListener('input', (e) => { e.target.classList.remove('correct', 'wrong'); }); });
+      fcClozeState.activeInput = null; if(inputs.length > 0) inputs[0].focus();
     }
 
-    function setFcActiveInput(el) {
-      fcClozeState.activeInput = el;
-      el.classList.remove('correct', 'wrong');
-    }
-
+    function setFcActiveInput(el) { fcClozeState.activeInput = el; el.classList.remove('correct', 'wrong'); }
     function fillFcWordChip(word) {
       if (fcClozeState.activeInput) {
-        fcClozeState.activeInput.value = word;
-        fcClozeState.activeInput.classList.remove('correct', 'wrong');
+        fcClozeState.activeInput.value = word; fcClozeState.activeInput.classList.remove('correct', 'wrong');
         const inputs = Array.from(document.querySelectorAll('#fc-cloze-back .fc-blank-input'));
         const nextEmpty = inputs.slice(inputs.indexOf(fcClozeState.activeInput) + 1).find(i => !i.value) || inputs.find(i => !i.value);
         if (nextEmpty) nextEmpty.focus();
-      } else {
-        showMsg("먼저 채워넣을 빈칸을 클릭해주세요.");
-      }
+      } else { showMsg("먼저 채워넣을 빈칸을 클릭해주세요."); }
     }
 
     function checkFcClozeAnswers() {
-      const inputs = document.querySelectorAll('#fc-cloze-back .fc-blank-input');
-      let correctCount = 0;
-
+      const inputs = document.querySelectorAll('#fc-cloze-back .fc-blank-input'); let correctCount = 0;
       inputs.forEach(input => {
-        const actual = input.dataset.answer.replace(/\s+/g, '');
-        const user = input.value.replace(/\s+/g, '');
-        if (actual === user) {
-          input.classList.add('correct'); input.classList.remove('wrong'); input.placeholder = ''; correctCount++;
-        } else {
-          input.classList.add('wrong'); input.classList.remove('correct'); if (!input.value) input.placeholder = "?";
-        }
+        const actual = input.dataset.answer.replace(/\s+/g, ''); const user = input.value.replace(/\s+/g, '');
+        if (actual === user) { input.classList.add('correct'); input.classList.remove('wrong'); input.placeholder = ''; correctCount++; } 
+        else { input.classList.add('wrong'); input.classList.remove('correct'); if (!input.value) input.placeholder = "?"; }
       });
 
-      // 채점 결과에 따른 추천 로직
-      document.getElementById('fc-cloze-check-btn').classList.add('hidden');
-      document.getElementById('fc-buttons').classList.add('show');
-      
+      document.getElementById('fc-cloze-check-btn').classList.add('hidden'); document.getElementById('fc-buttons').classList.add('show');
       const accuracy = inputs.length > 0 ? (correctCount / inputs.length) : 0;
-      
       document.querySelectorAll('.sm2-btn').forEach(btn => btn.classList.remove('ring-4', 'ring-offset-2', 'ring-rose-400', 'ring-orange-400', 'ring-blue-400', 'ring-emerald-400', 'animate-pulse'));
 
-      if (accuracy === 1) {
-        document.getElementById('btn-easy').classList.add('ring-4', 'ring-offset-2', 'ring-emerald-400', 'animate-pulse');
-        showMsg("🎉 100% 완벽! '쉬움'을 추천합니다.");
-      } else if (accuracy >= 0.75) {
-        document.getElementById('btn-good').classList.add('ring-4', 'ring-offset-2', 'ring-blue-400', 'animate-pulse');
-        showMsg("👍 75% 이상 정답! '보통'을 추천합니다.");
-      } else if (accuracy >= 0.25) {
-        document.getElementById('btn-hard').classList.add('ring-4', 'ring-offset-2', 'ring-orange-400', 'animate-pulse');
-        showMsg("🔥 25%~75% 정답. '어려움'을 추천합니다.");
-      } else {
-        document.getElementById('btn-again').classList.add('ring-4', 'ring-offset-2', 'ring-rose-400', 'animate-pulse');
-        showMsg("💪 25% 미만 정답. 다시 한 번 확실히 외워봅시다!");
-      }
+      if (accuracy === 1) { document.getElementById('btn-easy').classList.add('ring-4', 'ring-offset-2', 'ring-emerald-400', 'animate-pulse'); showMsg("🎉 100% 완벽! '쉬움'을 추천합니다."); } 
+      else if (accuracy >= 0.75) { document.getElementById('btn-good').classList.add('ring-4', 'ring-offset-2', 'ring-blue-400', 'animate-pulse'); showMsg("👍 75% 이상 정답! '보통'을 추천합니다."); } 
+      else if (accuracy >= 0.25) { document.getElementById('btn-hard').classList.add('ring-4', 'ring-offset-2', 'ring-orange-400', 'animate-pulse'); showMsg("🔥 25%~75% 정답. '어려움'을 추천합니다."); } 
+      else { document.getElementById('btn-again').classList.add('ring-4', 'ring-offset-2', 'ring-rose-400', 'animate-pulse'); showMsg("💪 25% 미만 정답. 다시 한 번 확실히 외워봅시다!"); }
     }
 
-    function flipCard() {
-      document.getElementById('fc-card').classList.add('flipped');
-      document.getElementById('fc-buttons').classList.add('show');
-    }
+    function flipCard() { document.getElementById('fc-card').classList.add('flipped'); document.getElementById('fc-buttons').classList.add('show'); }
 
     function rateCard(rating) {
       let q = rating === 1 ? 0 : rating === 2 ? 3 : rating === 3 ? 4 : 5;
       let r = currentCard.repetition || 0; let iv = currentCard.interval || 0; let e = currentCard.efactor || 2.5;
 
       if (q >= 3) {
-        if (r === 0) iv = (q === 4 ? 4 : 1); else if (r === 1) iv = 6; else iv = Math.round(iv * e * (q === 4 ? 1.3 : 1));
-        r++;
+        if (r === 0) iv = (q === 4 ? 4 : 1); else if (r === 1) iv = 6; else iv = Math.round(iv * e * (q === 4 ? 1.3 : 1)); r++;
       } else { r = 0; iv = (rating === 2 ? 0.5 : 0); }
 
-      e = e + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02));
-      if (e < 1.3) e = 1.3;
-
+      e = e + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02)); if (e < 1.3) e = 1.3;
       currentCard.repetition = r; currentCard.interval = iv; currentCard.efactor = e;
 
       let nextDate = new Date();
@@ -1106,78 +983,67 @@
       else nextDate.setDate(nextDate.getDate() + iv);
 
       currentCard.nextReview = nextDate.toISOString().split('T')[0];
-
       const idx = db.flashcards.findIndex(c => c.id === currentCard.id);
       if (idx > -1) db.flashcards[idx] = currentCard;
-      saveDB(); markStudiedToday();
-      dueCards.shift(); if (rating === 1) dueCards.push(currentCard);
-      loadNextCard();
+      saveDB(); markStudiedToday(); dueCards.shift(); if (rating === 1) dueCards.push(currentCard); loadNextCard();
     }
 
     // ==========================================
-    // 7.5 빈칸 채우기
+    // 7.5 빈칸 채우기 (💡 AI 목차 생성 기능 추가)
     // ==========================================
-    function toggleOutlineAdder() { 
-      editingOutlineId = null;
-      document.getElementById('outline-adder-title').innerHTML = '<i class="ri-file-list-line text-emerald-500"></i> 새 목차 구조 등록';
-      document.getElementById('outline-save-btn').textContent = '등록하기';
-      document.getElementById('outline-title').value = '';
-      document.getElementById('outline-content').value = '';
-      document.getElementById('outline-adder').classList.toggle('hidden'); 
-    }
-    
-    function cancelOutlineEdit() {
-      editingOutlineId = null;
-      document.getElementById('outline-adder').classList.add('hidden');
-    }
-
-    function editOutline(id) {
-      const o = db.outlines.find(x => String(x.id) === String(id));
-      if(!o) return;
-      editingOutlineId = o.id;
-      
-      document.getElementById('outline-adder-title').innerHTML = '<i class="ri-edit-line text-emerald-500"></i> 목차 내용 수정';
-      document.getElementById('outline-subject').value = o.subject;
-      document.getElementById('outline-title').value = o.title;
-      document.getElementById('outline-content').value = o.content;
-      document.getElementById('outline-save-btn').textContent = "수정 완료";
-      
-      document.getElementById('outline-adder').classList.remove('hidden');
-      window.scrollTo(0, document.getElementById('outline-adder').offsetTop - 100);
-    }
-
-    function saveOutline() {
+    async function generateOutlineWithAI() {
       const subject = document.getElementById('outline-subject').value;
       const title = document.getElementById('outline-title').value.trim();
-      const content = document.getElementById('outline-content').value.trim();
       
-      if (!title || !content) { showMsg("제목과 내용을 모두 입력해주세요."); return; }
-
-      if (editingOutlineId) {
-         const idx = db.outlines.findIndex(x => String(x.id) === String(editingOutlineId));
-         if(idx > -1) {
-             db.outlines[idx].subject = subject;
-             db.outlines[idx].title = title;
-             db.outlines[idx].content = content;
-         }
-         editingOutlineId = null;
-         showMsg("목차가 성공적으로 수정되었습니다.");
-      } else {
-         db.outlines.push({ id: Date.now() + Math.random(), subject, title, content });
-         showMsg("새 목차가 등록되었습니다.");
-      }
-
-      saveDB();
-      document.getElementById('outline-title').value = ''; 
-      document.getElementById('outline-content').value = '';
-      document.getElementById('outline-adder').classList.add('hidden');
-      renderOutlineList(); 
+      if (!title) { showMsg("주제(제목)를 먼저 입력해주세요!"); return; }
+      
+      showLoading("AI가 표준 목차 구조를 작성 중입니다...");
+      try {
+        const schema = { type: "OBJECT", properties: { outline: { type: "STRING" } } };
+        const prompt = `과목: ${subject}\n주제: ${title}\n\n위 주제에 대해 노무사 2차 시험 답안지에 쓸 수 있는 핵심 표준 목차를 작성해주세요. 반드시 'I. -> 1. -> (1)' 형태의 번호 체계를 엄격하게 사용해야 합니다. 다른 부가 설명 없이 목차 내용만 출력하세요.`;
+        const res = await callGemini(prompt, schema);
+        document.getElementById('outline-content').value = res.outline;
+        showMsg("✨ AI 목차 자동 생성 완료!");
+      } catch(e) {
+        showMsg("목차 생성 실패: " + e.message);
+      } finally { hideLoading(); }
     }
 
+    function toggleOutlineAdder() { 
+      editingOutlineId = null; document.getElementById('outline-adder-title').innerHTML = '<i class="ri-file-list-line text-emerald-500"></i> 새 목차 구조 등록';
+      document.getElementById('outline-save-btn').textContent = '등록하기'; document.getElementById('outline-title').value = ''; document.getElementById('outline-content').value = '';
+      document.getElementById('outline-adder').classList.toggle('hidden'); 
+    }
+    function cancelOutlineEdit() { editingOutlineId = null; document.getElementById('outline-adder').classList.add('hidden'); }
+    function editOutline(id) {
+      const o = db.outlines.find(x => String(x.id) === String(id)); if(!o) return; editingOutlineId = o.id;
+      document.getElementById('outline-adder-title').innerHTML = '<i class="ri-edit-line text-emerald-500"></i> 목차 내용 수정';
+      document.getElementById('outline-subject').value = o.subject; document.getElementById('outline-title').value = o.title; document.getElementById('outline-content').value = o.content;
+      document.getElementById('outline-save-btn').textContent = "수정 완료"; document.getElementById('outline-adder').classList.remove('hidden');
+      window.scrollTo(0, document.getElementById('outline-adder').offsetTop - 100);
+    }
+    function saveOutline() {
+      const subject = document.getElementById('outline-subject').value; const title = document.getElementById('outline-title').value.trim(); const content = document.getElementById('outline-content').value.trim();
+      if (!title || !content) { showMsg("제목과 내용을 모두 입력해주세요."); return; }
+      if (editingOutlineId) {
+         const idx = db.outlines.findIndex(x => String(x.id) === String(editingOutlineId));
+         if(idx > -1) { db.outlines[idx].subject = subject; db.outlines[idx].title = title; db.outlines[idx].content = content; }
+         editingOutlineId = null; showMsg("목차가 수정되었습니다.");
+      } else { db.outlines.push({ id: Date.now() + Math.random(), subject, title, content }); showMsg("새 목차가 등록되었습니다."); }
+      saveDB(); document.getElementById('outline-title').value = ''; document.getElementById('outline-content').value = ''; document.getElementById('outline-adder').classList.add('hidden'); renderOutlineList(); 
+    }
     window.renderOutlineList = function() {
       const container = document.getElementById('outline-list');
-      if (!db.outlines || db.outlines.length === 0) { container.innerHTML = '<p class="col-span-2 text-center text-gray-400 py-10">등록된 목차가 없습니다.</p>'; return; }
-      container.innerHTML = db.outlines.map(o => `
+      const filterEl = document.getElementById('outline-filter-subject');
+      const filter = filterEl ? filterEl.value : 'all';
+      
+      let filteredOutlines = db.outlines || [];
+      if (filter !== 'all') {
+        filteredOutlines = filteredOutlines.filter(o => o.subject === filter);
+      }
+
+      if (filteredOutlines.length === 0) { container.innerHTML = '<p class="col-span-2 text-center text-gray-400 py-10">등록된 목차가 없습니다.</p>'; return; }
+      container.innerHTML = filteredOutlines.map(o => `
         <div class="p-6 bg-white border border-gray-200 rounded-xl shadow-sm flex flex-col justify-between hover:border-emerald-500 transition-all group">
           <div><span class="text-[10px] font-bold text-emerald-500 bg-emerald-50 px-2 py-1 rounded-full">${o.subject}</span><h4 class="font-extrabold text-slate-800 text-lg mt-3 mb-2">${o.title}</h4></div>
           <div class="flex justify-end gap-2 mt-4">
@@ -1188,110 +1054,60 @@
         </div>
       `).join('');
     };
-
-    function deleteOutline(id) {
-      if(!confirm("해당 목차를 삭제하시겠습니까?")) return;
-      db.outlines = db.outlines.filter(o => String(o.id) !== String(id)); saveDB(); renderOutlineList(); showMsg("삭제되었습니다.");
-    }
-
+    function deleteOutline(id) { if(!confirm("해당 목차를 삭제하시겠습니까?")) return; db.outlines = db.outlines.filter(o => String(o.id) !== String(id)); saveDB(); renderOutlineList(); showMsg("삭제되었습니다."); }
     function startBlankQuiz(id) {
-      blankState.outline = db.outlines.find(o => String(o.id) === String(id));
-      if(!blankState.outline) return;
-      document.getElementById('blank-list-view').classList.add('hidden');
-      document.getElementById('blank-quiz-view').classList.remove('hidden');
-      document.getElementById('quiz-subject').textContent = blankState.outline.subject;
-      document.getElementById('quiz-title').textContent = blankState.outline.title;
+      blankState.outline = db.outlines.find(o => String(o.id) === String(id)); if(!blankState.outline) return;
+      document.getElementById('blank-list-view').classList.add('hidden'); document.getElementById('blank-quiz-view').classList.remove('hidden');
+      document.getElementById('quiz-subject').textContent = blankState.outline.subject; document.getElementById('quiz-title').textContent = blankState.outline.title;
       generateBlankQuiz();
     }
-
-    function closeBlankQuiz() {
-      document.getElementById('blank-quiz-view').classList.add('hidden');
-      document.getElementById('blank-list-view').classList.remove('hidden');
-    }
-
+    function closeBlankQuiz() { document.getElementById('blank-quiz-view').classList.add('hidden'); document.getElementById('blank-list-view').classList.remove('hidden'); }
     function generateBlankQuiz() {
-      const level = document.getElementById('quiz-level').value;
-      const lines = blankState.outline.content.split('\n');
-      const regex = /^([\s]*[IVX]+\.|[\s]*\d+\.|[\s]*\(\d+\)|[\s]*[①-⑨])(.*)$/;
-      
+      const level = document.getElementById('quiz-level').value; const lines = blankState.outline.content.split('\n'); const regex = /^([\s]*[IVX]+\.|[\s]*\d+\.|[\s]*\(\d+\)|[\s]*[①-⑨])(.*)$/;
       let parsedLines = lines.map((line, idx) => {
-        let prefix = ''; let content = line;
-        const match = line.match(regex);
-        if (match) { prefix = match[1]; content = match[2].trim(); } 
-        else { const spaceMatch = line.match(/^(\s*)(.*)$/); if (spaceMatch) { prefix = spaceMatch[1]; content = spaceMatch[2]; } }
+        let prefix = ''; let content = line; const match = line.match(regex);
+        if (match) { prefix = match[1]; content = match[2].trim(); } else { const spaceMatch = line.match(/^(\s*)(.*)$/); if (spaceMatch) { prefix = spaceMatch[1]; content = spaceMatch[2]; } }
         return { id: idx, original: line, prefix, content, isBlank: false };
       });
-
       let candidates = parsedLines.filter(l => l.content.length > 0);
       if (level === 'all') candidates.forEach(l => l.isBlank = true);
       else if (level === '50') { candidates.sort(() => Math.random() - 0.5); candidates.slice(0, Math.ceil(candidates.length / 2)).forEach(l => l.isBlank = true); }
       else if (level === '30') { candidates.sort(() => Math.random() - 0.5); candidates.slice(0, Math.ceil(candidates.length * 0.3)).forEach(l => l.isBlank = true); }
       else if (level === 'main') candidates.forEach(l => { if (l.prefix.match(/[IVX]+\.|\d+\./)) l.isBlank = true; });
 
-      parsedLines.sort((a,b) => a.id - b.id);
-      blankState.lines = parsedLines;
-      blankState.answers = parsedLines.filter(l => l.isBlank).map(l => l.content);
-      blankState.answers.sort(() => Math.random() - 0.5); 
+      parsedLines.sort((a,b) => a.id - b.id); blankState.lines = parsedLines; blankState.answers = parsedLines.filter(l => l.isBlank).map(l => l.content); blankState.answers.sort(() => Math.random() - 0.5); 
       renderBlankQuizRoom();
     }
-
     function renderBlankQuizRoom() {
-      const container = document.getElementById('quiz-lines');
-      container.innerHTML = '';
-
-      const blankLines = blankState.lines.filter(l => l.isBlank);
-      const maxCharLen = blankLines.length > 0 ? Math.max(...blankLines.map(l => l.content.length)) : 15;
-      const uniformWidth = `calc(${Math.max(maxCharLen, 15)}ch + 32px)`;
+      const container = document.getElementById('quiz-lines'); container.innerHTML = '';
+      const blankLines = blankState.lines.filter(l => l.isBlank); const maxCharLen = blankLines.length > 0 ? Math.max(...blankLines.map(l => l.content.length)) : 15; const uniformWidth = `calc(${Math.max(maxCharLen, 15)}ch + 32px)`;
 
       blankState.lines.forEach(line => {
-        const row = document.createElement('div');
-        row.className = "mb-3 whitespace-pre flex items-center"; 
-        
-        const prefixSpan = document.createElement('span');
-        prefixSpan.textContent = line.prefix;
-        prefixSpan.className = "font-bold text-slate-500 mr-2";
-        row.appendChild(prefixSpan);
-
+        const row = document.createElement('div'); row.className = "mb-3 whitespace-pre flex items-center"; 
+        const prefixSpan = document.createElement('span'); prefixSpan.textContent = line.prefix; prefixSpan.className = "font-bold text-slate-500 mr-2"; row.appendChild(prefixSpan);
         if (line.isBlank) {
-          const input = document.createElement('input');
-          input.type = "text"; input.className = "blank-input"; input.dataset.answer = line.content;
-          input.style.width = uniformWidth;
-          
+          const input = document.createElement('input'); input.type = "text"; input.className = "blank-input"; input.dataset.answer = line.content; input.style.width = uniformWidth;
           input.addEventListener('focus', (e) => { blankState.activeInput = e.target; e.target.classList.remove('correct', 'wrong'); });
-          input.addEventListener('input', (e) => { e.target.classList.remove('correct', 'wrong'); });
-          row.appendChild(input);
-        } else {
-          const contentSpan = document.createElement('span'); contentSpan.textContent = line.content; row.appendChild(contentSpan);
-        }
+          input.addEventListener('input', (e) => { e.target.classList.remove('correct', 'wrong'); }); row.appendChild(input);
+        } else { const contentSpan = document.createElement('span'); contentSpan.textContent = line.content; row.appendChild(contentSpan); }
         container.appendChild(row);
       });
-
-      const bankContainer = document.getElementById('quiz-word-bank');
-      bankContainer.innerHTML = '';
+      const bankContainer = document.getElementById('quiz-word-bank'); bankContainer.innerHTML = '';
       blankState.answers.forEach(ans => {
-        const chip = document.createElement('div'); chip.className = "word-chip"; chip.textContent = ans;
-        chip.onclick = () => fillWordChipOutline(ans);
-        bankContainer.appendChild(chip);
+        const chip = document.createElement('div'); chip.className = "word-chip"; chip.textContent = ans; chip.onclick = () => fillWordChipOutline(ans); bankContainer.appendChild(chip);
       });
-
-      blankState.activeInput = null;
-      const firstInput = document.querySelector('.blank-input');
-      if(firstInput) firstInput.focus();
+      blankState.activeInput = null; const firstInput = document.querySelector('.blank-input'); if(firstInput) firstInput.focus();
     }
-
     function fillWordChipOutline(word) {
       if (blankState.activeInput) {
-        blankState.activeInput.value = word;
-        blankState.activeInput.classList.remove('correct', 'wrong');
+        blankState.activeInput.value = word; blankState.activeInput.classList.remove('correct', 'wrong');
         const inputs = Array.from(document.querySelectorAll('#quiz-lines .blank-input'));
         const nextEmpty = inputs.slice(inputs.indexOf(blankState.activeInput) + 1).find(i => !i.value) || inputs.find(i => !i.value);
         if (nextEmpty) nextEmpty.focus();
       } else { showMsg("먼저 채워넣을 빈칸을 터치(클릭)해주세요."); }
     }
-
     function checkBlankAnswers() {
-      const inputs = document.querySelectorAll('#quiz-lines .blank-input');
-      let correctCount = 0;
+      const inputs = document.querySelectorAll('#quiz-lines .blank-input'); let correctCount = 0;
       inputs.forEach(input => {
         const actual = input.dataset.answer.replace(/\s+/g, ''); const user = input.value.replace(/\s+/g, '');
         if (actual === user) { input.classList.add('correct'); input.classList.remove('wrong'); input.placeholder = ''; correctCount++; } 
@@ -1305,12 +1121,8 @@
     // 8. 실전 모의고사
     // ==========================================
     window.updateExamQList = function() {
-      const sub = document.getElementById('exam-subject').value;
-      const sel = document.getElementById('exam-question-select');
-      sel.innerHTML = '<option value="">직접 입력하기</option>';
-      db.questions.filter(q => q.subject === sub).forEach(q => {
-        const opt = document.createElement('option'); opt.value = String(q.id); opt.textContent = `[추출] ${q.question.substring(0, 30)}...`; sel.appendChild(opt);
-      });
+      const sub = document.getElementById('exam-subject').value; const sel = document.getElementById('exam-question-select'); sel.innerHTML = '<option value="">직접 입력하기</option>';
+      db.questions.filter(q => q.subject === sub).forEach(q => { const opt = document.createElement('option'); opt.value = String(q.id); opt.textContent = `[추출] ${q.question.substring(0, 30)}...`; sel.appendChild(opt); });
       previewQuestion();
     };
 
@@ -1321,95 +1133,50 @@
     }
 
     function toggleExamManager() {
-      const view = document.getElementById('exam-manager-view');
-      view.classList.toggle('hidden');
-      if(!view.classList.contains('hidden')) {
-        document.getElementById('exam-edit-form').classList.add('hidden');
-        renderExamList();
-      }
+      const view = document.getElementById('exam-manager-view'); view.classList.toggle('hidden');
+      if(!view.classList.contains('hidden')) { document.getElementById('exam-edit-form').classList.add('hidden'); renderExamList(); }
     }
 
     function renderExamList() {
-      const container = document.getElementById('exam-list');
-      const currentSubject = document.getElementById('exam-subject').value;
+      const container = document.getElementById('exam-list'); const currentSubject = document.getElementById('exam-subject').value;
       const filtered = db.questions.filter(q => q.subject === currentSubject);
-      
-      if(filtered.length === 0) { 
-        container.innerHTML = '<p class="text-sm text-gray-400 py-4 text-center">이 과목에 추출된 문제가 없습니다.</p>'; 
-        return; 
-      }
-      
+      if(filtered.length === 0) { container.innerHTML = '<p class="text-sm text-gray-400 py-4 text-center">이 과목에 추출된 문제가 없습니다.</p>'; return; }
       container.innerHTML = filtered.map(q => `
         <div class="p-3 bg-gray-50 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors">
-           <div class="flex justify-between items-start mb-2">
-              <span class="text-[10px] text-blue-500 font-bold bg-blue-50 px-2 py-0.5 rounded">${q.subject}</span>
-              <div class="flex gap-2">
-                 <button onclick="editExamQ('${q.id}')" class="px-2 py-1 bg-white border border-gray-200 text-xs font-bold text-slate-600 rounded hover:bg-gray-100">수정</button>
-                 <button onclick="deleteExamQ('${q.id}')" class="px-2 py-1 border border-red-100 text-xs font-bold text-red-500 rounded hover:bg-red-50">삭제</button>
-              </div>
+           <div class="flex justify-between items-start mb-2"><span class="text-[10px] text-blue-500 font-bold bg-blue-50 px-2 py-0.5 rounded">${q.subject}</span>
+              <div class="flex gap-2"><button onclick="editExamQ('${q.id}')" class="px-2 py-1 bg-white border border-gray-200 text-xs font-bold text-slate-600 rounded hover:bg-gray-100">수정</button><button onclick="deleteExamQ('${q.id}')" class="px-2 py-1 border border-red-100 text-xs font-bold text-red-500 rounded hover:bg-red-50">삭제</button></div>
            </div>
            <p class="font-bold text-sm text-slate-800 mb-1 truncate">${q.question}</p>
-           <p class="text-[11px] text-gray-500 truncate border-t border-gray-200 pt-1 mt-1">채점기준: ${q.rubric || '없음'}</p>
+           <p class="text-[11px] text-gray-500 truncate border-t border-gray-200 pt-1 mt-1">모범답안: ${q.rubric || '없음'}</p>
         </div>
       `).join('');
     }
 
-    function deleteExamQ(id) {
-      if(!confirm('문제를 삭제하시겠습니까?')) return;
-      db.questions = db.questions.filter(q => String(q.id) !== String(id));
-      saveDB(); renderExamList(); updateExamQList(); showMsg("삭제되었습니다.");
-    }
+    function deleteExamQ(id) { if(!confirm('문제를 삭제하시겠습니까?')) return; db.questions = db.questions.filter(q => String(q.id) !== String(id)); saveDB(); renderExamList(); updateExamQList(); showMsg("삭제되었습니다."); }
 
     function editExamQ(id) {
-      const q = db.questions.find(x => String(x.id) === String(id));
-      if(!q) return;
-      editingExamId = q.id;
-      document.getElementById('edit-exam-subject').value = q.subject;
-      document.getElementById('edit-exam-q').value = q.question;
-      document.getElementById('edit-exam-rubric').value = q.rubric || '';
-      
+      const q = db.questions.find(x => String(x.id) === String(id)); if(!q) return; editingExamId = q.id;
+      document.getElementById('edit-exam-subject').value = q.subject; document.getElementById('edit-exam-q').value = q.question; document.getElementById('edit-exam-rubric').value = q.rubric || '';
       document.getElementById('exam-edit-form').classList.remove('hidden');
     }
 
     function saveExamEdit() {
       if(!editingExamId) return;
       const idx = db.questions.findIndex(x => String(x.id) === String(editingExamId));
-      if(idx > -1) {
-         db.questions[idx].subject = document.getElementById('edit-exam-subject').value;
-         db.questions[idx].question = document.getElementById('edit-exam-q').value.trim();
-         db.questions[idx].rubric = document.getElementById('edit-exam-rubric').value.trim();
-         saveDB();
-      }
-      editingExamId = null;
-      document.getElementById('exam-edit-form').classList.add('hidden');
-      renderExamList();
-      updateExamQList();
-      showMsg('문제가 성공적으로 수정되었습니다.');
+      if(idx > -1) { db.questions[idx].subject = document.getElementById('edit-exam-subject').value; db.questions[idx].question = document.getElementById('edit-exam-q').value.trim(); db.questions[idx].rubric = document.getElementById('edit-exam-rubric').value.trim(); saveDB(); }
+      editingExamId = null; document.getElementById('exam-edit-form').classList.add('hidden'); renderExamList(); updateExamQList(); showMsg('문제가 성공적으로 수정되었습니다.');
     }
 
-    function cancelExamEdit() {
-      editingExamId = null;
-      document.getElementById('exam-edit-form').classList.add('hidden');
-    }
+    function cancelExamEdit() { editingExamId = null; document.getElementById('exam-edit-form').classList.add('hidden'); }
 
     async function handleExamRubricUpload(e) {
-      const file = e.target.files[0];
-      if(!file) return;
+      const file = e.target.files[0]; if(!file) return;
       document.getElementById('exam-rubric-name').innerHTML = `<i class="ri-check-line mr-1"></i>${file.name} 첨부완료`;
-      
       try {
-        const buf = await file.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument(buf).promise;
-        let text = '';
-        for (let i=1; i<=pdf.numPages; i++) {
-          const page = await pdf.getPage(i);
-          const content = await page.getTextContent();
-          text += content.items.map(it => it.str).join(' ') + '\n';
-        }
+        const buf = await file.arrayBuffer(); const pdf = await pdfjsLib.getDocument(buf).promise; let text = '';
+        for (let i=1; i<=pdf.numPages; i++) { const page = await pdf.getPage(i); const content = await page.getTextContent(); text += content.items.map(it => it.str).join(' ') + '\n'; }
         examState.uploadedRubricText = text;
-      } catch(err) {
-        showMsg("PDF 읽기 실패. 텍스트로 된 정상적인 PDF인지 확인해주세요.");
-      }
+      } catch(err) { showMsg("PDF 읽기 실패. 텍스트로 된 정상적인 PDF인지 확인해주세요."); }
     }
 
     function startExam() {
@@ -1417,13 +1184,18 @@
       const qText = document.getElementById('exam-direct-q').value.trim();
       const time = parseInt(document.getElementById('exam-time').value);
       const id = document.getElementById('exam-question-select').value;
-      let rubric = examState.uploadedRubricText || '';
+      
+      let baseRubric = '';
+      if (id) { const q = db.questions.find(x => String(x.id) === String(id)); if (q) baseRubric = q.rubric; }
+      
+      let combinedRubric = '';
+      if (baseRubric) combinedRubric += `[기본 모범답안 및 배점]\n${baseRubric}\n\n`;
+      if (examState.uploadedRubricText) combinedRubric += `[강사 채점평 및 주의사항 (가장 중요하게 반영할 것)]\n${examState.uploadedRubricText}`;
 
       if (!qText) { showMsg("문제를 입력해주세요."); return; }
-      if (!rubric && id) { const q = db.questions.find(x => String(x.id) === String(id)); if (q) rubric = q.rubric; }
 
       if (examState.timer) clearInterval(examState.timer);
-      examState = { subject: sub, question: qText, rubric: rubric, time: time, seconds: time * 60, totalPage: Math.floor(time / 5), currPage: 1, answers: {}, timer: null, uploadedRubricText: examState.uploadedRubricText };
+      examState = { subject: sub, question: qText, rubric: combinedRubric, time: time, seconds: time * 60, totalPage: Math.floor(time / 5), currPage: 1, answers: {}, timer: null, uploadedRubricText: examState.uploadedRubricText };
 
       document.getElementById('room-subject').textContent = sub; document.getElementById('room-q-preview').textContent = qText;
       document.getElementById('room-q-full').textContent = qText; document.getElementById('room-total-page').textContent = examState.totalPage;
@@ -1444,9 +1216,7 @@
     }
 
     function renderAnswerSheet() {
-      const container = document.getElementById('answer-lines');
-      container.innerHTML = '';
-
+      const container = document.getElementById('answer-lines'); container.innerHTML = '';
       for (let i = 1; i <= LINES_PER_PAGE; i++) {
         const key = `${examState.currPage}-${i}`; const savedVal = examState.answers[key] || '';
         const row = document.createElement('div'); row.className = 'answer-row';
@@ -1454,10 +1224,8 @@
         const wrapDiv = document.createElement('div'); wrapDiv.className = 'row-input-wrapper';
         const input = document.createElement('input'); input.type = 'text'; input.className = 'row-input'; input.maxLength = MAX_CHARS_PER_LINE; input.dataset.key = key; input.value = savedVal;
         const indicator = document.createElement('span'); indicator.className = 'char-indicator'; indicator.textContent = `${savedVal.length}/${MAX_CHARS_PER_LINE}`;
-        
         wrapDiv.appendChild(input); wrapDiv.appendChild(indicator); row.appendChild(numDiv); row.appendChild(wrapDiv); container.appendChild(row);
       }
-
       document.getElementById('room-curr-page').textContent = examState.currPage;
 
       const inputs = container.querySelectorAll('.row-input');
@@ -1465,11 +1233,9 @@
         input.addEventListener('input', (e) => {
           const val = e.target.value; examState.answers[e.target.dataset.key] = val;
           const ind = e.target.nextElementSibling; ind.textContent = `${val.length}/${MAX_CHARS_PER_LINE}`;
-          if (val.length >= MAX_CHARS_PER_LINE) { ind.classList.add('full'); if (idx < inputs.length - 1) inputs[idx + 1].focus(); } 
-          else { ind.classList.remove('full'); }
+          if (val.length >= MAX_CHARS_PER_LINE) { ind.classList.add('full'); if (idx < inputs.length - 1) inputs[idx + 1].focus(); } else { ind.classList.remove('full'); }
           document.getElementById('char-count').textContent = Object.values(examState.answers).join('').length;
         });
-
         input.addEventListener('keydown', (e) => {
           if (e.key === 'Enter') { e.preventDefault(); if (idx < inputs.length - 1) inputs[idx + 1].focus(); else changePage(1); } 
           else if (e.key === 'Backspace' && e.target.value === '' && idx > 0) { e.preventDefault(); inputs[idx - 1].focus(); } 
@@ -1482,29 +1248,27 @@
 
     function changePage(dir) {
       const next = examState.currPage + dir;
-      if (next >= 1 && next <= examState.totalPage) { examState.currPage = next; renderAnswerSheet(); } 
-      else if (dir > 0) showMsg("마지막 페이지입니다."); else showMsg("첫 번째 페이지입니다.");
+      if (next >= 1 && next <= examState.totalPage) { examState.currPage = next; renderAnswerSheet(); } else if (dir > 0) showMsg("마지막 페이지입니다."); else showMsg("첫 번째 페이지입니다.");
     }
 
-    // ==========================================
-    // 9. AI 채점
-    // ==========================================
     async function submitExam(auto = false) {
       if (!auto && !confirm("제출하고 AI 채점을 진행하시겠습니까?")) return;
       clearInterval(examState.timer); showLoading("AI 채점관이 답안을 분석 중입니다...");
 
       const fullAnswer = Object.keys(examState.answers).sort((a, b) => {
-          const [ap, al] = a.split('-').map(Number); const [bp, bl] = b.split('-').map(Number);
-          return ap !== bp ? ap - bp : al - bl;
+          const [ap, al] = a.split('-').map(Number); const [bp, bl] = b.split('-').map(Number); return ap !== bp ? ap - bp : al - bl;
         }).map(k => examState.answers[k]).filter(v => v.trim()).join('\n');
 
       const schema = { type: "OBJECT", properties: { score: { type: "INTEGER" }, details: { type: "OBJECT", properties: { issue: { type: "INTEGER" }, law: { type: "INTEGER" }, logic: { type: "INTEGER" }, conclusion: { type: "INTEGER" }, format: { type: "INTEGER" } }, required: ["issue", "law", "logic", "conclusion", "format"] }, feedback: { type: "STRING" }, good: { type: "STRING" }, missing: { type: "STRING" }, advice: { type: "STRING" }, next3: { type: "ARRAY", items: { type: "STRING" } } }, required: ["score", "details", "feedback", "good", "missing", "advice", "next3"] };
-      const prompt = `과목: ${examState.subject}\n문제: ${examState.question}\n\n[채점기준표 원본 및 핵심 채점요소]\n${examState.rubric || "일반 채점기준"}\n\n[학생 답안]\n${fullAnswer || "미작성"}\n\n위 채점기준표 원본 내용을 바탕으로 아주 엄격하고 상세하게 100점 만점 채점하세요. 쟁점25, 법적근거30, 논리25, 결론10, 형식10`;
+      
+      const prompt = `과목: ${examState.subject}\n문제: ${examState.question}\n\n${examState.rubric || "[자료 없음]"}\n\n[학생 답안]\n${fullAnswer || "미작성"}\n\n당신은 아주 깐깐한 노무사 2차 시험 채점위원입니다. 학생 답안을 [기본 모범답안]과 한 줄 한 줄 치밀하게 대조하여 100점 만점 기준으로 채점하세요. 특히 [강사 채점평 및 주의사항]이 있다면, 수험생들이 자주 범하는 오류나 누락 포인트에 이 학생도 빠지지 않았는지 최우선으로 검토하고 가차없이 감점하세요. 쟁점25, 법적근거30, 논리25, 결론10, 형식10 기준으로 세부 점수를 매기고, 구체적인 피드백을 제공하세요.`;
 
       try {
         const result = await callGemini(prompt, schema);
         result.details = result.details || {}; result.details.issue = result.details.issue || 0; result.details.law = result.details.law || 0; result.details.logic = result.details.logic || 0; result.details.conclusion = result.details.conclusion || 0; result.details.format = result.details.format || 0; result.next3 = result.next3 || [];
-        const record = { id: Date.now(), date: getToday(), subject: examState.subject, score: result.score, feedback: result };
+        
+        // 💡 record에 fullAnswer 추가 저장
+        const record = { id: Date.now(), date: getToday(), subject: examState.subject, score: result.score, feedback: result, fullAnswer: fullAnswer };
         db.history.push(record); markStudiedToday(); saveDB();
         
         examState.uploadedRubricText = ''; 
@@ -1527,12 +1291,14 @@
       setBar('issue', fb.details.issue, 25); setBar('law', fb.details.law, 30); setBar('logic', fb.details.logic, 25); setBar('conc', fb.details.conclusion, 10); setBar('form', fb.details.format, 10);
 
       document.getElementById('res-good').textContent = fb.good || ''; document.getElementById('res-miss').textContent = fb.missing || ''; document.getElementById('res-next').innerHTML = (fb.next3 || []).map(t => `<li>${t}</li>`).join('');
+      
+      // 💡 저장해둔 답안지를 화면에 표시
+      const myAnswerEl = document.getElementById('res-my-answer');
+      if (myAnswerEl) myAnswerEl.textContent = data.fullAnswer || '저장된 답안이 없습니다.';
+
       navigate('result');
     }
 
-    // ==========================================
-    // 10. 데이터 관리
-    // ==========================================
     function exportDB() { const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `nomusa_backup_${getToday()}.json`; a.click(); showMsg("✅ 백업 파일이 다운로드되었습니다."); }
     function importDB() { document.getElementById('import-file-input').click(); }
     function doImportDB(event) {
