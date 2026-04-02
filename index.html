@@ -178,9 +178,31 @@
       <h2 class="text-2xl font-extrabold text-slate-800 mb-2 flex items-center gap-2"><i class="ri-stack-line"></i> 안키형 플래시카드</h2>
       <p class="text-sm text-gray-500 mb-6">빈칸이 있는 카드는 단어장 모드로, 일반 카드는 뒤집기 모드로 알아서 작동합니다.</p>
 
-      <div class="mb-6 flex justify-end gap-2">
+      <div class="mb-6 flex flex-wrap justify-end gap-2">
+        <button onclick="toggleCsvUploadForm()" class="px-4 py-2 bg-blue-50 border border-blue-200 text-blue-700 rounded-lg text-sm font-bold hover:bg-blue-100 transition-all flex items-center gap-1 shadow-sm"><i class="ri-file-excel-2-line"></i> CSV 일괄 등록</button>
         <button onclick="toggleFcManager()" class="px-4 py-2 bg-white border border-gray-200 text-slate-700 rounded-lg text-sm font-bold hover:bg-gray-50 transition-all flex items-center gap-1 shadow-sm"><i class="ri-list-settings-line"></i> 카드 관리</button>
-        <button onclick="toggleManualCardForm()" class="px-4 py-2 bg-slate-800 text-white rounded-lg text-sm font-bold hover:bg-slate-700 transition-all flex items-center gap-1 shadow-sm"><i class="ri-add-line"></i> 직접 카드 만들기</button>
+        <button onclick="toggleManualCardForm()" class="px-4 py-2 bg-slate-800 text-white rounded-lg text-sm font-bold hover:bg-slate-700 transition-all flex items-center gap-1 shadow-sm"><i class="ri-add-line"></i> 직접 만들기</button>
+      </div>
+
+      <!-- CSV 일괄 등록 폼 -->
+      <div id="csv-upload-form" class="hidden neo-card p-6 mb-8 bg-slate-50 border-2 border-blue-200 shadow-lg">
+        <h3 class="font-bold text-slate-800 mb-4 text-lg flex items-center gap-2"><i class="ri-file-excel-2-line text-blue-500"></i> CSV 일괄 등록</h3>
+        <div class="mb-4 text-sm text-gray-600 bg-white p-4 rounded-xl border border-gray-200">
+          <p class="font-bold mb-2 text-slate-700">📌 CSV 파일 작성 규칙 (엑셀 등에서 작성 후 .csv로 저장)</p>
+          <ul class="list-disc pl-5 space-y-1 mb-3">
+            <li><strong>A열 (1번째 칸):</strong> 과목 (예: 노동법)</li>
+            <li><strong>B열 (2번째 칸):</strong> 앞면 질문/키워드 (예: 경영상 해고 요건)</li>
+            <li><strong>C열 (3번째 칸):</strong> 뒷면 정답 및 [빈칸] 내용 (예: 긴박한 [경영상 필요성]...)</li>
+          </ul>
+          <p class="text-[11px] text-rose-500 font-bold">* 첫 번째 줄이 '과목', '앞면' 등으로 시작하면 제목 줄로 인식하여 자동으로 건너뜁니다.</p>
+        </div>
+        <div class="mb-4">
+          <input type="file" id="csv-file-input" accept=".csv" class="w-full p-2 bg-white rounded-xl border border-gray-200 text-sm cursor-pointer">
+        </div>
+        <div class="flex justify-end gap-2">
+          <button onclick="cancelCsvUpload()" class="px-5 py-2.5 bg-white border border-gray-200 text-gray-600 rounded-xl text-sm font-bold hover:bg-gray-50 transition-all">취소</button>
+          <button onclick="processCsvUpload()" class="px-6 py-2.5 bg-blue-500 text-white rounded-xl text-sm font-bold hover:bg-blue-600 shadow-md transition-all">일괄 등록하기</button>
+        </div>
       </div>
 
       <div id="fc-manager-view" class="hidden neo-card p-6 mb-8 bg-white border-2 border-slate-200">
@@ -257,7 +279,6 @@
              </div>
           </div>
 
-          <!-- 💡 추가된 기능: AI 힌트 & 암기비법 버튼 영역 -->
           <div id="fc-ai-tools" class="w-full max-w-[600px] mx-auto mt-4 mb-4">
             <div class="flex justify-center gap-2 mb-3">
               <button onclick="getFcHint()" class="px-4 py-1.5 bg-purple-50 border border-purple-100 text-purple-600 rounded-full text-[11px] font-bold hover:bg-purple-100 transition-colors shadow-sm">✨ AI 힌트</button>
@@ -316,7 +337,6 @@
             </div>
           </div>
           <div class="mb-4">
-            <!-- 💡 추가된 기능: AI 목차 자동 생성 버튼 -->
             <div class="flex justify-between items-center mb-2">
               <label class="text-xs font-bold text-gray-500 block">목차 내용 (I, 1, (1) 등 번호를 포함해 붙여넣어주세요)</label>
               <button type="button" onclick="generateOutlineWithAI()" class="text-[10px] font-bold text-purple-600 bg-purple-50 border border-purple-100 px-2 py-1 rounded hover:bg-purple-100 transition-colors shadow-sm">✨ AI 목차 자동 생성</button>
@@ -515,7 +535,6 @@
           <ul class="text-[13px] leading-relaxed text-slate-700 pl-4 list-disc space-y-2" id="res-next"></ul>
         </div>
 
-        <!-- 💡 추가된 부분: 내가 작성한 답안 섹션 -->
         <div class="neo-card p-6 border-t-4 border-t-slate-500 bg-slate-50">
           <h4 class="font-bold text-slate-700 mb-3 flex items-center gap-1"><i class="ri-file-text-line"></i> 내가 작성한 답안</h4>
           <div class="text-[13px] leading-relaxed text-slate-700 whitespace-pre-wrap bg-white p-4 rounded-lg border border-gray-200 max-h-60 overflow-y-auto" id="res-my-answer"></div>
@@ -622,7 +641,6 @@
     function hideLoading() { document.getElementById('loading-overlay').style.display = 'none'; }
     function showMsg(text) { const box = document.getElementById('message-box'); if (box) { box.textContent = text; box.style.display = 'block'; setTimeout(() => box.style.display = 'none', 3000); } else { alert(text); } }
     
-    // 💡 한국 로컬 시간 기준으로 날짜 가져오기 (시간대 버그 수정)
     function getLocalYYYYMMDD(d) {
         const year = d.getFullYear();
         const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -687,7 +705,6 @@
       } catch (e) { throw new Error("AI 응답 해석 실패"); }
     }
 
-    // 💡 Streak 계산 로직 개선
     function updateStreak() {
       const today = getToday();
       const yesterday = getYesterday();
@@ -793,6 +810,87 @@
     }
 
     // ==========================================
+    // 💡 7. 플래시카드 - CSV 일괄 등록 로직
+    // ==========================================
+    function parseCSV(text) {
+      let result = []; let row = []; let inQuotes = false; let value = "";
+      for (let i = 0; i < text.length; i++) {
+        let char = text[i]; let nextChar = text[i + 1];
+        if (char === '"' && inQuotes && nextChar === '"') { value += '"'; i++; } 
+        else if (char === '"') { inQuotes = !inQuotes; } 
+        else if (char === ',' && !inQuotes) { row.push(value.trim()); value = ""; } 
+        else if ((char === '\n' || char === '\r') && !inQuotes) {
+          if (char === '\r' && nextChar === '\n') i++;
+          row.push(value.trim()); value = "";
+          if (row.length > 0 && row.some(v => v !== "")) result.push(row);
+          row = [];
+        } 
+        else { value += char; }
+      }
+      if (value || row.length > 0) { row.push(value.trim()); result.push(row); }
+      return result;
+    }
+
+    function toggleCsvUploadForm() {
+      editingFcId = null;
+      document.getElementById('fc-manager-view').classList.add('hidden');
+      document.getElementById('manual-card-form').classList.add('hidden');
+      document.getElementById('csv-upload-form').classList.toggle('hidden');
+    }
+
+    function cancelCsvUpload() {
+      document.getElementById('csv-upload-form').classList.add('hidden');
+    }
+
+    function processCsvUpload() {
+      const fileInput = document.getElementById('csv-file-input');
+      const file = fileInput.files[0];
+      if (!file) { showMsg("CSV 파일을 선택해주세요."); return; }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const text = e.target.result;
+        const rows = parseCSV(text);
+        let addedCount = 0;
+
+        let startIndex = 0;
+        if (rows.length > 0 && rows[0][0] && (rows[0][0].includes("과목") || rows[0][1].includes("앞면"))) {
+          startIndex = 1; 
+        }
+
+        for (let i = startIndex; i < rows.length; i++) {
+          const row = rows[i];
+          if (row.length >= 3) {
+            const subject = row[0];
+            const front = row[1];
+            const back = row[2];
+            if (front && back) {
+              db.flashcards.push({
+                id: Date.now() + Math.random(),
+                subject: subject,
+                front: front,
+                back: back,
+                repetition: 0, interval: 0, efactor: 2.5, nextReview: getLocalNow()
+              });
+              addedCount++;
+            }
+          }
+        }
+
+        if (addedCount > 0) {
+          saveDB();
+          renderDueFlashcards();
+          showMsg(`✅ ${addedCount}개의 플래시카드가 일괄 등록되었습니다!`);
+          cancelCsvUpload();
+          fileInput.value = "";
+        } else {
+          showMsg("등록할 수 있는 유효한 데이터가 없습니다. CSV 파일의 형식을 확인해주세요.");
+        }
+      };
+      reader.readAsText(file, "UTF-8");
+    }
+
+    // ==========================================
     // 💡 7. 플래시카드 AI 도우미 함수 추가
     // ==========================================
     async function getFcHint() {
@@ -830,7 +928,7 @@
 
     function toggleFcManager() {
       const view = document.getElementById('fc-manager-view'); view.classList.toggle('hidden');
-      if (!view.classList.contains('hidden')) { renderFcList(); document.getElementById('manual-card-form').classList.add('hidden'); }
+      if (!view.classList.contains('hidden')) { renderFcList(); document.getElementById('manual-card-form').classList.add('hidden'); document.getElementById('csv-upload-form').classList.add('hidden'); }
     }
 
     function renderFcList() {
@@ -858,13 +956,13 @@
       document.getElementById('manual-fc-title').innerHTML = '<i class="ri-edit-2-line text-emerald-500"></i> 플래시카드 수정하기';
       document.getElementById('manual-fc-subject').value = c.subject; document.getElementById('manual-fc-front').value = c.front; document.getElementById('manual-fc-back').value = c.back;
       document.getElementById('manual-fc-save-btn').textContent = '수정 완료';
-      document.getElementById('manual-card-form').classList.remove('hidden'); document.getElementById('fc-manager-view').classList.add('hidden');
+      document.getElementById('manual-card-form').classList.remove('hidden'); document.getElementById('fc-manager-view').classList.add('hidden'); document.getElementById('csv-upload-form').classList.add('hidden');
     }
 
     function toggleManualCardForm() {
       editingFcId = null; document.getElementById('manual-fc-title').innerHTML = '<i class="ri-edit-circle-line text-emerald-500"></i> 새 플래시카드 입력';
       document.getElementById('manual-fc-front').value = ''; document.getElementById('manual-fc-back').value = ''; document.getElementById('manual-fc-save-btn').textContent = '추가하기';
-      document.getElementById('fc-manager-view').classList.add('hidden'); document.getElementById('manual-card-form').classList.toggle('hidden');
+      document.getElementById('fc-manager-view').classList.add('hidden'); document.getElementById('csv-upload-form').classList.add('hidden'); document.getElementById('manual-card-form').classList.toggle('hidden');
     }
 
     function cancelManualFlashcard() { editingFcId = null; document.getElementById('manual-card-form').classList.add('hidden'); }
@@ -906,7 +1004,6 @@
 
       let e = currentCard.efactor || 2.5; let r = currentCard.repetition || 0; let iv = currentCard.interval || 0;
       
-      // 💡 버그 픽스: '쉬움' 주기가 '보통' 주기를 무조건 30% 상회하도록 로직 일치
       let nextGood = r === 0 ? 1 : (r === 1 ? 6 : Math.round(iv * e));
       let nextEasy = r === 0 ? 4 : Math.round(nextGood * 1.3);
 
@@ -987,7 +1084,6 @@
       let q = rating === 1 ? 0 : rating === 2 ? 3 : rating === 3 ? 4 : 5;
       let r = currentCard.repetition || 0; let iv = currentCard.interval || 0; let e = currentCard.efactor || 2.5;
 
-      // 💡 버그 픽스: UI에 표시된 일수(nextGood, nextEasy)와 실제 적용되는 알고리즘을 완벽 동기화
       let nextGood = r === 0 ? 1 : (r === 1 ? 6 : Math.round(iv * e));
       let nextEasy = r === 0 ? 4 : Math.round(nextGood * 1.3);
 
@@ -1009,7 +1105,7 @@
       else if (iv === 0.5) nextDate.setHours(nextDate.getHours() + 12);
       else {
         nextDate.setDate(nextDate.getDate() + iv);
-        nextDate.setHours(0, 0, 0, 0); // 1일 이상은 날짜 기준으로 확실히 초기화
+        nextDate.setHours(0, 0, 0, 0); 
       }
 
       const tzOffset = nextDate.getTimezoneOffset() * 60000;
