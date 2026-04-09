@@ -6,6 +6,7 @@
   <title>노무사 아웃풋 트레이너 - AI Master</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
   <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -62,6 +63,9 @@
     #message-box { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 50px; background: #333; color: white; font-size: 14px; font-weight: bold; z-index: 10000; display: none; box-shadow: 0 10px 20px rgba(0,0,0,0.2); white-space: nowrap; }
     
     .fc-item-checkbox { width: 18px; height: 18px; border-radius: 4px; border-gray-300; text-emerald-500; cursor: pointer; }
+    
+    /* 차트 컨테이너 스타일 */
+    .chart-wrapper { position: relative; height: 220px; width: 100%; }
   </style>
 </head>
 <body class="pb-24">
@@ -97,8 +101,9 @@
   <main class="pt-24 px-4 md:px-8 max-w-5xl mx-auto">
 
     <div id="page-dashboard" class="page-content active">
-      <h2 class="text-2xl font-extrabold text-slate-800 mb-6 flex items-center gap-2"><i class="ri-dashboard-line"></i> 대시보드</h2>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <h2 class="text-2xl font-extrabold text-slate-800 mb-6 flex items-center gap-2"><i class="ri-dashboard-line"></i> 학습 대시보드</h2>
+      
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <div class="neo-card p-6 flex flex-col items-center text-center">
           <span class="text-[10px] font-bold text-gray-400 uppercase mb-2">시험 D-Day</span>
           <span class="text-3xl font-extrabold text-emerald-500" id="d-day-val">D-?</span>
@@ -108,7 +113,7 @@
           <span class="text-3xl font-extrabold text-slate-800" id="streak-val">0일</span>
         </div>
         <div class="neo-card p-6 flex flex-col items-center text-center">
-          <span class="text-[10px] font-bold text-gray-400 uppercase mb-2">오늘 복습 카드</span>
+          <span class="text-[10px] font-bold text-gray-400 uppercase mb-2">오늘 남은 복습</span>
           <span class="text-3xl font-extrabold text-blue-500" id="due-cards-val">0장</span>
         </div>
         <div class="neo-card p-6 flex flex-col items-center text-center">
@@ -117,10 +122,28 @@
         </div>
       </div>
 
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <div class="lg:col-span-2 neo-card p-6">
+          <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2"><i class="ri-bar-chart-box-line text-blue-500"></i> 최근 7일 카드 학습량</h3>
+          <div class="chart-wrapper"><canvas id="chart-weekly"></canvas></div>
+        </div>
+        <div class="neo-card p-6">
+          <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2"><i class="ri-pie-chart-2-fill text-purple-500"></i> 모의고사 과목 비율</h3>
+          <div class="chart-wrapper"><canvas id="chart-subjects"></canvas></div>
+        </div>
+      </div>
+
+      <div class="neo-card p-6 mb-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="font-bold text-slate-800 flex items-center gap-2"><i class="ri-line-chart-line text-rose-500"></i> 모의고사 점수 추이</h3>
+        </div>
+        <div class="chart-wrapper"><canvas id="chart-scores"></canvas></div>
+      </div>
+
       <div class="neo-card p-6 mb-8">
         <div class="flex justify-between items-center">
-          <h3 class="font-bold text-slate-800 flex items-center gap-2"><i class="ri-brain-line text-purple-500"></i> AI 취약점 분석</h3>
-          <button onclick="analyzeStudyHistory()" class="px-4 py-2 bg-purple-500 text-white text-xs font-bold rounded-lg hover:bg-purple-600 transition-all">분석 시작</button>
+          <h3 class="font-bold text-slate-800 flex items-center gap-2"><i class="ri-brain-line text-purple-500"></i> AI 취약점 종합 진단</h3>
+          <button onclick="analyzeStudyHistory()" class="px-4 py-2 bg-purple-50 text-purple-600 border border-purple-200 text-xs font-bold rounded-lg hover:bg-purple-100 transition-all">진단 리포트 생성</button>
         </div>
         <div id="ai-analysis-box" class="hidden mt-4 p-4 bg-purple-50 rounded-xl border border-purple-100">
           <p class="text-sm leading-relaxed text-slate-700" id="ai-analysis-content"></p>
@@ -601,14 +624,23 @@
     // ==========================================
     // 1. 핵심 전역 상태
     // ==========================================
-    let db = { history: [], questions: [], flashcards: [], outlines: [], lastStudyDate: null, streak: 0 };
+    let db = { history: [], questions: [], flashcards: [], outlines: [], lastStudyDate: null, streak: 0, studyLog: {} };
     
     let editingFcId = null; let editingOutlineId = null; let editingExamId = null;
+    let chartInstances = {};
 
     window.getAppDB = () => db;
     window.setAppDB = (newDB) => { 
       if (!newDB) return;
-      db = { history: newDB.history || [], questions: newDB.questions || [], flashcards: newDB.flashcards || [], outlines: newDB.outlines || [], lastStudyDate: newDB.lastStudyDate || null, streak: newDB.streak || 0 };
+      db = { 
+        history: newDB.history || [], 
+        questions: newDB.questions || [], 
+        flashcards: newDB.flashcards || [], 
+        outlines: newDB.outlines || [], 
+        lastStudyDate: newDB.lastStudyDate || null, 
+        streak: newDB.streak || 0,
+        studyLog: newDB.studyLog || {} 
+      };
     };
 
     const LINES_PER_PAGE = 22; const MAX_CHARS_PER_LINE = 40; const MODEL_NAME = "gemini-2.5-flash";
@@ -727,9 +759,13 @@
       if (db.lastStudyDate !== today) {
         const yesterday = getYesterday();
         if (db.lastStudyDate === yesterday) db.streak++; else db.streak = 1;
-        db.lastStudyDate = today; saveDB();
-        if(window.renderDashboard) window.renderDashboard();
+        db.lastStudyDate = today; 
       }
+      // 💡 일일 카드 학습량 기록
+      db.studyLog = db.studyLog || {};
+      db.studyLog[today] = (db.studyLog[today] || 0) + 1;
+      saveDB();
+      if(window.renderDashboard && document.getElementById('page-dashboard').classList.contains('active')) window.renderDashboard();
     }
 
     window.renderDashboard = function() {
@@ -738,17 +774,117 @@
       document.getElementById('streak-val').textContent = `${db.streak}일`;
       document.getElementById('total-exams-val').textContent = `${db.history.length}회`;
       document.getElementById('due-cards-val').textContent = `${db.flashcards.filter(isCardDue).length}장`;
+      
       const tbody = document.getElementById('history-tbody');
-      if (db.history.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="py-10 text-center text-gray-400">기록이 없습니다.</td></tr>'; return; }
-      tbody.innerHTML = db.history.slice(-5).reverse().map(h => `
-        <tr class="border-b border-gray-50 hover:bg-gray-50 group">
-          <td class="py-3 px-2 text-[12px] text-gray-500">${h.date}</td>
-          <td class="py-3 px-2 font-bold text-slate-700 text-[13px]">${h.subject}</td>
-          <td class="py-3 px-2 text-emerald-600 font-extrabold">${h.score}점</td>
-          <td class="py-3 px-2 text-right"><button onclick="viewHistory(${h.id})" class="px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-bold rounded hover:bg-emerald-500 hover:text-white transition-all">결과 보기</button></td>
-        </tr>
-      `).join('');
+      if (db.history.length === 0) { 
+        tbody.innerHTML = '<tr><td colspan="4" class="py-10 text-center text-gray-400">기록이 없습니다.</td></tr>'; 
+      } else {
+        tbody.innerHTML = db.history.slice(-5).reverse().map(h => `
+          <tr class="border-b border-gray-50 hover:bg-gray-50 group">
+            <td class="py-3 px-2 text-[12px] text-gray-500">${h.date}</td>
+            <td class="py-3 px-2 font-bold text-slate-700 text-[13px]">${h.subject}</td>
+            <td class="py-3 px-2 text-emerald-600 font-extrabold">${h.score}점</td>
+            <td class="py-3 px-2 text-right"><button onclick="viewHistory(${h.id})" class="px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-bold rounded hover:bg-emerald-500 hover:text-white transition-all">결과 보기</button></td>
+          </tr>
+        `).join('');
+      }
+
+      // 💡 차트 그리기 로직 호출
+      if (typeof Chart !== 'undefined') {
+        drawDashboardCharts();
+      }
     };
+
+    // 💡 Chart.js 를 이용한 그래프 그리기 함수
+    function drawDashboardCharts() {
+      // 1. 주간 학습량 (Bar)
+      const ctxWeekly = document.getElementById('chart-weekly');
+      if(ctxWeekly) {
+        const last7Days = Array.from({length: 7}, (_, i) => {
+            const d = new Date(); d.setDate(d.getDate() - (6 - i));
+            return getLocalYYYYMMDD(d);
+        });
+        const weeklyData = last7Days.map(date => (db.studyLog && db.studyLog[date]) ? db.studyLog[date] : 0);
+        const labels = last7Days.map(date => date.slice(5).replace('-','/')); // MM/DD
+
+        if(chartInstances['weekly']) chartInstances['weekly'].destroy();
+        chartInstances['weekly'] = new Chart(ctxWeekly, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '학습한 카드 수',
+                    data: weeklyData,
+                    backgroundColor: 'rgba(16, 185, 129, 0.8)', // emerald-500
+                    borderRadius: 4,
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+            }
+        });
+      }
+
+      // 2. 과목별 비율 (Doughnut)
+      const ctxSub = document.getElementById('chart-subjects');
+      if(ctxSub) {
+        const subCounts = {};
+        db.history.forEach(h => { subCounts[h.subject] = (subCounts[h.subject] || 0) + 1; });
+        const subLabels = Object.keys(subCounts);
+        const subData = Object.values(subCounts);
+        
+        if(chartInstances['subjects']) chartInstances['subjects'].destroy();
+        chartInstances['subjects'] = new Chart(ctxSub, {
+            type: 'doughnut',
+            data: {
+                labels: subLabels.length ? subLabels : ['기록 없음'],
+                datasets: [{
+                    data: subData.length ? subData : [1],
+                    backgroundColor: subData.length ? ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b'] : ['#e2e8f0'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 11 } } } },
+                cutout: '70%'
+            }
+        });
+      }
+
+      // 3. 점수 추이 (Line)
+      const ctxScore = document.getElementById('chart-scores');
+      if(ctxScore) {
+        const sortedHistory = [...db.history].sort((a,b) => a.id - b.id);
+        const scoreLabels = sortedHistory.map((h, i) => `${i+1}회차`);
+        const scoreData = sortedHistory.map(h => h.score);
+
+        if(chartInstances['scores']) chartInstances['scores'].destroy();
+        chartInstances['scores'] = new Chart(ctxScore, {
+            type: 'line',
+            data: {
+                labels: scoreLabels.length ? scoreLabels : ['-'],
+                datasets: [{
+                    label: '모의고사 점수',
+                    data: scoreData.length ? scoreData : [0],
+                    borderColor: '#f43f5e', // rose-500
+                    backgroundColor: 'rgba(244, 63, 94, 0.1)',
+                    borderWidth: 2,
+                    pointBackgroundColor: '#f43f5e',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { min: 0, max: 100 } }
+            }
+        });
+      }
+    }
 
     function viewHistory(id) { const record = db.history.find(h => String(h.id) === String(id)); if(record) { renderExamResult(record); navigate('result'); } }
 
@@ -781,7 +917,7 @@
     async function processAIConvert() {
       const fileQ = document.getElementById('file-q').files[0];
       if (!fileQ) { showMsg('문제 또는 모범답안 PDF를 업로드해주세요.'); return; }
-      showLoading('AI가 PDF를 정밀 분석 중입니다...');
+      showLoading('AI가 PDF 정밀 분석 중입니다...');
       const type = document.getElementById('convert-type').value;
       const subject = document.getElementById('convert-subject').value;
 
@@ -1000,12 +1136,7 @@
 
     window.removeBracketsFromSelected = function() {
       const selectedIds = Array.from(document.querySelectorAll('.fc-item-checkbox:checked')).map(cb => cb.value);
-      
-      if (selectedIds.length === 0) {
-        showMsg("대괄호를 제거할 카드를 먼저 선택해주세요.");
-        return;
-      }
-      
+      if (selectedIds.length === 0) { showMsg("대괄호를 제거할 카드를 먼저 선택해주세요."); return; }
       if(!confirm(`선택한 ${selectedIds.length}개 카드의 대괄호 [ ] 를 싹 지워서 일반 카드로 변환하시겠습니까?`)) return;
       
       let count = 0;
@@ -1017,30 +1148,15 @@
           }
         }
       });
-      
-      if(count > 0) {
-        saveDB(); renderFcList(); renderDueFlashcards(); showMsg(`✅ ${count}개의 카드가 일반 통암기 카드로 변환되었습니다!`);
-      } else {
-        showMsg("선택한 카드 중 대괄호가 포함된 카드가 없습니다.");
-      }
+      if(count > 0) { saveDB(); renderFcList(); renderDueFlashcards(); showMsg(`✅ ${count}개의 카드가 변환되었습니다!`); }
     }
 
     window.deleteSelectedFc = function() {
       const selectedIds = Array.from(document.querySelectorAll('.fc-item-checkbox:checked')).map(cb => cb.value);
-      
-      if (selectedIds.length === 0) {
-        showMsg("삭제할 카드를 먼저 선택해주세요.");
-        return;
-      }
-      
+      if (selectedIds.length === 0) { showMsg("삭제할 카드를 먼저 선택해주세요."); return; }
       if(!confirm(`선택한 ${selectedIds.length}개의 카드를 정말로 삭제하시겠습니까?`)) return;
-      
       db.flashcards = db.flashcards.filter(c => !selectedIds.includes(String(c.id)));
-      
-      saveDB(); 
-      renderFcList(); 
-      renderDueFlashcards(); 
-      showMsg(`${selectedIds.length}개의 카드가 일괄 삭제되었습니다.`);
+      saveDB(); renderFcList(); renderDueFlashcards(); showMsg(`${selectedIds.length}개의 카드가 일괄 삭제되었습니다.`);
     }
 
     function deleteFc(id) { if(!confirm('해당 카드를 삭제하시겠습니까?')) return; db.flashcards = db.flashcards.filter(c => String(c.id) !== String(id)); saveDB(); renderFcList(); renderDueFlashcards(); showMsg("카드가 삭제되었습니다."); }
@@ -1119,7 +1235,6 @@
       document.getElementById('fc-cloze-check-btn').classList.remove('hidden');
       
       const container = document.getElementById('fc-cloze-back');
-      // 💡 한글 목차도 잘 뚫릴 수 있도록 빈칸 추출 정규식 일관성 유지
       const regex = /\[(.*?)\]/g; let html = ''; let match; let lastIdx = 0; fcClozeState.answers = [];
 
       let matches = []; let tempMatch; const tempRegex = /\[(.*?)\]/g;
@@ -1183,8 +1298,8 @@
 
       if (rating === 3) iv = nextGood;
       else if (rating === 4) iv = nextEasy;
-      else if (rating === 2) iv = 0.5; // 어려움 (12시간)
-      else iv = 0; // 다시 (1분)
+      else if (rating === 2) iv = 0.5; 
+      else iv = 0; 
 
       if (rating >= 3) r++; else r = 0;
 
@@ -1210,9 +1325,6 @@
       saveDB(); markStudiedToday(); dueCards.shift(); if (rating === 1) dueCards.push(currentCard); loadNextCard();
     }
 
-    // ==========================================
-    // 7.5 빈칸 채우기 (💡 목차 정규식 전면 업그레이드)
-    // ==========================================
     async function generateOutlineWithAI() {
       const subject = document.getElementById('outline-subject').value;
       const title = document.getElementById('outline-title').value.trim();
@@ -1288,8 +1400,6 @@
     function generateBlankQuiz() {
       const level = document.getElementById('quiz-level').value; 
       const lines = blankState.outline.content.split('\n'); 
-      
-      // 💡 목차 정규식 대폭 강화 (유니코드 로마자, 반괄호, 한글 목차 모두 포함)
       const regex = /^([\s]*[IVX]+\.|[\s]*[Ⅰ-Ⅻ]+\.?|[\s]*\d+[\.\)]|[\s]*[가-힣]+[\.\)]|[\s]*\(\d+\)|[\s]*\([가-힣]+\)|[\s]*[①-⑳])(.*)$/;
       
       let parsedLines = lines.map((line, idx) => {
@@ -1302,7 +1412,6 @@
       else if (level === '50') { candidates.sort(() => Math.random() - 0.5); candidates.slice(0, Math.ceil(candidates.length / 2)).forEach(l => l.isBlank = true); }
       else if (level === '30') { candidates.sort(() => Math.random() - 0.5); candidates.slice(0, Math.ceil(candidates.length * 0.3)).forEach(l => l.isBlank = true); }
       else if (level === 'main') candidates.forEach(l => { 
-        // 💡 대목차 판단 정규식도 같이 강화
         if (l.prefix.match(/[IVX]+\.|[Ⅰ-Ⅻ]+\.?|\d+\.|[가-힣]+\./)) l.isBlank = true; 
       });
 
