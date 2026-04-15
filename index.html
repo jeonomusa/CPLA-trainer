@@ -55,7 +55,7 @@
     .sm2-btn { padding: 12px 8px; border-radius: 16px; font-weight: 800; color: white; text-align: center; transition: all 0.2s; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; }
     .sm2-btn:active { transform: scale(0.95); }
 
-    .blank-input { border: none; border-bottom: 2px solid #cbd5e1; background: transparent; text-align: center; font-size: 15px; font-weight: 700; color: #0f172a; outline: none; transition: all 0.2s; padding: 2px 4px; margin: 0 4px; box-sizing: border-box; max-width: 100%; }
+    .blank-input { border: none; border-bottom: 2px solid #cbd5e1; background: transparent; text-align: center; font-size: inherit; font-weight: inherit; color: #0f172a; outline: none; transition: all 0.2s; padding: 2px 4px; margin: 0 4px; box-sizing: border-box; max-width: 100%; }
     .blank-input:focus { border-bottom-color: #10b981; background: #f0fdf4; }
     .blank-input.correct { border-bottom-color: #10b981; color: #10b981; background: #ecfdf5; }
     .blank-input.wrong { border-bottom-color: #ef4444; color: #ef4444; background: #fef2f2; }
@@ -112,18 +112,26 @@
     <div id="page-dashboard" class="page-content active">
       <h2 class="text-2xl font-extrabold text-slate-800 mb-6 flex items-center gap-2"><i class="ri-dashboard-line"></i> 학습 대시보드</h2>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
-        <div class="neo-card p-4 md:p-6 flex flex-col items-center text-center">
+        <div class="neo-card p-4 md:p-6 flex flex-col items-center justify-center text-center">
           <span class="text-[10px] font-bold text-gray-400 uppercase mb-2">시험 D-Day</span>
           <span class="text-2xl md:text-3xl font-extrabold text-emerald-500" id="d-day-val">D-?</span>
         </div>
-        <!-- 💡 수정됨: 역대 최고 연속 학습일(Max Streak) 표시 추가 -->
-        <div class="neo-card p-4 md:p-6 flex flex-col items-center text-center border-b-4 border-b-emerald-500 justify-center">
-          <span class="text-[10px] font-bold text-gray-400 uppercase mb-1">연속 학습일</span>
-          <div class="flex items-baseline gap-1 mt-1">
-            <span class="text-2xl md:text-3xl font-extrabold text-slate-800" id="streak-val">0일</span>
-            <span class="text-[10px] md:text-xs font-bold text-gray-400" id="max-streak-val">(최대 0일)</span>
+        
+        <div class="neo-card p-4 flex flex-col items-center justify-center text-center border-b-4 border-b-emerald-500">
+          <span class="text-[10px] font-bold text-gray-400 uppercase mb-2">연속 학습일</span>
+          <div class="flex items-center justify-center gap-2 md:gap-4 mt-1 w-full">
+            <div class="text-center flex-1">
+              <span class="text-[9px] md:text-[10px] font-bold text-slate-500 block mb-1">현재</span>
+              <div><span class="text-xl md:text-2xl font-extrabold text-slate-800" id="streak-val">0</span><span class="text-sm font-bold text-slate-800">일</span></div>
+            </div>
+            <div class="w-px h-6 md:h-8 bg-gray-200"></div>
+            <div class="text-center flex-1">
+              <span class="text-[9px] md:text-[10px] font-bold text-rose-500 block mb-1">최대</span>
+              <div><span class="text-xl md:text-2xl font-extrabold text-rose-500" id="max-streak-val">0</span><span class="text-sm font-bold text-rose-500">일</span></div>
+            </div>
           </div>
         </div>
+
         <div class="neo-card p-4 flex flex-col items-center justify-center text-center">
           <span class="text-[10px] font-bold text-gray-400 uppercase mb-2">오늘 남은 복습</span>
           <div class="flex items-center justify-center gap-2 md:gap-4 mt-1 w-full">
@@ -138,9 +146,9 @@
             </div>
           </div>
         </div>
-        <div class="neo-card p-4 md:p-6 flex flex-col items-center text-center">
+        <div class="neo-card p-4 md:p-6 flex flex-col items-center justify-center text-center">
           <span class="text-[10px] font-bold text-gray-400 uppercase mb-2">누적 모의고사</span>
-          <span class="text-2xl md:text-3xl font-extrabold text-slate-800" id="total-exams-val">0회</span>
+          <div><span class="text-2xl md:text-3xl font-extrabold text-slate-800" id="total-exams-val">0</span><span class="text-sm font-bold text-slate-800">회</span></div>
         </div>
       </div>
 
@@ -236,8 +244,8 @@
         <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 border-b border-gray-100 pb-3 gap-3">
           <div class="flex items-center gap-2 md:gap-3">
             <h3 class="font-bold text-slate-800 text-base md:text-lg flex items-center gap-1"><i class="ri-list-settings-line text-emerald-500"></i> 내 카드</h3>
-            <select id="fc-filter-subject" onchange="renderFcList()" class="p-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold outline-none">
-              <option value="all">전체</option><option value="노동법">노동법</option><option value="인사노무관리">인사노무관리</option><option value="행정쟁송법">행정쟁송법</option><option value="민사소송법">민사소송법</option>
+            <select id="fc-filter-subject" onchange="renderFcList()" class="p-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold outline-none focus:ring-2 focus:ring-emerald-500">
+              <option value="all">전체 과목</option><option value="노동법">노동법</option><option value="인사노무관리">인사노무관리</option><option value="행정쟁송법">행정쟁송법</option><option value="민사소송법">민사소송법</option>
             </select>
           </div>
           <div class="flex flex-wrap items-center gap-2">
@@ -246,7 +254,7 @@
             </label>
             <button onclick="removeBracketsFromSelected()" class="px-2 py-1.5 bg-indigo-50 text-indigo-600 text-[11px] font-bold rounded-lg hover:bg-indigo-100">선택 괄호제거</button>
             <button onclick="deleteSelectedFc()" class="px-2 py-1.5 bg-rose-50 text-rose-500 text-[11px] font-bold rounded-lg hover:bg-rose-100">선택 삭제</button>
-            <button onclick="toggleFcManager()" class="ml-1 text-sm text-gray-400"><i class="ri-close-line text-xl"></i></button>
+            <button onclick="toggleFcManager()" class="ml-1 text-sm text-gray-400 hover:text-gray-800"><i class="ri-close-line text-xl"></i></button>
           </div>
         </div>
         <div id="fc-list" class="space-y-2 md:space-y-3 max-h-96 overflow-y-auto pr-1"></div>
@@ -261,13 +269,13 @@
         </div>
         <div class="flex justify-end gap-2">
           <button onclick="cancelManualFlashcard()" class="px-4 py-2 bg-white border border-gray-200 text-gray-600 rounded-xl text-xs font-bold hover:bg-gray-50">취소</button>
-          <button id="manual-fc-save-btn" onclick="addManualFlashcard()" class="px-4 py-2 bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-md">추가하기</button>
+          <button id="manual-fc-save-btn" onclick="addManualFlashcard()" class="px-4 py-2 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 shadow-md">추가하기</button>
         </div>
       </div>
 
       <div class="neo-card p-4 md:p-8 flex flex-col items-center min-h-[400px]">
-        <div class="text-xs font-bold text-gray-500 mb-4 md:mb-6 bg-gray-100 px-3 py-1.5 rounded-full">
-          카드 복습: <span class="text-blue-500" id="fc-due-display">0</span>장
+        <div class="text-xs font-bold text-gray-500 mb-4 md:mb-6 bg-gray-100 px-3 py-1.5 rounded-full flex gap-2">
+          <span>카드 복습: <span class="text-blue-500" id="fc-due-display">0</span>장</span>
         </div>
         
         <div id="fc-workspace" class="w-full hidden">
@@ -310,8 +318,8 @@
             <div id="fc-ai-result" class="hidden p-3 md:p-4 bg-white border border-slate-200 rounded-xl text-xs md:text-[13px] shadow-inner break-keep"></div>
           </div>
 
-          <!-- 💡 수정됨: Tailwind grid를 활용하여 모바일 2x2, PC 1x4 완벽 대응 -->
-          <div id="fc-buttons" style="display: none;" class="w-full max-w-[600px] mx-auto mt-4 md:mt-6 grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
+          <!-- 💡 Hidden 클래스로 완전히 숨겼다 나타나게 제어 -->
+          <div id="fc-buttons" class="hidden w-full max-w-[600px] mx-auto mt-4 md:mt-6 grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
             <div class="sm2-btn bg-rose-500 hover:bg-rose-600" id="fc-btn-again" onclick="rateCard(1)">
                 <span>다시</span>
                 <span class="block text-[9px] md:text-[10px] mt-0.5 opacity-90 font-medium" id="fc-time-again">1분 후</span>
@@ -338,8 +346,9 @@
       </div>
     </div>
 
+    <!-- 4. 목차 빈칸 채우기 -->
     <div id="page-blank" class="page-content">
-      <h2 class="text-2xl font-extrabold text-slate-800 mb-2 flex items-center gap-2"><i class="ri-edit-2-line"></i> 목차 빈칸 채우기</h2>
+      <h2 class="text-2xl font-extrabold text-slate-800 mb-2 flex items-center gap-2"><i class="ri-edit-2-line"></i> 목차 빈칸 뚫기</h2>
       <p class="text-sm text-gray-500 mb-6">전체적인 구조 암기를 위해 목차의 빈칸을 채워보세요. 이제 목차도 알고리즘으로 관리됩니다.</p>
 
       <div id="blank-list-view">
@@ -377,7 +386,11 @@
           <div class="lg:w-2/3 neo-card p-4 md:p-8 order-2 lg:order-1">
             <div class="flex flex-col md:flex-row justify-between md:items-end gap-3 mb-4 md:mb-6 border-b border-gray-100 pb-3 md:pb-4">
               <div>
-                <span class="text-[10px] font-bold text-emerald-500 bg-emerald-50 px-2 py-1 rounded-full mb-1 md:mb-2 inline-block" id="quiz-subject"></span>
+                <!-- 💡 목차 퀴즈에도 상단에 회독수 뱃지 추가 -->
+                <div class="flex items-center gap-2 mb-1 md:mb-2">
+                  <span class="text-[10px] font-bold text-emerald-500 bg-emerald-50 px-2 py-1 rounded-full inline-block" id="quiz-subject"></span>
+                  <span class="text-[10px] md:text-xs font-bold px-2 py-1 rounded-full inline-block shrink-0" id="quiz-status"></span>
+                </div>
                 <h3 class="text-lg md:text-2xl font-extrabold text-slate-800" id="quiz-title"></h3>
               </div>
               <div class="flex items-center gap-2">
@@ -388,13 +401,13 @@
               </div>
             </div>
             
-            <div id="quiz-lines" class="text-[13px] md:text-[15px] leading-loose md:leading-loose text-slate-700 font-medium mb-6 md:mb-8 overflow-x-hidden"></div>
+            <div id="quiz-lines" class="mb-6 md:mb-8 overflow-x-hidden"></div>
             
             <div id="quiz-control-area" class="text-center mt-6 md:mt-8">
               <button id="quiz-check-btn" onclick="checkBlankAnswers()" class="w-full md:w-auto px-6 md:px-8 py-2.5 md:py-3 bg-emerald-500 text-white rounded-xl font-bold text-sm md:text-lg hover:bg-emerald-600 shadow-md active:scale-95"><i class="ri-check-double-line"></i> 정답 확인</button>
               
-              <!-- 💡 텍스트 중복 방지 및 그리드 레이아웃 적용된 목차 버튼 -->
-              <div id="quiz-sm2-buttons" style="display: none;" class="w-full max-w-[600px] mx-auto mt-4 md:mt-6 grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
+              <!-- 💡 숨김 방식을 class 토글(hidden/grid)로 변경 -->
+              <div id="quiz-sm2-buttons" class="hidden w-full max-w-[600px] mx-auto mt-4 md:mt-6 grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
                 <div class="sm2-btn bg-rose-500 hover:bg-rose-600" id="quiz-btn-again" onclick="rateOutline(1)">
                     <span>다시</span>
                     <span class="block text-[9px] md:text-[10px] mt-0.5 opacity-90 font-medium" id="quiz-time-again">1분 후</span>
@@ -615,31 +628,33 @@
     let editingFcId = null; let editingOutlineId = null; let editingExamId = null; let chartInstances = {};
 
     window.onload = () => {
-      const saved = localStorage.getItem('nomusa_db_v4');
-      if (saved) { 
-        const parsed = JSON.parse(saved);
-        db = { ...db, ...parsed };
-        if (!db.maxStreak) db.maxStreak = db.streak || 0;
-        for (let date in db.studyLog) {
-          if (typeof db.studyLog[date] === 'number') {
-            db.studyLog[date] = { fc: db.studyLog[date], outline: 0, exam: 0 };
+      try {
+        const saved = localStorage.getItem('nomusa_db_v4');
+        if (saved) { 
+          const parsed = JSON.parse(saved);
+          db = { ...db, ...parsed };
+          if (!db.maxStreak) db.maxStreak = db.streak || 0;
+          for (let date in db.studyLog) {
+            if (typeof db.studyLog[date] === 'number') {
+              db.studyLog[date] = { fc: db.studyLog[date], outline: 0, exam: 0 };
+            }
           }
         }
-      }
-      const savedKey = localStorage.getItem('gemini_api_key');
-      if(savedKey) document.getElementById('api-key-input').value = savedKey;
+        const savedKey = localStorage.getItem('gemini_api_key');
+        if(savedKey) document.getElementById('api-key-input').value = savedKey;
+      } catch(e) {}
       updateStreak(); renderDashboard();
     };
 
     function saveDB() { 
-      try { localStorage.setItem('nomusa_db_v4', JSON.stringify(db)); if (window.triggerCloudSave) window.triggerCloudSave(); } catch(e) {} 
+      try { localStorage.setItem('nomusa_db_v4', JSON.stringify(db)); } catch(e) {} 
+      if (window.triggerCloudSave) window.triggerCloudSave(); 
     }
 
     const MODEL_NAME = "gemini-2.5-flash";
     const LINES_PER_PAGE = 22; const MAX_CHARS_PER_LINE = 40; 
     let examState = { subject: '', question: '', rubric: '', time: 0, seconds: 0, totalPage: 5, currPage: 1, timer: null, answers: {}, uploadedRubricText: '' };
     let blankState = { outline: null, lines: [], answers: [], activeInput: null };
-    let fcClozeState = { activeInput: null, answers: [] }; 
     let dueCards = []; let dueOutlines = []; let currentCard = null;
 
     function navigate(id) {
@@ -676,10 +691,10 @@
 
     function saveApiKey() {
       const val = document.getElementById('api-key-input').value.trim();
-      if(val) { localStorage.setItem('gemini_api_key', val); showMsg('API 키가 저장되었습니다.'); } else showMsg('키를 입력해주세요.');
+      if(val) { try { localStorage.setItem('gemini_api_key', val); } catch(e){} showMsg('API 키가 저장되었습니다.'); } else showMsg('키를 입력해주세요.');
     }
     function getApiKey() {
-      const key = localStorage.getItem('gemini_api_key');
+      let key = ''; try { key = localStorage.getItem('gemini_api_key'); } catch(e){}
       if(!key) { showMsg("설정 탭에서 Gemini API 키를 먼저 입력해주세요!"); throw new Error("No API Key"); } return key;
     }
 
@@ -746,15 +761,14 @@
       const target = new Date('2026-08-29'); const diff = Math.ceil((target - new Date().setHours(0,0,0,0)) / 86400000);
       document.getElementById('d-day-val').textContent = `D-${diff}`;
       
-      // 💡 연속 학습일 및 최대 기록 표시
-      document.getElementById('streak-val').textContent = `${db.streak}일`;
-      document.getElementById('max-streak-val').textContent = `(최대 ${db.maxStreak || db.streak || 0}일)`;
+      document.getElementById('streak-val').textContent = db.streak || 0;
+      document.getElementById('max-streak-val').textContent = db.maxStreak || db.streak || 0;
       
       dueCards = db.flashcards.filter(isDue);
       dueOutlines = db.outlines.filter(isDue);
       document.getElementById('due-fc-val').textContent = dueCards.length;
       document.getElementById('due-outline-val').textContent = dueOutlines.length;
-      document.getElementById('total-exams-val').textContent = `${db.history.length}회`;
+      document.getElementById('total-exams-val').textContent = db.history.length;
       
       const tbody = document.getElementById('history-tbody');
       if (db.history.length === 0) { 
@@ -801,7 +815,7 @@
                     { type: 'bar', label: '카드 (장)', data: weeklyDataFc, backgroundColor: 'rgba(16, 185, 129, 0.8)', borderRadius: 4, order: 2 }
                 ]
             },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'top', labels: { boxWidth: 10, font: { size: 10, family: 'Pretendard' } } } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 }, suggestedMax: 120 } } }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'top', labels: { boxWidth: 10, font: { size: 10, family: 'Pretendard' } } } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 }, suggestedMax: 100 } } }
         });
       }
 
@@ -1014,7 +1028,7 @@
       if (selectedIds.length === 0) { showMsg("선택된 카드가 없습니다."); return; }
       if(!confirm(`선택한 ${selectedIds.length}개 카드의 대괄호를 지우시겠습니까?`)) return;
       let count = 0;
-      db.flashcards.forEach(c => { if (selectedIds.includes(String(c.id))) { if (c.back.includes('[') || c.back.includes(']')) { c.back = c.back.replace(/\[/g, '').replace(/\]/g, ''); count++; } } });
+      db.flashcards.forEach(c => { if (selectedIds.includes(String(c.id))) { if (c.back.includes('[') || c.back.includes(']')) { c.back = c.back.replace(/\[/g, '').replace(/\]/g, count++); } } });
       if(count > 0) { saveDB(); renderFcList(); renderDueFlashcards(); showMsg(`✅ ${count}개의 카드가 변환되었습니다!`); }
     }
 
@@ -1077,7 +1091,7 @@
       if (dueCards.length === 0) { renderDueFlashcards(); return; }
       currentCard = dueCards[0];
       
-      document.getElementById('fc-buttons').style.display = 'none';
+      document.getElementById('fc-buttons').classList.add('hidden');
       document.querySelectorAll('#fc-buttons .sm2-btn').forEach(btn => btn.classList.remove('ring-4', 'ring-offset-2', 'ring-rose-400', 'ring-orange-400', 'ring-blue-400', 'ring-emerald-400', 'animate-pulse'));
       
       const aiResult = document.getElementById('fc-ai-result');
@@ -1159,8 +1173,9 @@
       });
 
       document.getElementById('fc-cloze-check-btn').classList.add('hidden'); 
-      // 💡 2x2 및 1x4 레이아웃이 적용된 그리드 컨테이너 보이기
-      document.getElementById('fc-buttons').className = "grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 w-full max-w-[600px] mx-auto mt-4 md:mt-6";
+      const btnContainer = document.getElementById('fc-buttons');
+      btnContainer.classList.remove('hidden');
+      btnContainer.classList.add('grid');
       
       const accuracy = inputs.length > 0 ? (correctCount / inputs.length) : 0;
       document.querySelectorAll('#fc-buttons .sm2-btn').forEach(btn => btn.classList.remove('ring-4', 'ring-offset-2', 'ring-rose-400', 'ring-orange-400', 'ring-blue-400', 'ring-emerald-400', 'animate-pulse'));
@@ -1173,7 +1188,9 @@
 
     function flipCard() { 
       document.getElementById('fc-card').classList.add('flipped'); 
-      document.getElementById('fc-buttons').className = "grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 w-full max-w-[600px] mx-auto mt-4 md:mt-6";
+      const btnContainer = document.getElementById('fc-buttons');
+      btnContainer.classList.remove('hidden');
+      btnContainer.classList.add('grid');
     }
 
     function rateCard(rating) {
@@ -1241,13 +1258,17 @@
       document.getElementById('outline-adder').classList.toggle('hidden'); 
     }
     function cancelOutlineEdit() { editingOutlineId = null; document.getElementById('outline-adder').classList.add('hidden'); }
+    
     function editOutline(id) {
       const o = db.outlines.find(x => String(x.id) === String(id)); if(!o) return; editingOutlineId = o.id;
       document.getElementById('outline-adder-title').innerHTML = '<i class="ri-edit-line text-emerald-500"></i> 목차 내용 수정';
       document.getElementById('outline-subject').value = o.subject; document.getElementById('outline-title').value = o.title; document.getElementById('outline-content').value = o.content;
-      document.getElementById('outline-save-btn').textContent = "수정 완료"; document.getElementById('outline-adder').classList.remove('hidden');
-      window.scrollTo(0, document.getElementById('outline-adder').offsetTop - 100);
+      document.getElementById('outline-save-btn').textContent = "수정 완료"; 
+      const adder = document.getElementById('outline-adder');
+      adder.classList.remove('hidden');
+      adder.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
+    
     function saveOutline() {
       const subject = document.getElementById('outline-subject').value; const title = document.getElementById('outline-title').value.trim(); const content = document.getElementById('outline-content').value.trim();
       if (!title || !content) { showMsg("제목과 내용을 모두 입력해주세요."); return; }
@@ -1301,7 +1322,7 @@
     function generateBlankQuiz() {
       const level = document.getElementById('quiz-level').value; 
       const lines = blankState.outline.content.split('\n'); 
-      const regex = /^([\s]*[IVX]+\.|[\s]*[Ⅰ-Ⅻ]+\.?|[\s]*\d+[\.\)]|[\s]*[가-힣]+[\.\)]|[\s]*\(\d+\)|[\s]*\([가-힣]+\)|[\s]*[①-⑳])(.*)$/;
+      const regex = /^([\s]*[IVX]+\.|[\s]*[Ⅰ-Ⅻ]+\.?|[\s]*\d+[\.\)]|[\s]*\(\d+\)|[\s]*[①-⑳]|[\s]*[가-힣]+[\.\)]|[\s]*\([가-힣]+\)|[\s]*[㈎-㈛])(.*)$/;
       
       let parsedLines = lines.map((line, idx) => {
         let prefix = ''; let content = line; const match = line.match(regex);
@@ -1325,6 +1346,16 @@
       document.getElementById('quiz-time-good').textContent = `${nextGood}일 후`;
       document.getElementById('quiz-time-easy').textContent = `${nextEasy}일 후`;
 
+      let reviewCount = o.reviews !== undefined ? o.reviews : (r === 0 ? 0 : r);
+      let statusHtml = reviewCount === 0 ? '🆕 처음' : `🔁 ${reviewCount}회독`;
+      let statusClass = reviewCount === 0 ? 'text-indigo-600 bg-indigo-50' : 'text-slate-500 bg-slate-100';
+
+      const statusEl = document.getElementById('quiz-status');
+      if (statusEl) {
+          statusEl.textContent = statusHtml;
+          statusEl.className = `text-[10px] md:text-xs font-bold px-2 py-1 rounded-full inline-block shrink-0 ${statusClass}`;
+      }
+
       renderBlankQuizRoom();
     }
     
@@ -1334,22 +1365,66 @@
       const uniformWidth = `clamp(80px, ${maxCharLen + 2}ch, 100%)`;
 
       blankState.lines.forEach(line => {
-        const row = document.createElement('div'); row.className = "mb-3 flex items-center flex-wrap"; 
-        const prefixSpan = document.createElement('span'); prefixSpan.textContent = line.prefix; prefixSpan.className = "font-bold text-slate-500 mr-2 shrink-0"; row.appendChild(prefixSpan);
+        let indentClass = '';
+        let textClass = 'text-[13px] md:text-[15px] font-medium text-slate-700';
+        let prefixClass = 'font-bold text-slate-500';
+        let inputClass = '';
+        
+        const p = line.prefix.trim();
+        // 💡 계층별 들여쓰기 자동 적용 (Ⅰ - 1 - (1) - 1) - ① - ㈎)
+        if (/^[IVX]+\.|^[Ⅰ-Ⅻ]+\.?/.test(p)) {
+            indentClass = 'ml-0 mt-6 mb-3';
+            textClass = 'text-base md:text-lg font-extrabold text-slate-800';
+            prefixClass = 'text-emerald-600';
+            inputClass = 'font-extrabold text-emerald-700';
+        } else if (/^\d+\./.test(p)) {
+            indentClass = 'ml-4 md:ml-6 mt-3 mb-2';
+            textClass = 'text-[14px] md:text-[16px] font-bold text-slate-700';
+        } else if (/^\(\d+\)/.test(p)) {
+            indentClass = 'ml-8 md:ml-12 mb-2';
+        } else if (/^\d+\)/.test(p)) {
+            indentClass = 'ml-12 md:ml-16 mb-1.5';
+            textClass = 'text-[12px] md:text-[14px] font-medium text-slate-600';
+        } else if (/^[①-⑳]/.test(p)) {
+            indentClass = 'ml-16 md:ml-20 mb-1';
+            textClass = 'text-[12px] md:text-[14px] font-medium text-slate-600';
+        } else if (/^[가-힣]+\.|^\([가-힣]+\)|^[㈎-㈛]/.test(p)) {
+            indentClass = 'ml-20 md:ml-24 mb-1';
+            textClass = 'text-[12px] md:text-[14px] font-medium text-slate-600';
+        } else {
+            indentClass = 'ml-4 md:ml-6 mb-1'; // 기본 여백
+        }
+
+        const row = document.createElement('div'); 
+        row.className = `flex items-center flex-wrap ${indentClass} ${textClass}`; 
+        
+        const prefixSpan = document.createElement('span'); 
+        prefixSpan.textContent = line.prefix; 
+        prefixSpan.className = `mr-2 shrink-0 ${prefixClass}`; 
+        row.appendChild(prefixSpan);
+        
         if (line.isBlank) {
-          const input = document.createElement('input'); input.type = "text"; input.className = "blank-input"; input.dataset.answer = line.content; input.style.width = uniformWidth;
+          const input = document.createElement('input'); input.type = "text"; 
+          input.className = `blank-input ${inputClass}`; 
+          input.dataset.answer = line.content; input.style.width = uniformWidth;
+          if (/^[IVX]+\.|^[Ⅰ-Ⅻ]+\.?/.test(p)) input.style.fontSize = 'inherit';
+          
           input.addEventListener('focus', (e) => { blankState.activeInput = e.target; e.target.classList.remove('correct', 'wrong'); });
           input.addEventListener('input', (e) => { e.target.classList.remove('correct', 'wrong'); }); row.appendChild(input);
-        } else { const contentSpan = document.createElement('span'); contentSpan.textContent = line.content; row.appendChild(contentSpan); }
+        } else { 
+          const contentSpan = document.createElement('span'); contentSpan.textContent = line.content; row.appendChild(contentSpan); 
+        }
         container.appendChild(row);
       });
+      
       const bankContainer = document.getElementById('quiz-word-bank'); bankContainer.innerHTML = '';
       blankState.answers.forEach(ans => {
         const chip = document.createElement('div'); chip.className = "word-chip"; chip.textContent = ans; chip.onclick = () => fillWordChipOutline(ans); bankContainer.appendChild(chip);
       });
       blankState.activeInput = null; const firstInput = document.querySelector('.blank-input'); if(firstInput) firstInput.focus();
       document.getElementById('quiz-check-btn').classList.remove('hidden');
-      document.getElementById('quiz-sm2-buttons').style.display = 'none';
+      document.getElementById('quiz-sm2-buttons').classList.add('hidden');
+      document.getElementById('quiz-sm2-buttons').classList.remove('grid');
     }
     
     function fillWordChipOutline(word) {
@@ -1378,7 +1453,9 @@
       else { document.getElementById('quiz-btn-again').classList.add('ring-4', 'ring-offset-2', 'ring-rose-400', 'animate-pulse'); showMsg("💪 25% 미만 정답. 다시 한 번 확실히 외워봅시다!"); }
       
       document.getElementById('quiz-check-btn').classList.add('hidden');
-      document.getElementById('quiz-sm2-buttons').className = "grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 w-full max-w-[600px] mx-auto mt-4 md:mt-6";
+      const btnContainer = document.getElementById('quiz-sm2-buttons');
+      btnContainer.classList.remove('hidden');
+      btnContainer.classList.add('grid');
     }
 
     function rateOutline(rating) {
@@ -1393,6 +1470,9 @@
 
       e = e + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02)); if (e < 1.3) e = 1.3;
       
+      let currentReviewCount = outline.reviews !== undefined ? outline.reviews : (r === 0 ? 0 : r);
+      outline.reviews = currentReviewCount + 1;
+
       let nextDate = new Date();
       if (iv === 0) nextDate.setMinutes(nextDate.getMinutes() + 1);
       else if (iv === 0.5) nextDate.setHours(nextDate.getHours() + 12);
@@ -1408,9 +1488,6 @@
       closeBlankQuiz();
     }
 
-    // ==========================================
-    // 8. 실전 모의고사
-    // ==========================================
     function updateExamQList() {
       const sub = document.getElementById('exam-subject').value; const sel = document.getElementById('exam-question-select'); sel.innerHTML = '<option value="">직접 입력하기</option>';
       db.questions.filter(q => q.subject === sub).forEach(q => { const opt = document.createElement('option'); opt.value = String(q.id); opt.textContent = `[추출] ${q.question.substring(0, 30)}...`; sel.appendChild(opt); });
@@ -1604,6 +1681,70 @@
       reader.readAsText(file); event.target.value = '';
     }
     function resetDB() { if (confirm("정말로 모든 학습 기록을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다!")) { localStorage.removeItem('nomusa_db_v4'); location.reload(); } }
+    
+    window.navigate = navigate;
+    window.toggleCsvUploadForm = toggleCsvUploadForm;
+    window.cancelCsvUpload = cancelCsvUpload;
+    window.processCsvUpload = processCsvUpload;
+    window.toggleFcManager = toggleFcManager;
+    window.toggleManualCardForm = toggleManualCardForm;
+    window.cancelManualFlashcard = cancelManualFlashcard;
+    window.addManualFlashcard = addManualFlashcard;
+    window.renderFcList = renderFcList;
+    window.toggleSelectAllFc = toggleSelectAllFc;
+    window.updateSelectAllFcState = updateSelectAllFcState;
+    window.removeBracketsFromSelected = removeBracketsFromSelected;
+    window.deleteSelectedFc = deleteSelectedFc;
+    window.editFc = editFc;
+    window.deleteFc = deleteFc;
+    window.flipCard = flipCard;
+    window.checkFcClozeAnswers = checkFcClozeAnswers;
+    window.rateCard = rateCard;
+    window.getFcHint = getFcHint;
+    window.getFcMnemonic = getFcMnemonic;
+    window.setFcActiveInput = setFcActiveInput;
+    window.fillFcWordChip = fillFcWordChip;
+    
+    window.renderOutlineList = renderOutlineList;
+    window.toggleOutlineAdder = toggleOutlineAdder;
+    window.cancelOutlineEdit = cancelOutlineEdit;
+    window.saveOutline = saveOutline;
+    window.editOutline = editOutline;
+    window.deleteOutline = deleteOutline;
+    window.startBlankQuiz = startBlankQuiz;
+    window.closeBlankQuiz = closeBlankQuiz;
+    window.generateBlankQuiz = generateBlankQuiz;
+    window.checkBlankAnswers = checkBlankAnswers;
+    window.rateOutline = rateOutline;
+    window.generateOutlineWithAI = generateOutlineWithAI;
+    window.fillWordChipOutline = fillWordChipOutline;
+
+    window.updateExamQList = updateExamQList;
+    window.previewQuestion = previewQuestion;
+    window.toggleExamManager = toggleExamManager;
+    window.editExamQ = editExamQ;
+    window.deleteExamQ = deleteExamQ;
+    window.saveExamEdit = saveExamEdit;
+    window.cancelExamEdit = cancelExamEdit;
+    window.handleExamRubricUpload = handleExamRubricUpload;
+    window.startExam = startExam;
+    window.submitExam = submitExam;
+    window.changePage = changePage;
+
+    window.searchLawDB = searchLawDB;
+    window.processAIConvert = processAIConvert;
+    window.handleFileDisplay = handleFileDisplay;
+    
+    window.saveApiKey = saveApiKey;
+    window.exportDB = exportDB;
+    window.importDB = importDB;
+    window.doImportDB = doImportDB;
+    window.resetDB = resetDB;
+    window.viewHistory = viewHistory;
+    window.analyzeStudyHistory = analyzeStudyHistory;
+    window.renderDashboard = renderDashboard;
+    window.renderDueFlashcards = renderDueFlashcards;
+
   </script>
 
   <script type="module">
