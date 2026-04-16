@@ -80,6 +80,10 @@
     
     .fc-item-checkbox { width: 18px; height: 18px; border-radius: 4px; border-gray-300; text-emerald-500; cursor: pointer; }
     .chart-wrapper { position: relative; height: 220px; width: 100%; }
+
+    /* 💡 전체화면 시 시험장 스타일 */
+    :fullscreen #exam-room { background: #f8fafc; padding: 20px; overflow-y: auto; }
+    :-webkit-full-screen #exam-room { background: #f8fafc; padding: 20px; overflow-y: auto; }
   </style>
 </head>
 <body class="pb-24">
@@ -189,7 +193,7 @@
           <table class="w-full text-left">
             <thead>
               <tr class="text-[10px] md:text-[11px] font-bold text-gray-400 uppercase border-b border-gray-100">
-                <th class="pb-3 px-2">날짜</th><th class="pb-3 px-2">과목</th><th class="pb-3 px-2">점수</th><th class="pb-3 px-2 text-right">첨삭 결과</th>
+                <th class="pb-3 px-2">날짜</th><th class="pb-3 px-2">과목</th><th class="pb-3 px-2">점수</th><th class="pb-3 px-2 text-right">관리</th>
               </tr>
             </thead>
             <tbody id="history-tbody"></tbody>
@@ -198,12 +202,12 @@
       </div>
     </div>
 
+    <!-- AI 자료 변환 -->
     <div id="page-convert" class="page-content">
       <h2 class="text-2xl font-extrabold text-slate-800 mb-2 flex items-center gap-2"><i class="ri-robot-line"></i> AI 자료 변환</h2>
       <p class="text-sm text-gray-500 mb-6">문제지/모범답안을 업로드하거나 직접 텍스트를 붙여넣으면 AI가 분석하여 문제나 카드로 변환해줍니다.</p>
       
       <div class="neo-card p-4 md:p-8">
-        
         <div class="flex gap-6 mb-4 md:mb-6 border-b border-gray-100 pb-4">
           <label class="flex items-center gap-2 cursor-pointer text-sm font-bold text-slate-700">
             <input type="radio" name="input-mode" value="pdf" checked onchange="toggleInputMode()" class="w-4 h-4 text-emerald-500"> PDF 파일 업로드
@@ -250,18 +254,17 @@
            <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2 text-lg"><i class="ri-eye-line text-emerald-500"></i> 추출 결과 미리보기 (수정 가능)</h3>
            <p class="text-xs text-gray-500 mb-4">아래 내용을 검토하고 필요 시 직접 수정한 후 저장 버튼을 누르세요. 불필요한 항목은 '삭제'를 눌러 뺄 수 있습니다.</p>
            
-           <div id="convert-preview-list" class="space-y-4 mb-6 max-h-[500px] overflow-y-auto pr-2">
-           </div>
+           <div id="convert-preview-list" class="space-y-4 mb-6 max-h-[500px] overflow-y-auto pr-2"></div>
            
            <div class="flex justify-end gap-3">
              <button onclick="cancelConvert()" class="px-5 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 active:scale-95">취소</button>
              <button onclick="saveConvertedData()" class="px-8 py-2.5 bg-emerald-500 text-white font-bold rounded-xl hover:bg-emerald-600 shadow-md active:scale-95"><i class="ri-save-line mr-1"></i> 확정 및 저장하기</button>
            </div>
         </div>
-
       </div>
     </div>
 
+    <!-- 플래시카드 -->
     <div id="page-flashcard" class="page-content">
       <h2 class="text-2xl font-extrabold text-slate-800 mb-2 flex items-center gap-2"><i class="ri-stack-line"></i> 안키형 플래시카드</h2>
       <p class="text-sm text-gray-500 mb-6">빈칸이 있는 카드는 단어장 모드로, 일반 카드는 뒤집기 모드로 알아서 작동합니다.</p>
@@ -395,6 +398,7 @@
       </div>
     </div>
 
+    <!-- 목차 빈칸 채우기 -->
     <div id="page-blank" class="page-content">
       <h2 class="text-2xl font-extrabold text-slate-800 mb-2 flex items-center gap-2"><i class="ri-edit-2-line"></i> 목차 빈칸 채우기</h2>
       <p class="text-sm text-gray-500 mb-6">전체적인 구조 암기를 위해 목차의 빈칸을 채워보세요. 이제 목차도 알고리즘으로 관리됩니다.</p>
@@ -513,13 +517,15 @@
       </div>
     </div>
     
+    <!-- 실전 모의고사 -->
     <div id="page-exam" class="page-content">
       <h2 class="text-2xl font-extrabold text-slate-800 mb-2 flex items-center gap-2"><i class="ri-edit-box-line"></i> 실전 모의고사</h2>
-      <p class="text-sm text-gray-500 mb-6">강사님의 채점평 PDF를 업로드하여 가장 깐깐하게 채점받아 보세요!</p>
+      <p class="text-sm text-gray-500 mb-6">강사님의 채점평을 바탕으로 가장 깐깐하게 채점받고, 부족한 점을 점검하세요!</p>
+      
       <div id="exam-setup" class="neo-card p-6 md:p-8 max-w-2xl mx-auto">
         <div class="space-y-4 md:space-y-6">
           <div><label class="text-[11px] md:text-xs font-bold text-gray-500 block mb-2">과목</label>
-            <select id="exam-subject" onchange="updateExamQList()" class="w-full p-3 md:p-4 bg-gray-50 rounded-xl font-bold border-none outline-none">
+            <select id="exam-subject" onchange="updateExamQList()" class="w-full p-3 md:p-4 bg-gray-50 rounded-xl font-bold border-none outline-none focus:ring-2 focus:ring-emerald-500">
               <option>노동법</option><option>인사노무관리</option><option>행정쟁송법</option><option>민사소송법</option>
             </select>
           </div>
@@ -528,10 +534,11 @@
               <label class="text-[11px] md:text-xs font-bold text-gray-500 block">문제 선택</label>
               <button onclick="toggleExamManager()" class="text-[10px] md:text-xs font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded hover:bg-blue-100"><i class="ri-edit-line"></i> 관리</button>
             </div>
-            <select id="exam-question-select" onchange="previewQuestion()" class="w-full p-3 md:p-4 bg-gray-50 rounded-xl font-bold border-none outline-none">
+            <select id="exam-question-select" onchange="previewQuestion()" class="w-full p-3 md:p-4 bg-gray-50 rounded-xl font-bold border-none outline-none focus:ring-2 focus:ring-emerald-500">
               <option value="">직접 입력하기</option>
             </select>
           </div>
+          
           <div id="exam-manager-view" class="hidden p-4 bg-white border border-gray-200 shadow-lg rounded-xl">
             <div class="flex justify-between items-center border-b border-gray-100 pb-2 mb-2">
               <h4 class="font-bold text-sm text-slate-800 flex items-center gap-1"><i class="ri-list-check-2"></i> 문제 관리 목록</h4>
@@ -548,18 +555,34 @@
                </div>
             </div>
           </div>
-          <textarea id="exam-direct-q" class="w-full h-24 md:h-32 p-3 md:p-4 bg-gray-50 rounded-xl text-xs md:text-sm font-medium outline-none resize-none" placeholder="문제를 입력하세요."></textarea>
+          
+          <textarea id="exam-direct-q" class="w-full h-24 md:h-32 p-3 md:p-4 bg-gray-50 rounded-xl text-[13px] md:text-sm font-medium outline-none resize-y focus:ring-2 focus:ring-emerald-500" placeholder="문제를 입력하세요."></textarea>
+          
           <div class="p-3 md:p-4 bg-emerald-50/50 rounded-xl border border-emerald-100">
-            <label class="text-[10px] md:text-xs font-bold text-emerald-700 mb-2 flex items-center gap-1"><i class="ri-file-text-line"></i> 강사 채점평 첨부</label>
-            <label class="border-2 border-dashed border-emerald-200 rounded-lg p-3 flex flex-col items-center justify-center cursor-pointer hover:border-emerald-500 bg-white">
-              <input type="file" id="exam-rubric-file" class="hidden" accept=".pdf" onchange="handleExamRubricUpload(event)">
-              <span class="font-bold text-[11px] md:text-sm text-emerald-600" id="exam-rubric-name">여기를 눌러 PDF 첨부</span>
-            </label>
+            <div class="flex justify-between items-center mb-3">
+              <label class="text-[10px] md:text-xs font-bold text-emerald-700 flex items-center gap-1"><i class="ri-file-text-line"></i> 강사 채점평 및 주의사항 (선택)</label>
+              <div class="flex gap-3">
+                <label class="text-[10px] md:text-xs font-bold text-emerald-600 cursor-pointer flex items-center"><input type="radio" name="rubric-mode" value="pdf" checked onchange="toggleRubricMode()" class="mr-1 w-3 h-3 text-emerald-500 focus:ring-emerald-500">PDF 첨부</label>
+                <label class="text-[10px] md:text-xs font-bold text-emerald-600 cursor-pointer flex items-center"><input type="radio" name="rubric-mode" value="text" onchange="toggleRubricMode()" class="mr-1 w-3 h-3 text-emerald-500 focus:ring-emerald-500">텍스트 입력</label>
+              </div>
+            </div>
+            
+            <div id="rubric-pdf-area">
+              <label class="border-2 border-dashed border-emerald-200 rounded-lg p-3 flex flex-col items-center justify-center cursor-pointer hover:border-emerald-500 bg-white transition-colors">
+                <input type="file" id="exam-rubric-file" class="hidden" accept=".pdf" onchange="handleExamRubricUpload(event)">
+                <span class="font-bold text-[11px] md:text-sm text-emerald-600" id="exam-rubric-name">여기를 눌러 PDF 첨부</span>
+              </label>
+            </div>
+            
+            <div id="rubric-text-area" class="hidden">
+              <textarea id="exam-rubric-text" class="w-full h-24 p-3 bg-white rounded-lg border border-emerald-200 outline-none text-xs md:text-[13px] resize-y focus:ring-1 focus:ring-emerald-500 leading-relaxed" placeholder="채점 기준이나 모범답안을 텍스트로 직접 붙여넣으세요..."></textarea>
+            </div>
           </div>
+          
           <div class="grid grid-cols-2 gap-3 md:gap-4">
             <div>
               <label class="text-[10px] md:text-xs font-bold text-gray-500 mb-1 md:mb-2 block">시험 시간</label>
-              <select id="exam-time" class="w-full p-3 md:p-4 bg-gray-50 rounded-xl text-xs md:text-sm font-bold border-none outline-none" onchange="document.getElementById('exam-pages').innerText = this.value / 5">
+              <select id="exam-time" class="w-full p-3 md:p-4 bg-gray-50 rounded-xl text-xs md:text-sm font-bold border-none outline-none focus:ring-2 focus:ring-emerald-500" onchange="document.getElementById('exam-pages').innerText = this.value / 5">
                 <option value="25">25분</option><option value="50">50분</option><option value="75">75분</option><option value="100" selected>100분</option>
               </select>
             </div>
@@ -568,7 +591,7 @@
               <div class="p-3 md:p-4 bg-emerald-50 text-emerald-600 font-extrabold rounded-xl text-center text-xs md:text-sm"><span id="exam-pages">20</span> 페이지</div>
             </div>
           </div>
-          <button onclick="startExam()" class="w-full py-3 md:py-4 bg-slate-900 text-white rounded-xl font-bold text-sm md:text-lg hover:bg-slate-800 active:scale-95">⏱️ 시험 시작</button>
+          <button onclick="startExam()" class="w-full py-3 md:py-4 bg-slate-900 text-white rounded-xl font-bold text-sm md:text-lg hover:bg-slate-800 active:scale-95 transition-all">⏱️ 시험 시작</button>
         </div>
       </div>
       
@@ -596,7 +619,7 @@
             </div>
           </div>
           <div class="lg:col-span-8">
-            <div class="bg-white border-2 border-slate-300 rounded-xl overflow-hidden shadow-sm">
+            <div class="bg-white border-2 border-slate-300 rounded-xl overflow-hidden shadow-sm mx-auto max-w-3xl">
               <div class="bg-slate-100 p-2 text-center text-[10px] md:text-[11px] font-bold text-slate-500 tracking-widest border-b border-slate-300">노무사 2차 답안지</div>
               <div id="answer-lines" class="bg-white"></div>
               <div class="p-3 md:p-4 bg-gray-50 flex justify-between border-t border-gray-200">
@@ -609,13 +632,22 @@
       </div>
     </div>
 
+    <!-- 모의고사 결과 -->
     <div id="page-result" class="page-content">
-      <div class="max-w-3xl mx-auto space-y-4 md:space-y-6" id="result-container">
+      <div class="max-w-4xl mx-auto space-y-4 md:space-y-6" id="result-container">
+        
         <div class="neo-card p-6 md:p-10 text-center relative overflow-hidden bg-gradient-to-b from-white to-emerald-50/30">
           <h2 class="text-lg md:text-xl font-extrabold text-slate-800 mb-2">AI 정밀 채점 결과</h2>
-          <div class="text-5xl md:text-7xl font-black text-emerald-500 my-4 md:my-6" id="res-score">0<span class="text-xl md:text-2xl text-gray-300">점</span></div>
+          
+          <div class="flex flex-col items-center justify-center my-4 md:my-6">
+             <div class="text-5xl md:text-7xl font-black text-emerald-500 flex items-center justify-center" id="res-score">
+               0<span class="text-xl md:text-2xl text-gray-300 ml-1">점</span>
+             </div>
+          </div>
+          
           <p class="text-xs md:text-sm font-bold text-slate-600 bg-white inline-block px-4 py-2 md:px-6 md:py-3 rounded-full border border-gray-100" id="res-feedback"></p>
         </div>
+
         <div class="neo-card p-4 md:p-8">
           <h3 class="font-bold text-sm md:text-base text-slate-800 mb-4 md:mb-6 border-b border-gray-100 pb-2">세부 평가 항목</h3>
           <div class="space-y-3 md:space-y-4">
@@ -626,6 +658,7 @@
             <div class="flex items-center"><span class="w-20 md:w-24 text-[10px] md:text-xs font-bold text-gray-500">형식·구조</span><div class="flex-1 h-2 md:h-3 bg-gray-100 rounded-full mx-2 md:mx-4 overflow-hidden"><div class="h-full bg-slate-500" id="bar-form"></div></div><span class="w-6 md:w-8 text-right font-bold text-xs md:text-sm" id="score-form">0</span></div>
           </div>
         </div>
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           <div class="neo-card p-4 md:p-6 border-t-4 border-t-blue-500 bg-blue-50/10">
             <h4 class="font-bold text-sm md:text-base text-blue-600 mb-2 md:mb-3 flex items-center gap-1"><i class="ri-thumb-up-fill"></i> 잘한 점</h4>
@@ -636,20 +669,29 @@
             <p class="text-[11px] md:text-[13px] leading-relaxed text-slate-700" id="res-miss"></p>
           </div>
         </div>
+
         <div class="neo-card p-4 md:p-6 border-t-4 border-t-amber-500 bg-amber-50/10">
           <h4 class="font-bold text-sm md:text-base text-amber-600 mb-2 md:mb-3 flex items-center gap-1"><i class="ri-lightbulb-flash-fill"></i> 다음 시험 조언</h4>
           <ul class="text-[11px] md:text-[13px] leading-relaxed text-slate-700 pl-4 list-disc space-y-1 md:space-y-2" id="res-next"></ul>
         </div>
         
-        <div class="neo-card p-4 md:p-6 border-t-4 border-t-slate-500 bg-slate-50">
-          <h4 class="font-bold text-sm md:text-base text-slate-700 mb-2 md:mb-3 flex items-center gap-1"><i class="ri-article-line"></i> 내 작성 답안 복기</h4>
-          <div id="res-my-answer" class="text-[12px] md:text-[13px] leading-relaxed text-slate-600 whitespace-pre-wrap max-h-60 overflow-y-auto p-3 bg-white border border-gray-200 rounded-lg"></div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+          <div class="neo-card p-4 md:p-6 border-t-4 border-t-indigo-500 bg-indigo-50/10 flex flex-col h-[400px]">
+            <h4 class="font-bold text-sm md:text-base text-indigo-700 mb-2 md:mb-3 flex items-center gap-1 shrink-0"><i class="ri-file-list-3-line"></i> 모범답안 및 채점기준</h4>
+            <div id="res-rubric" class="text-[12px] md:text-[13px] leading-relaxed text-slate-600 whitespace-pre-wrap flex-1 overflow-y-auto p-3 bg-white border border-indigo-100 rounded-lg shadow-inner"></div>
+          </div>
+          
+          <div class="neo-card p-4 md:p-6 border-t-4 border-t-slate-500 bg-slate-50 flex flex-col h-[400px]">
+            <h4 class="font-bold text-sm md:text-base text-slate-700 mb-2 md:mb-3 flex items-center gap-1 shrink-0"><i class="ri-article-line"></i> 내 작성 답안 복기</h4>
+            <div id="res-my-answer" class="text-[12px] md:text-[13px] leading-relaxed text-slate-600 whitespace-pre-wrap flex-1 overflow-y-auto p-3 bg-white border border-gray-200 rounded-lg shadow-inner"></div>
+          </div>
         </div>
 
         <button onclick="navigate('dashboard')" class="w-full py-3 md:py-4 bg-slate-100 text-slate-600 text-sm md:text-base font-bold rounded-xl hover:bg-slate-200">대시보드로 돌아가기</button>
       </div>
     </div>
 
+    <!-- 설정 -->
     <div id="page-settings" class="page-content">
       <h2 class="text-2xl font-extrabold text-slate-800 mb-6 flex items-center gap-2"><i class="ri-settings-4-line"></i> 설정</h2>
       <div class="max-w-xl mx-auto space-y-4 md:space-y-6">
@@ -733,6 +775,19 @@
     let tempConvertType = '';
     let tempConvertSubject = '';
 
+    function requestFullScreen() {
+      const doc = window.document;
+      const docEl = doc.documentElement;
+      const requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+      if (requestFullScreen) requestFullScreen.call(docEl).catch(err => console.log(err));
+    }
+    
+    function exitFullScreen() {
+      const doc = window.document;
+      const exitFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
+      if (exitFullScreen && doc.fullscreenElement) exitFullScreen.call(doc).catch(err => console.log(err));
+    }
+
     function saveApiKey() {
       const val = document.getElementById('api-key-input').value.trim();
       if(val) { try { localStorage.setItem('gemini_api_key', val); } catch(e){} showMsg('API 키가 저장되었습니다.'); } else showMsg('키를 입력해주세요.');
@@ -763,6 +818,8 @@
     }
 
     function navigate(id) {
+      exitFullScreen();
+      
       document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
       const target = document.getElementById('page-' + id); if(target) target.classList.add('active');
       document.querySelectorAll('.nav-btn, .desktop-nav-btn').forEach(a => a.classList.remove('active'));
@@ -869,19 +926,40 @@
       
       const tbody = document.getElementById('history-tbody');
       if (db.history.length === 0) { 
-        tbody.innerHTML = '<tr><td colspan="4" class="py-10 text-center text-gray-400">기록이 없습니다.</td></tr>'; 
+        tbody.innerHTML = '<tr><td colspan="5" class="py-10 text-center text-gray-400">기록이 없습니다.</td></tr>'; 
       } else {
         tbody.innerHTML = db.history.slice(-5).reverse().map(h => `
           <tr class="border-b border-gray-50 hover:bg-gray-50 group">
             <td class="py-3 px-2 text-[12px] text-gray-500">${h.date}</td>
             <td class="py-3 px-2 font-bold text-slate-700 text-[13px]">${h.subject}</td>
             <td class="py-3 px-2 text-emerald-600 font-extrabold">${h.score}점</td>
-            <td class="py-3 px-2 text-right"><button onclick="viewHistory(${h.id})" class="px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-bold rounded hover:bg-emerald-500 hover:text-white transition-all">결과 보기</button></td>
+            <td class="py-3 px-2 text-right whitespace-nowrap">
+              <button onclick="viewHistory(${h.id})" class="px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-bold rounded hover:bg-emerald-500 hover:text-white transition-all shadow-sm">결과</button>
+              <button onclick="retryExam(${h.id})" class="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-bold rounded hover:bg-blue-500 hover:text-white transition-all shadow-sm ml-1"><i class="ri-refresh-line"></i> 재도전</button>
+            </td>
           </tr>
         `).join('');
       }
 
       if (typeof Chart !== 'undefined') drawDashboardCharts();
+    }
+
+    function retryExam(id) {
+      const record = db.history.find(h => String(h.id) === String(id));
+      if(!record) return;
+      
+      document.getElementById('exam-subject').value = record.subject;
+      document.getElementById('exam-direct-q').value = record.question || '문제 내용을 불러올 수 없습니다.';
+      
+      document.querySelector('input[name="rubric-mode"][value="text"]').click();
+      toggleRubricMode();
+      
+      let prevRubric = record.rubric || '';
+      prevRubric = prevRubric.replace(/\[강사 채점평 및 주의사항.*?\]\n/g, '').replace(/\[기본 모범답안 및 배점\]\n/g, '').trim();
+      document.getElementById('exam-rubric-text').value = prevRubric;
+      
+      navigate('exam');
+      showMsg("과거 모의고사 세팅이 완료되었습니다. 타이머를 확인하고 시작하세요!");
     }
 
     function drawDashboardCharts() {
@@ -1764,6 +1842,18 @@
       closeBlankQuiz();
     }
 
+    // 💡 1. 모의고사 채점평: PDF / 텍스트 입력 모드 토글
+    function toggleRubricMode() {
+      const mode = document.querySelector('input[name="rubric-mode"]:checked').value;
+      if (mode === 'pdf') {
+        document.getElementById('rubric-pdf-area').style.display = 'block';
+        document.getElementById('rubric-text-area').style.display = 'none';
+      } else {
+        document.getElementById('rubric-pdf-area').style.display = 'none';
+        document.getElementById('rubric-text-area').style.display = 'block';
+      }
+    }
+
     function updateExamQList() {
       const sub = document.getElementById('exam-subject').value; const sel = document.getElementById('exam-question-select'); sel.innerHTML = '<option value="">직접 입력하기</option>';
       db.questions.filter(q => q.subject === sub).forEach(q => { const opt = document.createElement('option'); opt.value = String(q.id); opt.textContent = `[추출] ${q.question.substring(0, 30)}...`; sel.appendChild(opt); });
@@ -1838,7 +1928,17 @@
       
       let combinedRubric = '';
       if (baseRubric) combinedRubric += `[기본 모범답안 및 배점]\n${baseRubric}\n\n`;
-      if (examState.uploadedRubricText) combinedRubric += `[강사 채점평 및 주의사항 (가장 중요하게 반영할 것)]\n${examState.uploadedRubricText}`;
+      
+      // 💡 선택된 모드에 따라 텍스트 또는 PDF 내용을 적용
+      let finalRubricInput = '';
+      const rMode = document.querySelector('input[name="rubric-mode"]:checked').value;
+      if (rMode === 'text') {
+        finalRubricInput = document.getElementById('exam-rubric-text').value.trim();
+      } else {
+        finalRubricInput = examState.uploadedRubricText;
+      }
+      
+      if (finalRubricInput) combinedRubric += `[강사 채점평 및 주의사항 (가장 중요하게 반영할 것)]\n${finalRubricInput}`;
 
       if (!qText) { showMsg("문제를 입력해주세요."); return; }
 
@@ -1849,6 +1949,9 @@
       document.getElementById('room-q-full').textContent = qText; document.getElementById('room-total-page').textContent = examState.totalPage;
       document.getElementById('char-count').textContent = '0';
       document.getElementById('exam-setup').style.display = 'none'; document.getElementById('exam-room').style.display = 'block';
+
+      // 💡 4. 방해금지(전체화면) 모드 실행
+      requestFullScreen();
 
       renderAnswerSheet(); updateTimerDisplay();
       examState.timer = setInterval(() => {
@@ -1908,6 +2011,9 @@
     }
 
     async function performSubmitExam() {
+      // 💡 제출 시 전체화면 자동 해제
+      exitFullScreen();
+      
       clearInterval(examState.timer); showLoading("AI 채점관이 답안을 분석 중입니다...");
 
       const fullAnswer = Object.keys(examState.answers).sort((a, b) => {
@@ -1922,7 +2028,8 @@
         const result = await callGemini(prompt, schema);
         result.details = result.details || {}; result.details.issue = result.details.issue || 0; result.details.law = result.details.law || 0; result.details.logic = result.details.logic || 0; result.details.conclusion = result.details.conclusion || 0; result.details.format = result.details.format || 0; result.next3 = result.next3 || [];
         
-        const record = { id: Date.now(), date: getToday(), subject: examState.subject, score: result.score, feedback: result, fullAnswer: fullAnswer };
+        // 💡 2. 재도전 및 비교를 위해 원본 question, rubric도 명시적으로 저장
+        const record = { id: Date.now(), date: getToday(), subject: examState.subject, question: examState.question, rubric: examState.rubric, score: result.score, feedback: result, fullAnswer: fullAnswer };
         db.history.push(record); 
         markStudiedToday('exam'); 
         saveDB();
@@ -1930,6 +2037,7 @@
         examState.uploadedRubricText = ''; 
         document.getElementById('exam-rubric-file').value = '';
         document.getElementById('exam-rubric-name').innerHTML = `<i class="ri-upload-cloud-2-line mr-1"></i>여기를 눌러 PDF 첨부`;
+        document.getElementById('exam-rubric-text').value = '';
 
         document.getElementById('exam-room').style.display = 'none'; document.getElementById('exam-setup').style.display = 'block';
         renderExamResult(record);
@@ -1940,7 +2048,36 @@
 
     function renderExamResult(data) {
       const fb = data.feedback;
-      document.getElementById('res-score').innerHTML = `${data.score}<span class="text-2xl text-gray-300">점</span>`;
+      
+      // 💡 2. 점수 변화 비교 로직 (과거 동일한 문제 응시 기록 탐색)
+      let trendHtml = '';
+      if (data.question) {
+         const attempts = db.history.filter(h => h.question === data.question).sort((a,b) => a.id - b.id);
+         const currIdx = attempts.findIndex(h => h.id === data.id);
+         if (currIdx > 0) {
+            const prevScore = attempts[currIdx - 1].score;
+            const diff = data.score - prevScore;
+            if (diff > 0) {
+                trendHtml = `<div class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-[11px] font-extrabold mt-2 tracking-wide animate-pulse">▲ 이전 대비 ${diff}점 상승!</div>`;
+            } else if (diff < 0) {
+                trendHtml = `<div class="bg-rose-100 text-rose-700 px-3 py-1 rounded-full text-[11px] font-extrabold mt-2 tracking-wide">▼ 이전 대비 ${Math.abs(diff)}점 하락</div>`;
+            } else {
+                trendHtml = `<div class="bg-gray-100 text-gray-500 px-3 py-1 rounded-full text-[11px] font-extrabold mt-2 tracking-wide">- 이전 점수와 동일</div>`;
+            }
+         }
+      }
+      
+      document.getElementById('res-score').innerHTML = `${data.score}<span class="text-xl md:text-2xl text-gray-300 ml-1">점</span>`;
+      
+      // 트렌드 뱃지가 들어갈 영역 생성
+      let scoreBox = document.getElementById('res-score').parentNode;
+      let existingBadge = document.getElementById('score-trend-badge');
+      if(existingBadge) existingBadge.remove(); // 기존 뱃지 초기화
+      
+      if(trendHtml) {
+          scoreBox.insertAdjacentHTML('beforeend', `<div id="score-trend-badge">${trendHtml}</div>`);
+      }
+
       document.getElementById('res-feedback').textContent = fb.feedback || '';
 
       const setBar = (id, val, max) => { const safeVal = Math.min(Math.max(val || 0, 0), max); document.getElementById(`score-${id}`).textContent = safeVal; document.getElementById(`bar-${id}`).style.width = `${(safeVal / max) * 100}%`; };
@@ -1948,8 +2085,17 @@
 
       document.getElementById('res-good').textContent = fb.good || ''; document.getElementById('res-miss').textContent = fb.missing || ''; document.getElementById('res-next').innerHTML = (fb.next3 || []).map(t => `<li>${t}</li>`).join('');
       
+      // 💡 3. 좌우 분할 비교 패널 렌더링
       const myAnswerEl = document.getElementById('res-my-answer');
       if (myAnswerEl) myAnswerEl.textContent = data.fullAnswer || '저장된 답안이 없습니다.';
+      
+      const rubricEl = document.getElementById('res-rubric');
+      if (rubricEl) {
+         let rawRubric = data.rubric || '저장된 모범답안이 없습니다.';
+         // 불필요한 시스템 마크다운 태그 정리
+         rawRubric = rawRubric.replace(/\[기본 모범답안 및 배점\]/g, '').replace(/\[강사 채점평 및 주의사항.*?\]/g, '\n[강사 채점평/주의사항]');
+         rubricEl.textContent = rawRubric.trim();
+      }
 
       navigate('result');
     }
@@ -2032,6 +2178,8 @@
     window.submitExam = submitExam;
     window.performSubmitExam = performSubmitExam;
     window.changePage = changePage;
+    window.retryExam = retryExam; // 💡 재도전 함수 추가
+    window.toggleRubricMode = toggleRubricMode; // 💡 모범답안 텍스트 모드 함수 추가
 
     window.searchLawDB = searchLawDB;
     window.compareConceptsWithAI = compareConceptsWithAI;
@@ -2060,50 +2208,40 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAkAfhZev3uF9qzAcqfhwBrKWorV10qNWE",
-      authDomain: "nomusa-trainer.firebaseapp.com",
-      projectId: "nomusa-trainer",
-      storageBucket: "nomusa-trainer.firebasestorage.app",
-      messagingSenderId: "361338496072",
-      appId: "1:361338496072:web:798c1a6695cbfab5a7647d"
-    };
-
     try {
+      const firebaseConfig = JSON.parse(__firebase_config);
       const app = initializeApp(firebaseConfig);
       const auth = getAuth(app);
       const firestore = getFirestore(app);
-      let unsubSnapshot = null;
+      const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
-      window.loginWithGoogle = () => {
-        const provider = new GoogleAuthProvider();
-        signInWithPopup(auth, provider).catch(error => {
-          console.error("Login Error:", error);
-          alert("로그인 중 오류가 발생했습니다: " + error.message);
-        });
+      const initAuth = async () => {
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          await signInAnonymously(auth);
+        }
       };
+      
+      initAuth();
 
-      window.logoutGoogle = () => { signOut(auth).then(() => { alert("로그아웃 되었습니다."); }); };
+      let unsubSnapshot = null;
 
       onAuthStateChanged(auth, (user) => {
         window.currentUser = user;
         const statusEl = document.getElementById('auth-status'); 
         const headerStatus = document.getElementById('header-auth-status');
-        const loginBtn = document.getElementById('login-btn'); 
-        const logoutBtn = document.getElementById('logout-btn');
 
         if (user) {
-          if (statusEl) statusEl.textContent = user.displayName + " (연동됨)"; 
+          if (statusEl) statusEl.textContent = "동기화 연결됨 (" + user.uid.substring(0, 5) + "...)"; 
           if (headerStatus) { headerStatus.textContent = "Cloud Sync: ON"; headerStatus.classList.replace('text-slate-400', 'text-blue-400'); }
-          if (loginBtn) loginBtn.classList.add('hidden'); 
-          if (logoutBtn) logoutBtn.classList.remove('hidden');
           
           if (unsubSnapshot) unsubSnapshot();
           
-          const docRef = doc(firestore, 'users', user.uid);
+          const docRef = doc(firestore, 'artifacts', appId, 'users', user.uid, 'data', 'nomusaDB');
           
           unsubSnapshot = onSnapshot(docRef, (docSnap) => {
             if (docSnap.exists()) {
@@ -2130,8 +2268,6 @@
         } else {
           if (statusEl) statusEl.textContent = "로컬 모드 (로그인 안됨)"; 
           if (headerStatus) { headerStatus.textContent = "Mode: Local Storage"; headerStatus.classList.replace('text-blue-400', 'text-slate-400'); }
-          if (loginBtn) loginBtn.classList.remove('hidden'); 
-          if (logoutBtn) logoutBtn.classList.add('hidden');
           if (unsubSnapshot) { unsubSnapshot(); unsubSnapshot = null; }
         }
       });
@@ -2153,15 +2289,15 @@
           };
 
           const sanitizedDB = removeUndefined(currentDB);
-          setDoc(doc(firestore, 'users', window.currentUser.uid), { db: sanitizedDB }, { merge: true }).catch(err => {
+          const docRef = doc(firestore, 'artifacts', appId, 'users', window.currentUser.uid, 'data', 'nomusaDB');
+          
+          setDoc(docRef, { db: sanitizedDB }, { merge: true }).catch(err => {
               console.error("Sync Error:", err);
           });
         }
       };
     } catch(e) {
       console.error("Firebase init failed:", e);
-      window.loginWithGoogle = () => alert("로그인 오류: 환경 설정을 확인해주세요.");
-      window.logoutGoogle = () => {};
       window.triggerCloudSave = () => {};
     }
   </script>
