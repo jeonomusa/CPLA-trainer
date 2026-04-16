@@ -351,7 +351,7 @@
 
     <!-- 4. 목차 빈칸 채우기 -->
     <div id="page-blank" class="page-content">
-      <h2 class="text-2xl font-extrabold text-slate-800 mb-2 flex items-center gap-2"><i class="ri-edit-2-line"></i> 목차 빈칸 채우기</h2>
+      <h2 class="text-2xl font-extrabold text-slate-800 mb-2 flex items-center gap-2"><i class="ri-edit-2-line"></i> 목차 빈칸 뚫기</h2>
       <p class="text-sm text-gray-500 mb-6">전체적인 구조 암기를 위해 목차의 빈칸을 채워보세요. 이제 목차도 알고리즘으로 관리됩니다.</p>
 
       <div id="blank-list-view">
@@ -1674,6 +1674,11 @@
 
     function exportDB() { const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `nomusa_backup_${getToday()}.json`; a.click(); showMsg("✅ 백업 파일이 다운로드되었습니다."); }
     function importDB() { document.getElementById('import-file-input').click(); }
+    
+    // 💡 추가된 부분: 클라우드/로컬 백업 시 DB를 가져오고 덮어씌우는 핵심 함수
+    function getAppDB() { return db; }
+    function setAppDB(newDB) { db = { ...db, ...newDB }; }
+
     function doImportDB(event) {
       const file = event.target.files[0]; if (!file) return; const reader = new FileReader();
       reader.onload = (e) => {
@@ -1745,6 +1750,11 @@
     window.importDB = importDB;
     window.doImportDB = doImportDB;
     window.resetDB = resetDB;
+    
+    // 💡 추가된 부분: Firebase 모듈에서 접근할 수 있도록 window에 등록
+    window.getAppDB = getAppDB;
+    window.setAppDB = setAppDB;
+
     window.viewHistory = viewHistory;
     window.analyzeStudyHistory = analyzeStudyHistory;
     window.renderDashboard = renderDashboard;
