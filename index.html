@@ -81,7 +81,7 @@
     .fc-item-checkbox { width: 18px; height: 18px; border-radius: 4px; border-gray-300; text-emerald-500; cursor: pointer; }
     .chart-wrapper { position: relative; height: 220px; width: 100%; }
 
-    /* 💡 전체화면 시 시험장 스타일 */
+    /* 전체화면 적용 시 시험장 배경 */
     :fullscreen #exam-room { background: #f8fafc; padding: 20px; overflow-y: auto; }
     :-webkit-full-screen #exam-room { background: #f8fafc; padding: 20px; overflow-y: auto; }
   </style>
@@ -187,7 +187,6 @@
         <div class="chart-wrapper"><canvas id="chart-scores"></canvas></div>
       </div>
 
-      <!-- 💡 수정된 최근 모의고사 기록 패널 (가운데 정렬 & 과목 필터 적용) -->
       <div class="neo-card p-4 md:p-6 mb-8">
         <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
           <h3 class="font-bold text-slate-800 flex items-center gap-2 text-sm md:text-base"><i class="ri-history-line text-emerald-500"></i> 최근 모의고사 기록</h3>
@@ -1435,6 +1434,9 @@
     }
 
     function loadNextCard() {
+      // 💡 카운트 즉각 반영
+      document.getElementById('fc-due-display').textContent = dueCards.length;
+
       if (dueCards.length === 0) { renderDueFlashcards(); return; }
       currentCard = dueCards[0];
       
@@ -1584,6 +1586,12 @@
       markStudiedToday('fc');
       dueCards.shift(); 
       if (rating === 1) dueCards.push(currentCard); 
+      
+      // 💡 즉각적인 화면 반영 (플래시카드 상단 배지 및 대시보드 잔여 수치)
+      document.getElementById('fc-due-display').textContent = dueCards.length;
+      const dueFcValEl = document.getElementById('due-fc-val');
+      if (dueFcValEl) dueFcValEl.textContent = db.flashcards.filter(isDue).length;
+      
       loadNextCard();
     }
 
@@ -1866,6 +1874,11 @@
       if (idx > -1) db.outlines[idx] = outline;
       saveDB(); 
       markStudiedToday('outline'); 
+      
+      // 💡 즉각적인 화면 반영 (대시보드 목차 잔여 수치)
+      const dueOutlineValEl = document.getElementById('due-outline-val');
+      if (dueOutlineValEl) dueOutlineValEl.textContent = db.outlines.filter(isDue).length;
+      
       closeBlankQuiz();
     }
 
@@ -2198,7 +2211,7 @@
     window.changePage = changePage;
     window.retryExam = retryExam;
     window.toggleRubricMode = toggleRubricMode;
-    window.renderHistoryTable = renderHistoryTable; // 💡 필터용 렌더링 함수 등록
+    window.renderHistoryTable = renderHistoryTable;
 
     window.searchLawDB = searchLawDB;
     window.compareConceptsWithAI = compareConceptsWithAI;
@@ -2227,40 +2240,50 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+    const firebaseConfig = {
+      apiKey: "AIzaSyAkAfhZev3uF9qzAcqfhwBrKWorV10qNWE",
+      authDomain: "nomusa-trainer.firebaseapp.com",
+      projectId: "nomusa-trainer",
+      storageBucket: "nomusa-trainer.firebasestorage.app",
+      messagingSenderId: "361338496072",
+      appId: "1:361338496072:web:798c1a6695cbfab5a7647d"
+    };
+
     try {
-      const firebaseConfig = JSON.parse(__firebase_config);
       const app = initializeApp(firebaseConfig);
       const auth = getAuth(app);
       const firestore = getFirestore(app);
-      const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-
-      const initAuth = async () => {
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          await signInWithCustomToken(auth, __initial_auth_token);
-        } else {
-          await signInAnonymously(auth);
-        }
-      };
-      
-      initAuth();
-
       let unsubSnapshot = null;
+
+      window.loginWithGoogle = () => {
+        const provider = new GoogleAuthProvider();
+        signInWithPopup(auth, provider).catch(error => {
+          console.error("Login Error:", error);
+          alert("로그인 중 오류가 발생했습니다: " + error.message);
+        });
+      };
+
+      window.logoutGoogle = () => { signOut(auth).then(() => { alert("로그아웃 되었습니다."); }); };
 
       onAuthStateChanged(auth, (user) => {
         window.currentUser = user;
         const statusEl = document.getElementById('auth-status'); 
         const headerStatus = document.getElementById('header-auth-status');
+        const loginBtn = document.getElementById('login-btn'); 
+        const logoutBtn = document.getElementById('logout-btn');
 
         if (user) {
-          if (statusEl) statusEl.textContent = "동기화 연결됨 (" + user.uid.substring(0, 5) + "...)"; 
+          if (statusEl) statusEl.textContent = user.displayName + " (연동됨)"; 
           if (headerStatus) { headerStatus.textContent = "Cloud Sync: ON"; headerStatus.classList.replace('text-slate-400', 'text-blue-400'); }
+          if (loginBtn) loginBtn.classList.add('hidden'); 
+          if (logoutBtn) logoutBtn.classList.remove('hidden');
           
           if (unsubSnapshot) unsubSnapshot();
           
-          const docRef = doc(firestore, 'artifacts', appId, 'users', user.uid, 'data', 'nomusaDB');
+          const docRef = doc(firestore, 'users', user.uid);
           
           unsubSnapshot = onSnapshot(docRef, (docSnap) => {
             if (docSnap.exists()) {
@@ -2287,6 +2310,8 @@
         } else {
           if (statusEl) statusEl.textContent = "로컬 모드 (로그인 안됨)"; 
           if (headerStatus) { headerStatus.textContent = "Mode: Local Storage"; headerStatus.classList.replace('text-blue-400', 'text-slate-400'); }
+          if (loginBtn) loginBtn.classList.remove('hidden'); 
+          if (logoutBtn) logoutBtn.classList.add('hidden');
           if (unsubSnapshot) { unsubSnapshot(); unsubSnapshot = null; }
         }
       });
@@ -2308,15 +2333,16 @@
           };
 
           const sanitizedDB = removeUndefined(currentDB);
-          const docRef = doc(firestore, 'artifacts', appId, 'users', window.currentUser.uid, 'data', 'nomusaDB');
           
-          setDoc(docRef, { db: sanitizedDB }, { merge: true }).catch(err => {
+          setDoc(doc(firestore, 'users', window.currentUser.uid), { db: sanitizedDB }, { merge: true }).catch(err => {
               console.error("Sync Error:", err);
           });
         }
       };
     } catch(e) {
       console.error("Firebase init failed:", e);
+      window.loginWithGoogle = () => alert("로그인 오류: 환경 설정을 확인해주세요.");
+      window.logoutGoogle = () => {};
       window.triggerCloudSave = () => {};
     }
   </script>
