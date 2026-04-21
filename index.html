@@ -81,7 +81,7 @@
     .fc-item-checkbox { width: 18px; height: 18px; border-radius: 4px; border-gray-300; text-emerald-500; cursor: pointer; }
     .chart-wrapper { position: relative; height: 220px; width: 100%; }
 
-    /* 전체화면 시 시험장 스타일 */
+    /* 💡 전체화면 시 시험장 스타일 */
     :fullscreen #exam-room { background: #f8fafc; padding: 20px; overflow-y: auto; }
     :-webkit-full-screen #exam-room { background: #f8fafc; padding: 20px; overflow-y: auto; }
   </style>
@@ -187,13 +187,26 @@
         <div class="chart-wrapper"><canvas id="chart-scores"></canvas></div>
       </div>
 
+      <!-- 💡 수정된 최근 모의고사 기록 패널 (가운데 정렬 & 과목 필터 적용) -->
       <div class="neo-card p-4 md:p-6 mb-8">
-        <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2 text-sm md:text-base"><i class="ri-history-line text-emerald-500"></i> 최근 모의고사 기록</h3>
+        <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
+          <h3 class="font-bold text-slate-800 flex items-center gap-2 text-sm md:text-base"><i class="ri-history-line text-emerald-500"></i> 최근 모의고사 기록</h3>
+          <select id="history-filter-subject" onchange="renderHistoryTable()" class="p-1 md:p-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold outline-none focus:ring-2 focus:ring-emerald-500">
+            <option value="all">전체 과목</option>
+            <option value="노동법">노동법</option>
+            <option value="인사노무관리">인사노무관리</option>
+            <option value="행정쟁송법">행정쟁송법</option>
+            <option value="민사소송법">민사소송법</option>
+          </select>
+        </div>
         <div class="overflow-x-auto">
-          <table class="w-full text-left">
+          <table class="w-full text-center">
             <thead>
               <tr class="text-[10px] md:text-[11px] font-bold text-gray-400 uppercase border-b border-gray-100">
-                <th class="pb-3 px-2">날짜</th><th class="pb-3 px-2">과목</th><th class="pb-3 px-2">점수</th><th class="pb-3 px-2 text-right">관리</th>
+                <th class="pb-3 px-2 text-center">날짜</th>
+                <th class="pb-3 px-2 text-center">과목</th>
+                <th class="pb-3 px-2 text-center">점수</th>
+                <th class="pb-3 px-2 text-center">관리</th>
               </tr>
             </thead>
             <tbody id="history-tbody"></tbody>
@@ -202,12 +215,12 @@
       </div>
     </div>
 
+    <!-- AI 자료 변환 -->
     <div id="page-convert" class="page-content">
       <h2 class="text-2xl font-extrabold text-slate-800 mb-2 flex items-center gap-2"><i class="ri-robot-line"></i> AI 자료 변환</h2>
       <p class="text-sm text-gray-500 mb-6">문제지/모범답안을 업로드하거나 직접 텍스트를 붙여넣으면 AI가 분석하여 문제나 카드로 변환해줍니다.</p>
       
       <div class="neo-card p-4 md:p-8">
-        
         <div class="flex gap-6 mb-4 md:mb-6 border-b border-gray-100 pb-4">
           <label class="flex items-center gap-2 cursor-pointer text-sm font-bold text-slate-700">
             <input type="radio" name="input-mode" value="pdf" checked onchange="toggleInputMode()" class="w-4 h-4 text-emerald-500"> PDF 파일 업로드
@@ -264,6 +277,7 @@
       </div>
     </div>
 
+    <!-- 플래시카드 -->
     <div id="page-flashcard" class="page-content">
       <h2 class="text-2xl font-extrabold text-slate-800 mb-2 flex items-center gap-2"><i class="ri-stack-line"></i> 안키형 플래시카드</h2>
       <p class="text-sm text-gray-500 mb-6">빈칸이 있는 카드는 단어장 모드로, 일반 카드는 뒤집기 모드로 알아서 작동합니다.</p>
@@ -397,6 +411,7 @@
       </div>
     </div>
 
+    <!-- 목차 빈칸 채우기 -->
     <div id="page-blank" class="page-content">
       <h2 class="text-2xl font-extrabold text-slate-800 mb-2 flex items-center gap-2"><i class="ri-edit-2-line"></i> 목차 빈칸 채우기</h2>
       <p class="text-sm text-gray-500 mb-6">전체적인 구조 암기를 위해 목차의 빈칸을 채워보세요. 이제 목차도 알고리즘으로 관리됩니다.</p>
@@ -515,6 +530,7 @@
       </div>
     </div>
     
+    <!-- 실전 모의고사 -->
     <div id="page-exam" class="page-content">
       <h2 class="text-2xl font-extrabold text-slate-800 mb-2 flex items-center gap-2"><i class="ri-edit-box-line"></i> 실전 모의고사</h2>
       <p class="text-sm text-gray-500 mb-6">강사님의 채점평을 바탕으로 가장 깐깐하게 채점받고, 부족한 점을 점검하세요!</p>
@@ -629,6 +645,7 @@
       </div>
     </div>
 
+    <!-- 모의고사 결과 -->
     <div id="page-result" class="page-content">
       <div class="max-w-4xl mx-auto space-y-4 md:space-y-6" id="result-container">
         
@@ -687,6 +704,7 @@
       </div>
     </div>
 
+    <!-- 설정 -->
     <div id="page-settings" class="page-content">
       <h2 class="text-2xl font-extrabold text-slate-800 mb-6 flex items-center gap-2"><i class="ri-settings-4-line"></i> 설정</h2>
       <div class="max-w-xl mx-auto space-y-4 md:space-y-6">
@@ -761,7 +779,8 @@
       if (window.triggerCloudSave) window.triggerCloudSave(); 
     }
 
-    const MODEL_NAME = "gemini-2.5-flash";
+    const MODEL_NAME = "gemini-2.5-flash-preview-09-2025";
+    const apiKey = ""; 
     const LINES_PER_PAGE = 22; const MAX_CHARS_PER_LINE = 40; 
     let examState = { subject: '', question: '', rubric: '', time: 0, seconds: 0, totalPage: 5, currPage: 1, timer: null, answers: {}, uploadedRubricText: '' };
     let blankState = { outline: null, lines: [], answers: [], activeInput: null };
@@ -848,7 +867,7 @@
     }
 
     async function callGemini(prompt, schema, images = []) {
-      const activeKey = getApiKey();
+      const activeKey = apiKey || getApiKey();
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${activeKey}`;
       let parts = [{ text: prompt }];
       if (images && images.length > 0) { images.slice(0, 3).forEach(imgData => { parts.push({ inlineData: { mimeType: "image/jpeg", data: imgData } }); }); }
@@ -920,24 +939,36 @@
       document.getElementById('due-outline-val').textContent = dueOutlines.length;
       document.getElementById('total-exams-val').textContent = db.history.length;
       
-      const tbody = document.getElementById('history-tbody');
-      if (db.history.length === 0) { 
-        tbody.innerHTML = '<tr><td colspan="5" class="py-10 text-center text-gray-400">기록이 없습니다.</td></tr>'; 
-      } else {
-        tbody.innerHTML = db.history.slice(-5).reverse().map(h => `
-          <tr class="border-b border-gray-50 hover:bg-gray-50 group">
-            <td class="py-3 px-2 text-[12px] text-gray-500">${h.date}</td>
-            <td class="py-3 px-2 font-bold text-slate-700 text-[13px]">${h.subject}</td>
-            <td class="py-3 px-2 text-emerald-600 font-extrabold">${h.score}점</td>
-            <td class="py-3 px-2 text-right whitespace-nowrap">
-              <button onclick="viewHistory(${h.id})" class="px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-bold rounded hover:bg-emerald-500 hover:text-white transition-all shadow-sm">결과</button>
-              <button onclick="retryExam(${h.id})" class="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-bold rounded hover:bg-blue-500 hover:text-white transition-all shadow-sm ml-1"><i class="ri-refresh-line"></i> 재도전</button>
-            </td>
-          </tr>
-        `).join('');
-      }
+      renderHistoryTable();
 
       if (typeof Chart !== 'undefined') drawDashboardCharts();
+    }
+
+    function renderHistoryTable() {
+      const tbody = document.getElementById('history-tbody');
+      const filterEl = document.getElementById('history-filter-subject');
+      const filter = filterEl ? filterEl.value : 'all';
+
+      let filteredHistory = db.history || [];
+      if (filter !== 'all') {
+          filteredHistory = filteredHistory.filter(h => h.subject === filter);
+      }
+
+      if (filteredHistory.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4" class="py-10 text-center text-gray-400">기록이 없습니다.</td></tr>';
+      } else {
+          tbody.innerHTML = filteredHistory.slice(-5).reverse().map(h => `
+              <tr class="border-b border-gray-50 hover:bg-gray-50 group">
+                  <td class="py-3 px-2 text-[12px] text-gray-500 text-center">${h.date}</td>
+                  <td class="py-3 px-2 font-bold text-slate-700 text-[13px] text-center">${h.subject}</td>
+                  <td class="py-3 px-2 text-emerald-600 font-extrabold text-center">${h.score}점</td>
+                  <td class="py-3 px-2 text-center whitespace-nowrap">
+                      <button onclick="viewHistory(${h.id})" class="px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-bold rounded hover:bg-emerald-500 hover:text-white transition-all shadow-sm">결과</button>
+                      <button onclick="retryExam(${h.id})" class="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-bold rounded hover:bg-blue-500 hover:text-white transition-all shadow-sm ml-1"><i class="ri-refresh-line"></i> 재도전</button>
+                  </td>
+              </tr>
+          `).join('');
+      }
     }
 
     function retryExam(id) {
@@ -1103,7 +1134,7 @@
       } else {
         textQ = document.getElementById('text-q').value.trim();
         if (!textQ) { showMsg('변환할 텍스트를 입력해주세요.'); return; }
-        showLoading('AI가 텍스트 정밀 분석 중입니다...');
+        showLoading('AI가 텍스트를 정밀 분석 중입니다...');
       }
 
       tempConvertType = document.getElementById('convert-type').value;
@@ -1143,1163 +1174,4 @@
                 list.innerHTML += `
                     <div class="p-4 border border-emerald-200 bg-emerald-50/30 rounded-xl preview-item relative" data-index="${index}">
                         <button onclick="removePreviewItem(${index})" class="absolute top-3 right-3 text-red-400 hover:text-red-600"><i class="ri-delete-bin-line"></i></button>
-                        <div class="mb-3 pr-6"><label class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider mb-1 block">문제 (Question)</label><textarea class="w-full p-3 text-[13px] border border-emerald-100 rounded-lg outline-none resize-y min-h-[80px] edit-q bg-white focus:ring-1 focus:ring-emerald-300 leading-relaxed">${item.question}</textarea></div>
-                        <div><label class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider mb-1 block">채점 기준 및 모범답안 (Rubric)</label><textarea class="w-full p-3 text-[13px] border border-emerald-100 rounded-lg outline-none resize-y min-h-[120px] edit-r bg-white focus:ring-1 focus:ring-emerald-300 leading-relaxed">${item.rubric}</textarea></div>
-                    </div>
-                `;
-            } else {
-                list.innerHTML += `
-                    <div class="p-4 border border-blue-200 bg-blue-50/30 rounded-xl preview-item relative" data-index="${index}">
-                        <button onclick="removePreviewItem(${index})" class="absolute top-3 right-3 text-red-400 hover:text-red-600"><i class="ri-delete-bin-line"></i></button>
-                        <div class="mb-3 pr-6"><label class="text-[10px] font-bold text-blue-600 uppercase tracking-wider mb-1 block">앞면 (질문/키워드)</label><input type="text" class="w-full p-2 text-[13px] font-bold border border-blue-100 rounded-lg outline-none edit-f bg-white focus:ring-1 focus:ring-blue-300" value="${item.front}"></div>
-                        <div><label class="text-[10px] font-bold text-blue-600 uppercase tracking-wider mb-1 block">뒷면 (정답 - 빈칸은 [대괄호] 처리)</label><textarea class="w-full p-3 text-[13px] border border-blue-100 rounded-lg outline-none resize-y min-h-[80px] edit-b bg-white focus:ring-1 focus:ring-blue-300 leading-relaxed">${item.back}</textarea></div>
-                    </div>
-                `;
-            }
-        });
-        
-        area.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    function removePreviewItem(index) {
-        tempConvertResults.splice(index, 1);
-        renderConvertPreview();
-        if (tempConvertResults.length === 0) cancelConvert();
-    }
-
-    function cancelConvert() {
-        tempConvertResults = [];
-        document.getElementById('convert-preview-area').classList.add('hidden');
-        document.getElementById('file-q').value = '';
-        document.getElementById('file-q-name').innerText = 'PDF 업로드';
-        document.getElementById('text-q').value = '';
-    }
-
-    function saveConvertedData() {
-        const items = document.querySelectorAll('.preview-item');
-        let savedCount = 0;
-
-        items.forEach(el => {
-            if (tempConvertType === 'exam') {
-                const q = el.querySelector('.edit-q').value.trim();
-                const r = el.querySelector('.edit-r').value.trim();
-                if (q) {
-                    db.questions.push({ id: Date.now().toString() + '-' + Math.floor(Math.random() * 1000000), subject: tempConvertSubject, question: q, rubric: r });
-                    savedCount++;
-                }
-            } else {
-                const f = el.querySelector('.edit-f').value.trim();
-                const b = el.querySelector('.edit-b').value.trim();
-                if (f && b) {
-                    db.flashcards.push({ id: Date.now().toString() + '-' + Math.floor(Math.random() * 1000000), subject: tempConvertSubject, front: f, back: b, repetition: 0, interval: 0, efactor: 2.5, nextReview: getLocalNow() });
-                    savedCount++;
-                }
-            }
-        });
-
-        if (savedCount > 0) {
-            saveDB();
-            if (tempConvertType === 'exam') updateExamQList();
-            if (tempConvertType === 'flashcard') renderDueFlashcards();
-            showMsg(`✅ ${savedCount}개 항목이 성공적으로 저장되었습니다!`);
-        } else {
-            showMsg(`저장할 항목이 없습니다.`);
-        }
-        cancelConvert();
-    }
-
-    function parseCSV(text) {
-      let result = []; let row = []; let inQuotes = false; let value = "";
-      for (let i = 0; i < text.length; i++) {
-        let char = text[i]; let nextChar = text[i + 1];
-        if (char === '"' && inQuotes && nextChar === '"') { value += '"'; i++; } 
-        else if (char === '"') { inQuotes = !inQuotes; } 
-        else if (char === ',' && !inQuotes) { row.push(value.trim()); value = ""; } 
-        else if ((char === '\n' || char === '\r') && !inQuotes) {
-          if (char === '\r' && nextChar === '\n') i++;
-          row.push(value.trim()); value = "";
-          if (row.length > 0 && row.some(v => v !== "")) result.push(row);
-          row = [];
-        } else { value += char; }
-      }
-      if (value || row.length > 0) { row.push(value.trim()); result.push(row); }
-      return result;
-    }
-
-    function toggleCsvUploadForm() { document.getElementById('fc-manager-view').classList.add('hidden'); document.getElementById('manual-card-form').classList.add('hidden'); document.getElementById('csv-upload-form').classList.toggle('hidden'); }
-    function cancelCsvUpload() { document.getElementById('csv-upload-form').classList.add('hidden'); }
-
-    function processCsvUpload() {
-      const file = document.getElementById('csv-file-input').files[0];
-      if (!file) { showMsg("CSV 파일을 선택해주세요."); return; }
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        let text = e.target.result;
-        if (text.includes('')) {
-          const readerEuc = new FileReader();
-          readerEuc.onload = function(e2) { executeCsvParsing(e2.target.result); };
-          readerEuc.readAsText(file, "EUC-KR");
-        } else { executeCsvParsing(text); }
-      };
-      reader.readAsText(file, "UTF-8");
-    }
-
-    function executeCsvParsing(text) {
-      const rows = parseCSV(text); let addedCount = 0; let startIndex = 0;
-      if (rows.length > 0 && rows[0][0] && (rows[0][0].includes("과목") || rows[0][1]?.includes("앞면"))) startIndex = 1; 
-      for (let i = startIndex; i < rows.length; i++) {
-        if (rows[i].length >= 3) {
-          let subject = rows[i][0].trim(); let front = rows[i][1].trim(); let back = rows[i][2].trim();
-          if(subject.includes('노동')) subject = '노동법'; else if(subject.includes('인사') || subject.includes('노무')) subject = '인사노무관리'; else if(subject.includes('행정') || subject.includes('쟁송')) subject = '행정쟁송법'; else if(subject.includes('민사') || subject.includes('민소')) subject = '민사소송법';
-          if (front && back) {
-            db.flashcards.push({ id: Date.now().toString() + '-' + Math.floor(Math.random() * 1000000), subject: subject, front: front, back: back, repetition: 0, interval: 0, efactor: 2.5, nextReview: getLocalNow() });
-            addedCount++;
-          }
-        }
-      }
-      if (addedCount > 0) {
-        saveDB(); renderDueFlashcards();
-        if (!document.getElementById('fc-manager-view').classList.contains('hidden')) renderFcList();
-        showMsg(`✅ ${addedCount}개의 플래시카드가 등록되었습니다!`); cancelCsvUpload(); document.getElementById('csv-file-input').value = "";
-      } else showMsg("유효한 데이터가 없습니다.");
-    }
-
-    async function getFcHint() {
-      if (!currentCard) return;
-      const resEl = document.getElementById('fc-ai-result'); resEl.classList.remove('hidden'); resEl.innerHTML = '<div class="text-center text-purple-400 font-bold animate-pulse text-[11px] py-2">✨ AI가 힌트를 고민하고 있습니다...</div>';
-      try {
-        const schema = { type: "OBJECT", properties: { hint: { type: "STRING" } } };
-        const prompt = `과목: ${currentCard.subject}\n질문: ${currentCard.front}\n정답: ${currentCard.back}\n\n사용자가 정답을 떠올리지 못하고 있습니다. 정답에 포함된 직접적인 핵심 단어는 절대 노출하지 말고, 정답을 유추할 수 있도록 돕는 아주 결정적인 '힌트'나 '초성'을 1~2문장으로 제공해주세요.`;
-        const res = await callGemini(prompt, schema);
-        resEl.innerHTML = `<strong class="text-purple-600 block mb-1"><i class="ri-lightbulb-flash-line"></i> AI 힌트:</strong> ${res.hint}`;
-      } catch(e) { resEl.innerHTML = `<span class="text-red-500">오류 발생: ${e.message}</span>`; }
-    }
-
-    async function getFcMnemonic() {
-      if (!currentCard) return;
-      const resEl = document.getElementById('fc-ai-result'); resEl.classList.remove('hidden'); resEl.innerHTML = '<div class="text-center text-blue-400 font-bold animate-pulse text-[11px] py-2">✨ AI가 암기 비법을 만들고 있습니다...</div>';
-      try {
-        const schema = { type: "OBJECT", properties: { mnemonic: { type: "STRING" } } };
-        const prompt = `과목: ${currentCard.subject}\n질문: ${currentCard.front}\n정답: ${currentCard.back}\n\n수험생이 위 내용을 쉽게 외울 수 있도록, 각 키워드의 앞글자를 딴 기발하고 재미있는 '두음문자 암기법(연상법)'을 만들어주세요. 1~2문장으로 짧고 강렬하게 설명해주세요.`;
-        const res = await callGemini(prompt, schema);
-        resEl.innerHTML = `<strong class="text-blue-600 block mb-1"><i class="ri-magic-line"></i> AI 암기비법:</strong> ${res.mnemonic}`;
-      } catch(e) { resEl.innerHTML = `<span class="text-red-500">오류 발생: ${e.message}</span>`; }
-    }
-
-    async function askAITutor() {
-      if (!currentCard) return;
-      const question = document.getElementById('fc-ask-input').value.trim();
-      if (!question) { showMsg("질문을 입력해주세요."); return; }
-
-      const resEl = document.getElementById('fc-ask-result');
-      resEl.classList.remove('hidden');
-      resEl.innerHTML = '<div class="text-center text-slate-400 font-bold animate-pulse py-1">✨ AI 튜터가 답변을 작성 중입니다...</div>';
-
-      try {
-        const schema = { type: "OBJECT", properties: { answer: { type: "STRING" } } };
-        const prompt = `과목: ${currentCard.subject}\n주제/질문: ${currentCard.front}\n핵심내용: ${currentCard.back}\n\n사용자의 질문: "${question}"\n\n위 플래시카드 내용을 공부하는 수험생의 질문입니다. 노무사 시험 관점에서 정확하고 이해하기 쉽게 2~3문장으로 답변해주세요.`;
-        const res = await callGemini(prompt, schema);
-        resEl.innerHTML = `<strong class="text-slate-800 block mb-1">A.</strong> ${res.answer}`;
-      } catch(e) {
-        resEl.innerHTML = `<span class="text-red-500">오류 발생: ${e.message}</span>`;
-      }
-    }
-
-    function toggleFcManager() { const view = document.getElementById('fc-manager-view'); view.classList.toggle('hidden'); if (!view.classList.contains('hidden')) { renderFcList(); document.getElementById('manual-card-form').classList.add('hidden'); document.getElementById('csv-upload-form').classList.add('hidden'); } }
-
-    function renderFcList() {
-      const container = document.getElementById('fc-list'); const filter = document.getElementById('fc-filter-subject').value;
-      const selectAllCb = document.getElementById('fc-select-all'); if(selectAllCb) selectAllCb.checked = false;
-      let filteredCards = filter === 'all' ? db.flashcards : db.flashcards.filter(c => c.subject === filter);
-      if(filteredCards.length === 0) { container.innerHTML = '<p class="text-sm text-gray-400 py-4 text-center">등록된 카드가 없습니다.</p>'; return; }
-      container.innerHTML = filteredCards.map((c, index) => `
-        <div class="flex justify-between items-center p-2.5 md:p-3 bg-gray-50 border border-gray-100 rounded-lg hover:border-emerald-300 transition-colors">
-           <div class="flex items-center gap-2 md:gap-3 flex-1 min-w-0 pr-2">
-             <input type="checkbox" class="fc-item-checkbox rounded text-emerald-500 focus:ring-emerald-500 border-gray-300 w-4 h-4 cursor-pointer" value="${c.id}" onchange="updateSelectAllFcState()">
-             <span class="text-[10px] md:text-xs font-bold text-gray-400 w-4 md:w-5 text-center shrink-0">${index + 1}</span>
-             <div class="min-w-0">
-               <span class="text-[9px] md:text-[10px] font-bold text-emerald-500 bg-emerald-50 px-1.5 py-0.5 rounded">${c.subject}</span>
-               <p class="font-bold text-xs md:text-sm text-slate-800 mt-1 truncate">${c.front}</p>
-             </div>
-           </div>
-           <div class="flex gap-1 md:gap-2 shrink-0">
-              <button onclick="editFc('${c.id}')" class="px-2 py-1 md:px-3 md:py-1.5 bg-white border border-gray-200 text-slate-600 rounded text-[10px] md:text-xs font-bold hover:bg-gray-100">수정</button>
-              <button onclick="deleteFc('${c.id}')" class="px-2 py-1 md:px-3 md:py-1.5 border border-red-100 text-red-500 rounded text-[10px] md:text-xs font-bold hover:bg-red-50">삭제</button>
-           </div>
-        </div>
-      `).join('');
-    }
-
-    function toggleSelectAllFc(source) { document.querySelectorAll('.fc-item-checkbox').forEach(cb => cb.checked = source.checked); }
-    function updateSelectAllFcState() { const cbs = document.querySelectorAll('.fc-item-checkbox'); const allCb = document.getElementById('fc-select-all'); if (allCb && cbs.length > 0) allCb.checked = Array.from(cbs).every(cb => cb.checked); }
-
-    function removeBracketsFromSelected() {
-      const selectedIds = Array.from(document.querySelectorAll('.fc-item-checkbox:checked')).map(cb => cb.value);
-      if (selectedIds.length === 0) { showMsg("선택된 카드가 없습니다."); return; }
-      customConfirm(`선택한 ${selectedIds.length}개 카드의 대괄호를 지우시겠습니까?`, () => {
-        let count = 0;
-        db.flashcards.forEach(c => { if (selectedIds.includes(String(c.id))) { if (c.back.includes('[') || c.back.includes(']')) { c.back = c.back.replace(/\[/g, '').replace(/\]/g, count++); } } });
-        if(count > 0) { saveDB(); renderFcList(); renderDueFlashcards(); showMsg(`✅ ${count}개의 카드가 변환되었습니다!`); }
-      });
-    }
-
-    function deleteSelectedFc() {
-      const selectedIds = Array.from(document.querySelectorAll('.fc-item-checkbox:checked')).map(cb => cb.value);
-      if (selectedIds.length === 0) { showMsg("선택된 카드가 없습니다."); return; }
-      customConfirm(`선택한 ${selectedIds.length}개의 카드를 삭제하시겠습니까?`, () => {
-        db.flashcards = db.flashcards.filter(c => !selectedIds.includes(String(c.id)));
-        saveDB(); renderFcList(); renderDueFlashcards(); showMsg(`${selectedIds.length}개의 카드가 일괄 삭제되었습니다.`);
-      });
-    }
-
-    function deleteFc(id) { 
-      customConfirm('해당 카드를 삭제하시겠습니까?', () => {
-        db.flashcards = db.flashcards.filter(c => String(c.id) !== String(id)); saveDB(); renderFcList(); renderDueFlashcards(); showMsg("카드가 삭제되었습니다."); 
-      });
-    }
-
-    function editFc(id) {
-      const c = db.flashcards.find(x => String(x.id) === String(id)); if(!c) return; editingFcId = c.id;
-      document.getElementById('manual-fc-title').innerHTML = '<i class="ri-edit-2-line text-emerald-500"></i> 플래시카드 수정하기';
-      document.getElementById('manual-fc-subject').value = c.subject; document.getElementById('manual-fc-front').value = c.front; document.getElementById('manual-fc-back').value = c.back;
-      document.getElementById('manual-fc-save-btn').textContent = '수정 완료';
-      document.getElementById('manual-card-form').classList.remove('hidden'); document.getElementById('fc-manager-view').classList.add('hidden'); document.getElementById('csv-upload-form').classList.add('hidden');
-    }
-
-    function toggleManualCardForm() {
-      editingFcId = null; document.getElementById('manual-fc-title').innerHTML = '<i class="ri-edit-circle-line text-emerald-500"></i> 새 플래시카드 입력';
-      document.getElementById('manual-fc-front').value = ''; document.getElementById('manual-fc-back').value = ''; document.getElementById('manual-fc-save-btn').textContent = '추가하기';
-      document.getElementById('fc-manager-view').classList.add('hidden'); document.getElementById('csv-upload-form').classList.add('hidden'); document.getElementById('manual-card-form').classList.toggle('hidden');
-    }
-
-    function cancelManualFlashcard() { editingFcId = null; document.getElementById('manual-card-form').classList.add('hidden'); }
-
-    function addManualFlashcard() {
-      try {
-        const subject = document.getElementById('manual-fc-subject').value; const front = document.getElementById('manual-fc-front').value.trim(); const back = document.getElementById('manual-fc-back').value.trim();
-        if (!front || !back) { showMsg('⚠️ 앞면과 뒷면을 모두 입력해주세요.'); return; }
-        if (editingFcId) {
-          const idx = db.flashcards.findIndex(x => String(x.id) === String(editingFcId));
-          if(idx > -1) { db.flashcards[idx].subject = subject; db.flashcards[idx].front = front; db.flashcards[idx].back = back; }
-          editingFcId = null; showMsg('✅ 카드가 수정되었습니다!');
-        } else {
-          db.flashcards.push({ id: Date.now().toString() + '-' + Math.floor(Math.random() * 1000000), subject, front, back, repetition: 0, interval: 0, efactor: 2.5, nextReview: getLocalNow() });
-          showMsg('✅ 카드가 추가되었습니다!');
-        }
-        saveDB(); document.getElementById('manual-card-form').classList.add('hidden'); renderDueFlashcards();
-      } catch(e) { showMsg("카드 저장 오류: " + e.message); }
-    }
-
-    function renderDueFlashcards() {
-      dueCards = db.flashcards.filter(isDue);
-      document.getElementById('fc-due-display').textContent = dueCards.length;
-      if (dueCards.length > 0) { 
-        document.getElementById('fc-workspace').classList.remove('hidden'); 
-        document.getElementById('fc-empty').classList.add('hidden'); 
-        loadNextCard(); 
-      } else { 
-        document.getElementById('fc-workspace').classList.add('hidden'); 
-        document.getElementById('fc-empty').classList.remove('hidden'); 
-      }
-    }
-
-    function loadNextCard() {
-      if (dueCards.length === 0) { renderDueFlashcards(); return; }
-      currentCard = dueCards[0];
-      
-      document.getElementById('fc-buttons').classList.add('hidden');
-      document.querySelectorAll('#fc-buttons .sm2-btn').forEach(btn => btn.classList.remove('ring-4', 'ring-offset-2', 'ring-rose-400', 'ring-orange-400', 'ring-blue-400', 'ring-emerald-400', 'animate-pulse'));
-      
-      const aiResult = document.getElementById('fc-ai-result');
-      if(aiResult) { aiResult.classList.add('hidden'); aiResult.innerHTML = ''; }
-      
-      if(document.getElementById('fc-ask-input')) document.getElementById('fc-ask-input').value = '';
-      if(document.getElementById('fc-ask-result')) document.getElementById('fc-ask-result').classList.add('hidden');
-
-      let e = currentCard.efactor || 2.5; let r = currentCard.repetition || 0; let iv = currentCard.interval || 0;
-      let nextGood = r === 0 ? 1 : (r === 1 ? 6 : Math.round(iv * e));
-      let nextEasy = r === 0 ? 4 : Math.round(nextGood * 1.3);
-
-      document.getElementById('fc-time-good').textContent = `${nextGood}일 후`;
-      document.getElementById('fc-time-easy').textContent = `${nextEasy}일 후`;
-
-      let reviewCount = currentCard.reviews !== undefined ? currentCard.reviews : (currentCard.repetition || 0);
-      let statusHtml = reviewCount === 0 ? '🆕 처음' : `🔁 ${reviewCount}회독`;
-      let statusClassFlip = reviewCount === 0 ? 'text-indigo-600 bg-indigo-50' : 'text-slate-500 bg-slate-100';
-      let statusClassCloze = reviewCount === 0 ? 'text-indigo-600 bg-indigo-50' : 'text-slate-500 bg-slate-100';
-
-      document.getElementById('fc-front-status').textContent = statusHtml;
-      document.getElementById('fc-front-status').className = `text-[10px] md:text-xs font-bold px-2 md:px-3 py-1 rounded-full shrink-0 ${statusClassFlip}`;
-      document.getElementById('fc-cloze-status').textContent = statusHtml;
-      document.getElementById('fc-cloze-status').className = `text-[10px] md:text-xs font-bold px-2 py-1 rounded-full inline-block ${statusClassCloze}`;
-
-      const hasCloze = /\[(.*?)\]/.test(currentCard.back);
-      if (hasCloze) {
-        document.getElementById('fc-flip-container').classList.add('hidden'); document.getElementById('fc-cloze-container').classList.remove('hidden');
-        renderFcClozeCard(currentCard);
-      } else {
-        document.getElementById('fc-cloze-container').classList.add('hidden'); document.getElementById('fc-flip-container').classList.remove('hidden');
-        document.getElementById('fc-card').classList.remove('flipped');
-        document.getElementById('fc-front-sub').textContent = currentCard.subject || ''; document.getElementById('fc-front-text').textContent = currentCard.front || ''; document.getElementById('fc-back-text').textContent = currentCard.back || '';
-      }
-    }
-
-    function renderFcClozeCard(card) {
-      document.getElementById('fc-cloze-sub').textContent = card.subject || ''; document.getElementById('fc-cloze-front').textContent = card.front || '';
-      document.getElementById('fc-cloze-check-btn').classList.remove('hidden');
-      
-      const container = document.getElementById('fc-cloze-back');
-      const regex = /\[(.*?)\]/g; let html = ''; let match; let lastIdx = 0; fcClozeState.answers = [];
-
-      let matches = []; let tempMatch; const tempRegex = /\[(.*?)\]/g;
-      while ((tempMatch = tempRegex.exec(card.back)) !== null) { matches.push(tempMatch[1]); }
-      const maxCharLen = matches.length > 0 ? Math.max(...matches.map(x => x.length)) : 10;
-      const uniformWidth = `clamp(60px, ${maxCharLen + 2}ch, 100%)`;
-
-      while ((match = regex.exec(card.back)) !== null) {
-        html += card.back.substring(lastIdx, match.index);
-        const ans = match[1].trim(); fcClozeState.answers.push(ans);
-        html += `<input type="text" class="fc-blank-input blank-input" data-answer="${ans}" style="width: ${uniformWidth};" onclick="setFcActiveInput(this)" placeholder="">`;
-        lastIdx = regex.lastIndex;
-      }
-      html += card.back.substring(lastIdx); container.innerHTML = html;
-
-      const bank = document.getElementById('fc-cloze-word-bank'); bank.innerHTML = '';
-      const shuffled = [...fcClozeState.answers].sort(() => Math.random() - 0.5);
-      shuffled.forEach(ans => { const safeAns = ans.replace(/'/g, "\\'"); bank.innerHTML += `<div class="word-chip" onclick="fillFcWordChip('${safeAns}')">${ans}</div>`; });
-
-      const inputs = container.querySelectorAll('.fc-blank-input');
-      inputs.forEach(input => { input.addEventListener('focus', (e) => { setFcActiveInput(e.target); }); input.addEventListener('input', (e) => { e.target.classList.remove('correct', 'wrong'); }); });
-      fcClozeState.activeInput = null; if(inputs.length > 0) inputs[0].focus();
-    }
-
-    function setFcActiveInput(el) { fcClozeState.activeInput = el; el.classList.remove('correct', 'wrong'); }
-    function fillFcWordChip(word) {
-      if (fcClozeState.activeInput) {
-        fcClozeState.activeInput.value = word; fcClozeState.activeInput.classList.remove('correct', 'wrong');
-        const inputs = Array.from(document.querySelectorAll('#fc-cloze-back .fc-blank-input'));
-        const nextEmpty = inputs.slice(inputs.indexOf(fcClozeState.activeInput) + 1).find(i => !i.value) || inputs.find(i => !i.value);
-        if (nextEmpty) nextEmpty.focus();
-      } else { showMsg("먼저 채워넣을 빈칸을 클릭해주세요."); }
-    }
-
-    function checkFcClozeAnswers() {
-      const inputs = document.querySelectorAll('#fc-cloze-back .fc-blank-input'); let correctCount = 0;
-      inputs.forEach(input => {
-        const actual = input.dataset.answer.replace(/\s+/g, ''); const user = input.value.replace(/\s+/g, '');
-        if (actual === user) { input.classList.add('correct'); input.classList.remove('wrong'); input.placeholder = ''; correctCount++; } 
-        else { input.classList.add('wrong'); input.classList.remove('correct'); if (!input.value) input.placeholder = "?"; }
-      });
-
-      document.getElementById('fc-cloze-check-btn').classList.add('hidden'); 
-      const btnContainer = document.getElementById('fc-buttons');
-      btnContainer.classList.remove('hidden');
-      btnContainer.classList.add('grid');
-      
-      const accuracy = inputs.length > 0 ? (correctCount / inputs.length) : 0;
-      document.querySelectorAll('#fc-buttons .sm2-btn').forEach(btn => btn.classList.remove('ring-4', 'ring-offset-2', 'ring-rose-400', 'ring-orange-400', 'ring-blue-400', 'ring-emerald-400', 'animate-pulse'));
-
-      if (accuracy === 1) { document.getElementById('fc-btn-easy').classList.add('ring-4', 'ring-offset-2', 'ring-emerald-400', 'animate-pulse'); showMsg("🎉 100% 완벽! '쉬움'을 추천합니다."); } 
-      else if (accuracy >= 0.75) { document.getElementById('fc-btn-good').classList.add('ring-4', 'ring-offset-2', 'ring-blue-400', 'animate-pulse'); showMsg("👍 75% 이상 정답! '보통'을 추천합니다."); } 
-      else if (accuracy >= 0.25) { document.getElementById('fc-btn-hard').classList.add('ring-4', 'ring-offset-2', 'ring-orange-400', 'animate-pulse'); showMsg("🔥 25%~75% 정답. '어려움'을 추천합니다."); } 
-      else { document.getElementById('fc-btn-again').classList.add('ring-4', 'ring-offset-2', 'ring-rose-400', 'animate-pulse'); showMsg("💪 25% 미만 정답. 다시 한 번 확실히 외워봅시다!"); }
-    }
-
-    function flipCard() { 
-      document.getElementById('fc-card').classList.add('flipped'); 
-      const btnContainer = document.getElementById('fc-buttons');
-      btnContainer.classList.remove('hidden');
-      btnContainer.classList.add('grid');
-    }
-
-    function rateCard(rating) {
-      let q = rating === 1 ? 0 : rating === 2 ? 3 : rating === 3 ? 4 : 5;
-      let r = currentCard.repetition || 0; let iv = currentCard.interval || 0; let e = currentCard.efactor || 2.5;
-
-      let nextGood = r === 0 ? 1 : (r === 1 ? 6 : Math.round(iv * e));
-      let nextEasy = r === 0 ? 4 : Math.round(nextGood * 1.3);
-
-      if (rating === 3) iv = nextGood;
-      else if (rating === 4) iv = nextEasy;
-      else if (rating === 2) iv = 0.5; 
-      else iv = 0; 
-
-      if (rating >= 3) r++; else r = 0;
-
-      e = e + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02)); if (e < 1.3) e = 1.3;
-      currentCard.repetition = r; currentCard.interval = iv; currentCard.efactor = e;
-      
-      let currentReviewCount = currentCard.reviews !== undefined ? currentCard.reviews : (r === 0 ? 0 : r);
-      currentCard.reviews = currentReviewCount + 1;
-
-      let nextDate = new Date();
-      if (iv === 0) {
-        nextDate.setMinutes(nextDate.getMinutes() + 1);
-        if(dueCards.length > 1) showMsg("카드 대기열 맨 뒤로 이동됨 (1분 후)");
-      }
-      else if (iv === 0.5) nextDate.setHours(nextDate.getHours() + 12);
-      else {
-        nextDate.setDate(nextDate.getDate() + iv);
-        nextDate.setHours(0, 0, 0, 0); 
-      }
-
-      const tzOffset = nextDate.getTimezoneOffset() * 60000;
-      currentCard.nextReview = (new Date(nextDate.getTime() - tzOffset)).toISOString().slice(0, 19);
-
-      const idx = db.flashcards.findIndex(c => c.id === currentCard.id);
-      if (idx > -1) db.flashcards[idx] = currentCard;
-      
-      saveDB(); 
-      markStudiedToday('fc');
-      dueCards.shift(); 
-      if (rating === 1) dueCards.push(currentCard); 
-      loadNextCard();
-    }
-
-    async function generateOutlineWithAI() {
-      const subject = document.getElementById('outline-subject').value;
-      const title = document.getElementById('outline-title').value.trim();
-      if (!title) { showMsg("주제(제목)를 먼저 입력해주세요!"); return; }
-      
-      showLoading("AI가 표준 목차 구조를 작성 중입니다...");
-      try {
-        const schema = { type: "OBJECT", properties: { outline: { type: "STRING" } } };
-        const prompt = `과목: ${subject}\n주제: ${title}\n\n위 주제에 대해 노무사 2차 시험 답안지에 쓸 수 있는 핵심 표준 목차를 작성해주세요. 반드시 'I. -> 1. -> (1)' 형태의 번호 체계를 엄격하게 사용해야 합니다. 다른 부가 설명 없이 목차 내용만 출력하세요.`;
-        const res = await callGemini(prompt, schema);
-        document.getElementById('outline-content').value = res.outline;
-        showMsg("✨ AI 목차 자동 생성 완료!");
-      } catch(e) { showMsg("목차 생성 실패: " + e.message); } finally { hideLoading(); }
-    }
-
-    function toggleOutlineAdder() { 
-      editingOutlineId = null; document.getElementById('outline-adder-title').innerHTML = '<i class="ri-file-list-line text-emerald-500"></i> 새 목차 구조 등록';
-      document.getElementById('outline-save-btn').textContent = '등록하기'; document.getElementById('outline-title').value = ''; document.getElementById('outline-content').value = '';
-      document.getElementById('outline-adder').classList.toggle('hidden'); 
-    }
-    function cancelOutlineEdit() { editingOutlineId = null; document.getElementById('outline-adder').classList.add('hidden'); }
-    
-    function editOutline(id) {
-      const o = db.outlines.find(x => String(x.id) === String(id)); if(!o) return; editingOutlineId = o.id;
-      document.getElementById('outline-adder-title').innerHTML = '<i class="ri-edit-line text-emerald-500"></i> 목차 내용 수정';
-      document.getElementById('outline-subject').value = o.subject; document.getElementById('outline-title').value = o.title; document.getElementById('outline-content').value = o.content;
-      document.getElementById('outline-save-btn').textContent = "수정 완료"; 
-      const adder = document.getElementById('outline-adder');
-      adder.classList.remove('hidden');
-      adder.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-    
-    function saveOutline() {
-      const subject = document.getElementById('outline-subject').value; const title = document.getElementById('outline-title').value.trim(); const content = document.getElementById('outline-content').value.trim();
-      if (!title || !content) { showMsg("제목과 내용을 모두 입력해주세요."); return; }
-      if (editingOutlineId) {
-         const idx = db.outlines.findIndex(x => String(x.id) === String(editingOutlineId));
-         if(idx > -1) { db.outlines[idx].subject = subject; db.outlines[idx].title = title; db.outlines[idx].content = content; }
-         editingOutlineId = null; showMsg("목차가 수정되었습니다.");
-      } else { db.outlines.push({ id: Date.now().toString() + '-' + Math.floor(Math.random() * 1000000), subject, title, content, repetition: 0, interval: 0, efactor: 2.5, nextReview: getLocalNow() }); showMsg("새 목차가 등록되었습니다."); }
-      saveDB(); document.getElementById('outline-title').value = ''; document.getElementById('outline-content').value = ''; document.getElementById('outline-adder').classList.add('hidden'); renderOutlineList(); 
-    }
-    
-    function renderOutlineList() {
-      const container = document.getElementById('outline-list');
-      const filterEl = document.getElementById('outline-filter-subject');
-      const filter = filterEl ? filterEl.value : 'all';
-      
-      let filteredOutlines = db.outlines || [];
-      if (filter !== 'all') { filteredOutlines = filteredOutlines.filter(o => o.subject === filter); }
-
-      if (filteredOutlines.length === 0) { container.innerHTML = '<p class="col-span-2 text-center text-gray-400 py-10">등록된 목차가 없습니다.</p>'; return; }
-      container.innerHTML = filteredOutlines.map(o => {
-        const isToday = isDue(o);
-        return `
-        <div class="p-4 md:p-6 bg-white border ${isToday ? 'border-amber-400 bg-amber-50/10' : 'border-gray-200'} rounded-xl shadow-sm flex flex-col justify-between hover:shadow-md transition-all group">
-          <div>
-            <div class="flex justify-between items-start">
-              <span class="text-[9px] md:text-[10px] font-bold text-amber-500 bg-amber-50 px-2 py-1 rounded-full">${o.subject}</span>
-              ${isToday ? '<span class="text-[9px] md:text-[10px] font-bold text-white bg-amber-500 px-2 py-1 rounded-full animate-pulse">오늘 복습</span>' : ''}
-            </div>
-            <h4 class="font-extrabold text-slate-800 text-base md:text-lg mt-3 mb-2">${o.title}</h4>
-          </div>
-          <div class="flex justify-end gap-1 md:gap-2 mt-4">
-            <button onclick="editOutline('${o.id}')" class="px-2 py-1.5 md:px-3 md:py-1.5 border border-gray-200 text-slate-600 rounded-lg text-xs font-bold hover:bg-gray-100">수정</button>
-            <button onclick="deleteOutline('${o.id}')" class="px-2 py-1.5 md:px-3 md:py-1.5 border border-red-100 text-red-500 rounded-lg text-xs font-bold hover:bg-red-50">삭제</button>
-            <button onclick="startBlankQuiz('${o.id}')" class="px-3 py-1.5 md:px-4 md:py-1.5 bg-amber-500 text-white rounded-lg text-xs font-bold hover:bg-amber-600 shadow-sm">퀴즈 시작</button>
-          </div>
-        </div>
-      `}).join('');
-    }
-
-    function deleteOutline(id) { 
-      customConfirm("해당 목차를 삭제하시겠습니까?", () => {
-        db.outlines = db.outlines.filter(o => String(o.id) !== String(id)); saveDB(); renderOutlineList(); showMsg("삭제되었습니다."); 
-      });
-    }
-    
-    function startBlankQuiz(id) {
-      blankState.outline = db.outlines.find(o => String(o.id) === String(id)); if(!blankState.outline) return;
-      document.getElementById('blank-list-view').classList.add('hidden'); document.getElementById('blank-quiz-view').classList.remove('hidden');
-      document.getElementById('quiz-subject').textContent = blankState.outline.subject; document.getElementById('quiz-title').textContent = blankState.outline.title;
-      generateBlankQuiz();
-    }
-    function closeBlankQuiz() { 
-      document.getElementById('blank-quiz-view').classList.add('hidden'); 
-      document.getElementById('blank-list-view').classList.remove('hidden'); 
-      document.getElementById('quiz-ai-expand-btn').classList.add('hidden');
-      document.getElementById('quiz-ai-expand-result').classList.add('hidden');
-      renderOutlineList(); 
-      renderDashboard(); 
-    }
-    
-    function generateBlankQuiz() {
-      const level = document.getElementById('quiz-level').value; 
-      const lines = blankState.outline.content.split('\n'); 
-      const regex = /^([\s]*[IVX]+\.|[\s]*[Ⅰ-Ⅻ]+\.?|[\s]*\d+[\.\)]|[\s]*\(\d+\)|[\s]*[①-⑳]|[\s]*[가-힣]+[\.\)]|[\s]*\([가-힣]+\)|[\s]*[㈎-㈛])(.*)$/;
-      
-      let parsedLines = lines.map((line, idx) => {
-        let prefix = ''; let content = line; const match = line.match(regex);
-        if (match) { prefix = match[1]; content = match[2].trim(); } else { const spaceMatch = line.match(/^(\s*)(.*)$/); if (spaceMatch) { prefix = spaceMatch[1]; content = spaceMatch[2]; } }
-        return { id: idx, original: line, prefix, content, isBlank: false };
-      });
-      let candidates = parsedLines.filter(l => l.content.length > 0);
-      if (level === 'all') candidates.forEach(l => l.isBlank = true);
-      else if (level === '50') { candidates.sort(() => Math.random() - 0.5); candidates.slice(0, Math.ceil(candidates.length / 2)).forEach(l => l.isBlank = true); }
-      else if (level === '30') { candidates.sort(() => Math.random() - 0.5); candidates.slice(0, Math.ceil(candidates.length * 0.3)).forEach(l => l.isBlank = true); }
-      else if (level === 'main') candidates.forEach(l => { 
-        if (l.prefix.match(/[IVX]+\.|[Ⅰ-Ⅻ]+\.?|\d+\.|[가-힣]+\./)) l.isBlank = true; 
-      });
-
-      parsedLines.sort((a,b) => a.id - b.id); blankState.lines = parsedLines; blankState.answers = parsedLines.filter(l => l.isBlank).map(l => l.content); blankState.answers.sort(() => Math.random() - 0.5); 
-      
-      let o = blankState.outline;
-      let e = o.efactor || 2.5; let r = o.repetition || 0; let iv = o.interval || 0;
-      let nextGood = r === 0 ? 1 : (r === 1 ? 6 : Math.round(iv * e));
-      let nextEasy = r === 0 ? 4 : Math.round(nextGood * 1.3);
-      document.getElementById('quiz-time-good').textContent = `${nextGood}일 후`;
-      document.getElementById('quiz-time-easy').textContent = `${nextEasy}일 후`;
-
-      let reviewCount = o.reviews !== undefined ? o.reviews : (r === 0 ? 0 : r);
-      let statusHtml = reviewCount === 0 ? '🆕 처음' : `🔁 ${reviewCount}회독`;
-      let statusClass = reviewCount === 0 ? 'text-indigo-600 bg-indigo-50' : 'text-slate-500 bg-slate-100';
-
-      const statusEl = document.getElementById('quiz-status');
-      if (statusEl) {
-          statusEl.textContent = statusHtml;
-          statusEl.className = `text-[10px] md:text-xs font-bold px-2 py-1 rounded-full inline-block shrink-0 ${statusClass}`;
-      }
-      
-      document.getElementById('quiz-ai-expand-btn').classList.add('hidden');
-      document.getElementById('quiz-ai-expand-result').classList.add('hidden');
-      renderBlankQuizRoom();
-    }
-    
-    function renderBlankQuizRoom() {
-      const container = document.getElementById('quiz-lines'); container.innerHTML = '';
-      const blankLines = blankState.lines.filter(l => l.isBlank); const maxCharLen = blankLines.length > 0 ? Math.max(...blankLines.map(l => l.content.length)) : 10; 
-      const uniformWidth = `clamp(80px, ${maxCharLen + 2}ch, 100%)`;
-
-      blankState.lines.forEach(line => {
-        let indentClass = '';
-        let textClass = 'text-[13px] md:text-[15px] font-medium text-slate-700';
-        let prefixClass = 'font-bold text-slate-500';
-        let inputClass = '';
-        
-        const p = line.prefix.trim();
-        // 💡 계층별 들여쓰기 자동 적용 (Ⅰ - 1 - (1) - 1) - ① - ㈎)
-        if (/^[IVX]+\.|^[Ⅰ-Ⅻ]+\.?/.test(p)) {
-            indentClass = 'ml-0 mt-6 mb-3';
-            textClass = 'text-base md:text-lg font-extrabold text-slate-800';
-            prefixClass = 'text-emerald-600';
-            inputClass = 'font-extrabold text-emerald-700';
-        } else if (/^\d+\./.test(p)) {
-            indentClass = 'ml-4 md:ml-6 mt-3 mb-2';
-            textClass = 'text-[14px] md:text-[16px] font-bold text-slate-700';
-        } else if (/^\(\d+\)/.test(p)) {
-            indentClass = 'ml-8 md:ml-12 mb-2';
-        } else if (/^\d+\)/.test(p)) {
-            indentClass = 'ml-12 md:ml-16 mb-1.5';
-            textClass = 'text-[12px] md:text-[14px] font-medium text-slate-600';
-        } else if (/^[①-⑳]/.test(p)) {
-            indentClass = 'ml-16 md:ml-20 mb-1';
-            textClass = 'text-[12px] md:text-[14px] font-medium text-slate-600';
-        } else if (/^[가-힣]+\.|^\([가-힣]+\)|^[㈎-㈛]/.test(p)) {
-            indentClass = 'ml-20 md:ml-24 mb-1';
-            textClass = 'text-[12px] md:text-[14px] font-medium text-slate-600';
-        } else {
-            indentClass = 'ml-4 md:ml-6 mb-1'; // 기본 여백
-        }
-
-        const row = document.createElement('div'); 
-        row.className = `flex items-center flex-wrap ${indentClass} ${textClass}`; 
-        
-        const prefixSpan = document.createElement('span'); 
-        prefixSpan.textContent = line.prefix; 
-        prefixSpan.className = `mr-2 shrink-0 ${prefixClass}`; 
-        row.appendChild(prefixSpan);
-        
-        if (line.isBlank) {
-          const input = document.createElement('input'); input.type = "text"; 
-          input.className = `blank-input ${inputClass}`; 
-          input.dataset.answer = line.content; input.style.width = uniformWidth;
-          if (/^[IVX]+\.|^[Ⅰ-Ⅻ]+\.?/.test(p)) input.style.fontSize = 'inherit';
-          
-          input.addEventListener('focus', (e) => { blankState.activeInput = e.target; e.target.classList.remove('correct', 'wrong'); });
-          input.addEventListener('input', (e) => { e.target.classList.remove('correct', 'wrong'); }); row.appendChild(input);
-        } else { 
-          const contentSpan = document.createElement('span'); contentSpan.textContent = line.content; row.appendChild(contentSpan); 
-        }
-        container.appendChild(row);
-      });
-      
-      const bankContainer = document.getElementById('quiz-word-bank'); bankContainer.innerHTML = '';
-      blankState.answers.forEach(ans => {
-        const chip = document.createElement('div'); chip.className = "word-chip"; chip.textContent = ans; chip.onclick = () => fillWordChipOutline(ans); bankContainer.appendChild(chip);
-      });
-      blankState.activeInput = null; const firstInput = document.querySelector('.blank-input'); if(firstInput) firstInput.focus();
-      document.getElementById('quiz-check-btn').classList.remove('hidden');
-      document.getElementById('quiz-sm2-buttons').classList.add('hidden');
-      document.getElementById('quiz-sm2-buttons').classList.remove('grid');
-    }
-    
-    function fillWordChipOutline(word) {
-      if (blankState.activeInput) {
-        blankState.activeInput.value = word; blankState.activeInput.classList.remove('correct', 'wrong');
-        const inputs = Array.from(document.querySelectorAll('#quiz-lines .blank-input'));
-        const nextEmpty = inputs.slice(inputs.indexOf(blankState.activeInput) + 1).find(i => !i.value) || inputs.find(i => !i.value);
-        if (nextEmpty) nextEmpty.focus();
-      } else { showMsg("먼저 채워넣을 빈칸을 터치(클릭)해주세요."); }
-    }
-    
-    function checkBlankAnswers() {
-      const inputs = document.querySelectorAll('#quiz-lines .blank-input'); let correctCount = 0;
-      inputs.forEach(input => {
-        const actual = input.dataset.answer.replace(/\s+/g, ''); const user = input.value.replace(/\s+/g, '');
-        if (actual === user) { input.classList.add('correct'); input.classList.remove('wrong'); input.placeholder = ''; correctCount++; } 
-        else { input.classList.add('wrong'); input.classList.remove('correct'); if (!input.value) input.placeholder = "?"; }
-      });
-      
-      const accuracy = inputs.length > 0 ? (correctCount / inputs.length) : 0;
-      document.querySelectorAll('#quiz-sm2-buttons .sm2-btn').forEach(btn => btn.classList.remove('ring-4', 'ring-offset-2', 'ring-rose-400', 'ring-orange-400', 'ring-blue-400', 'ring-emerald-400', 'animate-pulse'));
-
-      if (accuracy === 1) { document.getElementById('quiz-btn-easy').classList.add('ring-4', 'ring-offset-2', 'ring-emerald-400', 'animate-pulse'); showMsg("🎉 100% 완벽! '쉬움'을 추천합니다."); } 
-      else if (accuracy >= 0.75) { document.getElementById('quiz-btn-good').classList.add('ring-4', 'ring-offset-2', 'ring-blue-400', 'animate-pulse'); showMsg("👍 75% 이상 정답! '보통'을 추천합니다."); } 
-      else if (accuracy >= 0.25) { document.getElementById('quiz-btn-hard').classList.add('ring-4', 'ring-offset-2', 'ring-orange-400', 'animate-pulse'); showMsg("🔥 25%~75% 정답. '어려움'을 추천합니다."); } 
-      else { document.getElementById('quiz-btn-again').classList.add('ring-4', 'ring-offset-2', 'ring-rose-400', 'animate-pulse'); showMsg("💪 25% 미만 정답. 다시 한 번 확실히 외워봅시다!"); }
-      
-      document.getElementById('quiz-check-btn').classList.add('hidden');
-      const btnContainer = document.getElementById('quiz-sm2-buttons');
-      btnContainer.classList.remove('hidden');
-      btnContainer.classList.add('grid');
-      
-      document.getElementById('quiz-ai-expand-btn').classList.remove('hidden');
-    }
-
-    async function generateParagraphFromOutline() {
-      if (!blankState.outline) return;
-      const resEl = document.getElementById('quiz-ai-expand-result');
-      resEl.classList.remove('hidden');
-      resEl.innerHTML = '<div class="text-center text-purple-400 font-bold animate-pulse text-xs py-2">✨ AI가 목차를 바탕으로 답안을 전개 중입니다...</div>';
-
-      try {
-        const schema = { type: "OBJECT", properties: { paragraph: { type: "STRING" } } };
-        const prompt = `과목: ${blankState.outline.subject}\n주제: ${blankState.outline.title}\n목차 구조:\n${blankState.outline.content}\n\n당신은 노무사 2차 수석 합격생입니다. 위 뼈대(목차)만 보고, 실제 시험 답안지에 작성할 법한 매끄럽고 논리적인 모범 단락(줄글)을 1~2개로 전개해서 작성해주세요. 수험생이 이 목차에서 어떤 살을 붙여야 하는지 보여주는 용도입니다. 전문적인 법률/인사 용어를 사용하세요.`;
-        const res = await callGemini(prompt, schema);
-        resEl.innerHTML = `<strong class="text-purple-600 block mb-2"><i class="ri-quill-pen-fill"></i> AI 예시 답안:</strong> ${res.paragraph.replace(/\n/g, '<br>')}`;
-      } catch (e) {
-        resEl.innerHTML = `<span class="text-red-500">오류 발생: ${e.message}</span>`;
-      }
-    }
-
-    function rateOutline(rating) {
-      let outline = blankState.outline;
-      let q = rating === 1 ? 0 : rating === 2 ? 3 : rating === 3 ? 4 : 5;
-      let r = outline.repetition || 0; let iv = outline.interval || 0; let e = outline.efactor || 2.5;
-
-      if (rating >= 3) {
-        if (r === 0) iv = 1; else if (r === 1) iv = 6; else iv = Math.round(iv * e);
-        r++;
-      } else { iv = 0; r = 0; }
-
-      e = e + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02)); if (e < 1.3) e = 1.3;
-      
-      let currentReviewCount = outline.reviews !== undefined ? outline.reviews : (r === 0 ? 0 : r);
-      outline.reviews = currentReviewCount + 1;
-
-      let nextDate = new Date();
-      if (iv === 0) nextDate.setMinutes(nextDate.getMinutes() + 1);
-      else if (iv === 0.5) nextDate.setHours(nextDate.getHours() + 12);
-      else nextDate.setDate(nextDate.getDate() + iv);
-
-      outline.repetition = r; outline.interval = iv; outline.efactor = e;
-      outline.nextReview = new Date(nextDate - nextDate.getTimezoneOffset()*60000).toISOString().slice(0,19);
-
-      const idx = db.outlines.findIndex(o => o.id === outline.id);
-      if (idx > -1) db.outlines[idx] = outline;
-      saveDB(); 
-      markStudiedToday('outline'); 
-      closeBlankQuiz();
-    }
-
-    function toggleRubricMode() {
-      const mode = document.querySelector('input[name="rubric-mode"]:checked').value;
-      if (mode === 'pdf') {
-        document.getElementById('rubric-pdf-area').style.display = 'block';
-        document.getElementById('rubric-text-area').style.display = 'none';
-      } else {
-        document.getElementById('rubric-pdf-area').style.display = 'none';
-        document.getElementById('rubric-text-area').style.display = 'block';
-      }
-    }
-
-    function updateExamQList() {
-      const sub = document.getElementById('exam-subject').value; const sel = document.getElementById('exam-question-select'); sel.innerHTML = '<option value="">직접 입력하기</option>';
-      db.questions.filter(q => q.subject === sub).forEach(q => { const opt = document.createElement('option'); opt.value = String(q.id); opt.textContent = `[추출] ${q.question.substring(0, 30)}...`; sel.appendChild(opt); });
-      previewQuestion();
-    }
-
-    function previewQuestion() {
-      const id = document.getElementById('exam-question-select').value;
-      if (id) { const q = db.questions.find(x => String(x.id) === String(id)); if (q) document.getElementById('exam-direct-q').value = q.question; } 
-      else { document.getElementById('exam-direct-q').value = ''; }
-    }
-
-    function toggleExamManager() {
-      const view = document.getElementById('exam-manager-view'); view.classList.toggle('hidden');
-      if(!view.classList.contains('hidden')) { document.getElementById('exam-edit-form').classList.add('hidden'); renderExamList(); }
-    }
-
-    function renderExamList() {
-      const container = document.getElementById('exam-list'); const currentSubject = document.getElementById('exam-subject').value;
-      const filtered = db.questions.filter(q => q.subject === currentSubject);
-      if(filtered.length === 0) { container.innerHTML = '<p class="text-sm text-gray-400 py-4 text-center">이 과목에 추출된 문제가 없습니다.</p>'; return; }
-      container.innerHTML = filtered.map(q => `
-        <div class="p-3 bg-gray-50 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors">
-           <div class="flex justify-between items-start mb-2"><span class="text-[10px] text-blue-500 font-bold bg-blue-50 px-2 py-0.5 rounded">${q.subject}</span>
-              <div class="flex gap-2"><button onclick="editExamQ('${q.id}')" class="px-2 py-1 bg-white border border-gray-200 text-xs font-bold text-slate-600 rounded hover:bg-gray-100">수정</button><button onclick="deleteExamQ('${q.id}')" class="px-2 py-1 border border-red-100 text-xs font-bold text-red-500 rounded hover:bg-red-50">삭제</button></div>
-           </div>
-           <p class="font-bold text-sm text-slate-800 mb-1 truncate">${q.question}</p>
-           <p class="text-[11px] text-gray-500 truncate border-t border-gray-200 pt-1 mt-1">모범답안: ${q.rubric || '없음'}</p>
-        </div>
-      `).join('');
-    }
-
-    function deleteExamQ(id) { 
-      customConfirm('문제를 삭제하시겠습니까?', () => {
-        db.questions = db.questions.filter(q => String(q.id) !== String(id)); saveDB(); renderExamList(); updateExamQList(); showMsg("삭제되었습니다."); 
-      });
-    }
-
-    function editExamQ(id) {
-      const q = db.questions.find(x => String(x.id) === String(id)); if(!q) return; editingExamId = q.id;
-      document.getElementById('edit-exam-subject').value = q.subject; document.getElementById('edit-exam-q').value = q.question; document.getElementById('edit-exam-rubric').value = q.rubric || '';
-      document.getElementById('exam-edit-form').classList.remove('hidden');
-    }
-
-    function saveExamEdit() {
-      if(!editingExamId) return;
-      const idx = db.questions.findIndex(x => String(x.id) === String(editingExamId));
-      if(idx > -1) { db.questions[idx].subject = document.getElementById('edit-exam-subject').value; db.questions[idx].question = document.getElementById('edit-exam-q').value.trim(); db.questions[idx].rubric = document.getElementById('edit-exam-rubric').value.trim(); saveDB(); }
-      editingExamId = null; document.getElementById('exam-edit-form').classList.add('hidden'); renderExamList(); updateExamQList(); showMsg('문제가 성공적으로 수정되었습니다.');
-    }
-
-    function cancelExamEdit() { editingExamId = null; document.getElementById('exam-edit-form').classList.add('hidden'); }
-
-    async function handleExamRubricUpload(e) {
-      const file = e.target.files[0]; if(!file) return;
-      document.getElementById('exam-rubric-name').innerHTML = `<i class="ri-check-line mr-1"></i>${file.name} 첨부완료`;
-      try {
-        const buf = await file.arrayBuffer(); const pdf = await pdfjsLib.getDocument(buf).promise; let text = '';
-        for (let i=1; i<=pdf.numPages; i++) { const page = await pdf.getPage(i); const content = await page.getTextContent(); text += content.items.map(it => it.str).join(' ') + '\n'; }
-        examState.uploadedRubricText = text;
-      } catch(err) { showMsg("PDF 읽기 실패. 텍스트로 된 정상적인 PDF인지 확인해주세요."); }
-    }
-
-    function startExam() {
-      const sub = document.getElementById('exam-subject').value;
-      const qText = document.getElementById('exam-direct-q').value.trim();
-      const time = parseInt(document.getElementById('exam-time').value);
-      const id = document.getElementById('exam-question-select').value;
-      
-      let baseRubric = '';
-      if (id) { const q = db.questions.find(x => String(x.id) === String(id)); if (q) baseRubric = q.rubric; }
-      
-      let combinedRubric = '';
-      if (baseRubric) combinedRubric += `[기본 모범답안 및 배점]\n${baseRubric}\n\n`;
-      
-      let finalRubricInput = '';
-      const rMode = document.querySelector('input[name="rubric-mode"]:checked').value;
-      if (rMode === 'text') {
-        finalRubricInput = document.getElementById('exam-rubric-text').value.trim();
-      } else {
-        finalRubricInput = examState.uploadedRubricText;
-      }
-      
-      if (finalRubricInput) combinedRubric += `[강사 채점평 및 주의사항 (가장 중요하게 반영할 것)]\n${finalRubricInput}`;
-
-      if (!qText) { showMsg("문제를 입력해주세요."); return; }
-
-      if (examState.timer) clearInterval(examState.timer);
-      examState = { subject: sub, question: qText, rubric: combinedRubric, time: time, seconds: time * 60, totalPage: Math.floor(time / 5), currPage: 1, answers: {}, timer: null, uploadedRubricText: examState.uploadedRubricText };
-
-      document.getElementById('room-subject').textContent = sub; document.getElementById('room-q-preview').textContent = qText;
-      document.getElementById('room-q-full').textContent = qText; document.getElementById('room-total-page').textContent = examState.totalPage;
-      document.getElementById('char-count').textContent = '0';
-      document.getElementById('exam-setup').style.display = 'none'; document.getElementById('exam-room').style.display = 'block';
-
-      requestFullScreen();
-
-      renderAnswerSheet(); updateTimerDisplay();
-      examState.timer = setInterval(() => {
-        examState.seconds--; updateTimerDisplay();
-        if (examState.seconds <= 0) { clearInterval(examState.timer); showMsg("⏰ 시간이 종료되었습니다! 자동 제출합니다."); performSubmitExam(); }
-      }, 1000);
-    }
-
-    function updateTimerDisplay() {
-      const m = Math.floor(examState.seconds / 60).toString().padStart(2, '0'); const s = (examState.seconds % 60).toString().padStart(2, '0');
-      const el = document.getElementById('timer'); el.textContent = `${m}:${s}`;
-      if (examState.seconds < 300) el.classList.add('text-rose-500'); else el.classList.remove('text-rose-500');
-    }
-
-    function renderAnswerSheet() {
-      const container = document.getElementById('answer-lines'); container.innerHTML = '';
-      for (let i = 1; i <= LINES_PER_PAGE; i++) {
-        const key = `${examState.currPage}-${i}`; const savedVal = examState.answers[key] || '';
-        const row = document.createElement('div'); row.className = 'answer-row';
-        const numDiv = document.createElement('div'); numDiv.className = 'row-num'; numDiv.textContent = i;
-        const wrapDiv = document.createElement('div'); wrapDiv.className = 'row-input-wrapper';
-        const input = document.createElement('input'); input.type = 'text'; input.className = 'row-input'; input.maxLength = MAX_CHARS_PER_LINE; input.dataset.key = key; input.value = savedVal;
-        const indicator = document.createElement('span'); indicator.className = 'char-indicator'; indicator.textContent = `${savedVal.length}/${MAX_CHARS_PER_LINE}`;
-        wrapDiv.appendChild(input); wrapDiv.appendChild(indicator); row.appendChild(numDiv); row.appendChild(wrapDiv); container.appendChild(row);
-      }
-      document.getElementById('room-curr-page').textContent = examState.currPage;
-
-      const inputs = container.querySelectorAll('.row-input');
-      inputs.forEach((input, idx) => {
-        input.addEventListener('input', (e) => {
-          const val = e.target.value; examState.answers[e.target.dataset.key] = val;
-          const ind = e.target.nextElementSibling; ind.textContent = `${val.length}/${MAX_CHARS_PER_LINE}`;
-          if (val.length >= MAX_CHARS_PER_LINE) { ind.classList.add('full'); if (idx < inputs.length - 1) inputs[idx + 1].focus(); } else { ind.classList.remove('full'); }
-          document.getElementById('char-count').textContent = Object.values(examState.answers).join('').length;
-        });
-        input.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') { e.preventDefault(); if (idx < inputs.length - 1) inputs[idx + 1].focus(); else changePage(1); } 
-          else if (e.key === 'Backspace' && e.target.value === '' && idx > 0) { e.preventDefault(); inputs[idx - 1].focus(); } 
-          else if (e.key === 'ArrowUp' && idx > 0) { e.preventDefault(); inputs[idx - 1].focus(); } 
-          else if (e.key === 'ArrowDown' && idx < inputs.length - 1) { e.preventDefault(); inputs[idx + 1].focus(); }
-        });
-      });
-      if (inputs.length > 0) inputs[0].focus();
-    }
-
-    function changePage(dir) {
-      const next = examState.currPage + dir;
-      if (next >= 1 && next <= examState.totalPage) { examState.currPage = next; renderAnswerSheet(); } else if (dir > 0) showMsg("마지막 페이지입니다."); else showMsg("첫 번째 페이지입니다.");
-    }
-
-    function submitExam(auto = false) {
-      if (!auto) {
-        customConfirm("제출하고 AI 채점을 진행하시겠습니까?", () => performSubmitExam());
-      } else {
-        performSubmitExam();
-      }
-    }
-
-    async function performSubmitExam() {
-      exitFullScreen();
-      
-      clearInterval(examState.timer); showLoading("AI 채점관이 답안을 분석 중입니다...");
-
-      const fullAnswer = Object.keys(examState.answers).sort((a, b) => {
-          const [ap, al] = a.split('-').map(Number); const [bp, bl] = b.split('-').map(Number); return ap !== bp ? ap - bp : al - bl;
-        }).map(k => examState.answers[k]).filter(v => v.trim()).join('\n');
-
-      const schema = { type: "OBJECT", properties: { score: { type: "INTEGER" }, details: { type: "OBJECT", properties: { issue: { type: "INTEGER" }, law: { type: "INTEGER" }, logic: { type: "INTEGER" }, conclusion: { type: "INTEGER" }, format: { type: "INTEGER" } }, required: ["issue", "law", "logic", "conclusion", "format"] }, feedback: { type: "STRING" }, good: { type: "STRING" }, missing: { type: "STRING" }, advice: { type: "STRING" }, next3: { type: "ARRAY", items: { type: "STRING" } } }, required: ["score", "details", "feedback", "good", "missing", "advice", "next3"] };
-      
-      const prompt = `과목: ${examState.subject}\n문제: ${examState.question}\n\n${examState.rubric || "[자료 없음]"}\n\n[학생 답안]\n${fullAnswer || "미작성"}\n\n당신은 아주 깐깐한 노무사 2차 시험 채점위원입니다. 학생 답안을 [기본 모범답안]과 한 줄 한 줄 치밀하게 대조하여 100점 만점 기준으로 채점하세요. 특히 [강사 채점평 및 주의사항]이 있다면, 수험생들이 자주 범하는 오류나 누락 포인트에 이 학생도 빠지지 않았는지 최우선으로 검토하고 가차없이 감점하세요. 쟁점25, 법적근거30, 논리25, 결론10, 형식10 기준으로 세부 점수를 매기고, 구체적인 피드백을 제공하세요.`;
-
-      try {
-        const result = await callGemini(prompt, schema);
-        result.details = result.details || {}; result.details.issue = result.details.issue || 0; result.details.law = result.details.law || 0; result.details.logic = result.details.logic || 0; result.details.conclusion = result.details.conclusion || 0; result.details.format = result.details.format || 0; result.next3 = result.next3 || [];
-        
-        const record = { id: Date.now(), date: getToday(), subject: examState.subject, question: examState.question, rubric: examState.rubric, score: result.score, feedback: result, fullAnswer: fullAnswer };
-        db.history.push(record); 
-        markStudiedToday('exam'); 
-        saveDB();
-        
-        examState.uploadedRubricText = ''; 
-        document.getElementById('exam-rubric-file').value = '';
-        document.getElementById('exam-rubric-name').innerHTML = `<i class="ri-upload-cloud-2-line mr-1"></i>여기를 눌러 PDF 첨부`;
-        document.getElementById('exam-rubric-text').value = '';
-
-        document.getElementById('exam-room').style.display = 'none'; document.getElementById('exam-setup').style.display = 'block';
-        renderExamResult(record);
-      } catch(e) {
-        showMsg(e.message); document.getElementById('exam-room').style.display = 'none'; document.getElementById('exam-setup').style.display = 'block';
-      } finally { hideLoading(); }
-    }
-
-    function renderExamResult(data) {
-      const fb = data.feedback;
-      
-      let trendHtml = '';
-      if (data.question) {
-         const attempts = db.history.filter(h => h.question === data.question).sort((a,b) => a.id - b.id);
-         const currIdx = attempts.findIndex(h => h.id === data.id);
-         if (currIdx > 0) {
-            const prevScore = attempts[currIdx - 1].score;
-            const diff = data.score - prevScore;
-            if (diff > 0) {
-                trendHtml = `<div class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-[11px] font-extrabold mt-2 tracking-wide animate-pulse">▲ 이전 대비 ${diff}점 상승!</div>`;
-            } else if (diff < 0) {
-                trendHtml = `<div class="bg-rose-100 text-rose-700 px-3 py-1 rounded-full text-[11px] font-extrabold mt-2 tracking-wide">▼ 이전 대비 ${Math.abs(diff)}점 하락</div>`;
-            } else {
-                trendHtml = `<div class="bg-gray-100 text-gray-500 px-3 py-1 rounded-full text-[11px] font-extrabold mt-2 tracking-wide">- 이전 점수와 동일</div>`;
-            }
-         }
-      }
-      
-      document.getElementById('res-score').innerHTML = `${data.score}<span class="text-xl md:text-2xl text-gray-300 ml-1">점</span>`;
-      
-      let scoreBox = document.getElementById('res-score').parentNode;
-      let existingBadge = document.getElementById('score-trend-badge');
-      if(existingBadge) existingBadge.remove(); 
-      
-      if(trendHtml) {
-          scoreBox.insertAdjacentHTML('beforeend', `<div id="score-trend-badge">${trendHtml}</div>`);
-      }
-
-      document.getElementById('res-feedback').textContent = fb.feedback || '';
-
-      const setBar = (id, val, max) => { const safeVal = Math.min(Math.max(val || 0, 0), max); document.getElementById(`score-${id}`).textContent = safeVal; document.getElementById(`bar-${id}`).style.width = `${(safeVal / max) * 100}%`; };
-      setBar('issue', fb.details.issue, 25); setBar('law', fb.details.law, 30); setBar('logic', fb.details.logic, 25); setBar('conc', fb.details.conclusion, 10); setBar('form', fb.details.format, 10);
-
-      document.getElementById('res-good').textContent = fb.good || ''; document.getElementById('res-miss').textContent = fb.missing || ''; document.getElementById('res-next').innerHTML = (fb.next3 || []).map(t => `<li>${t}</li>`).join('');
-      
-      const myAnswerEl = document.getElementById('res-my-answer');
-      if (myAnswerEl) myAnswerEl.textContent = data.fullAnswer || '저장된 답안이 없습니다.';
-      
-      const rubricEl = document.getElementById('res-rubric');
-      if (rubricEl) {
-         let rawRubric = data.rubric || '저장된 모범답안이 없습니다.';
-         rawRubric = rawRubric.replace(/\[기본 모범답안 및 배점\]/g, '').replace(/\[강사 채점평 및 주의사항.*?\]/g, '\n[강사 채점평/주의사항]');
-         rubricEl.textContent = rawRubric.trim();
-      }
-
-      navigate('result');
-    }
-
-    function exportDB() { const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `nomusa_backup_${getToday()}.json`; a.click(); showMsg("✅ 백업 파일이 다운로드되었습니다."); }
-    function importDB() { document.getElementById('import-file-input').click(); }
-    
-    function getAppDB() { return db; }
-    function setAppDB(newDB) { db = { ...db, ...newDB }; }
-
-    function doImportDB(event) {
-      const file = event.target.files[0]; if (!file) return; const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const imported = JSON.parse(e.target.result);
-          if (!imported.history || !imported.flashcards) { showMsg("❌ 올바른 백업 파일이 아닙니다."); return; }
-          customConfirm("백업 데이터를 복구하시겠습니까?<br>(현재 데이터는 덮어씌워집니다)", () => {
-            setAppDB(imported); saveDB(); renderDashboard(); showMsg("✅ 데이터가 복구되었습니다!");
-          });
-        } catch(err) { showMsg("❌ 파일 파싱 오류: " + err.message); }
-      };
-      reader.readAsText(file); event.target.value = '';
-    }
-    
-    function resetDB() { 
-      customConfirm("정말로 모든 학습 기록을 삭제하시겠습니까?<br>이 작업은 되돌릴 수 없습니다!", () => {
-        localStorage.removeItem('nomusa_db_v4'); location.reload(); 
-      });
-    }
-    
-    window.customConfirm = customConfirm;
-    window.navigate = navigate;
-    window.toggleCsvUploadForm = toggleCsvUploadForm;
-    window.cancelCsvUpload = cancelCsvUpload;
-    window.processCsvUpload = processCsvUpload;
-    window.toggleFcManager = toggleFcManager;
-    window.toggleManualCardForm = toggleManualCardForm;
-    window.cancelManualFlashcard = cancelManualFlashcard;
-    window.addManualFlashcard = addManualFlashcard;
-    window.renderFcList = renderFcList;
-    window.toggleSelectAllFc = toggleSelectAllFc;
-    window.updateSelectAllFcState = updateSelectAllFcState;
-    window.removeBracketsFromSelected = removeBracketsFromSelected;
-    window.deleteSelectedFc = deleteSelectedFc;
-    window.editFc = editFc;
-    window.deleteFc = deleteFc;
-    window.flipCard = flipCard;
-    window.checkFcClozeAnswers = checkFcClozeAnswers;
-    window.rateCard = rateCard;
-    window.getFcHint = getFcHint;
-    window.getFcMnemonic = getFcMnemonic;
-    window.setFcActiveInput = setFcActiveInput;
-    window.fillFcWordChip = fillFcWordChip;
-    window.askAITutor = askAITutor;
-    
-    window.renderOutlineList = renderOutlineList;
-    window.toggleOutlineAdder = toggleOutlineAdder;
-    window.cancelOutlineEdit = cancelOutlineEdit;
-    window.saveOutline = saveOutline;
-    window.editOutline = editOutline;
-    window.deleteOutline = deleteOutline;
-    window.startBlankQuiz = startBlankQuiz;
-    window.closeBlankQuiz = closeBlankQuiz;
-    window.generateBlankQuiz = generateBlankQuiz;
-    window.checkBlankAnswers = checkBlankAnswers;
-    window.rateOutline = rateOutline;
-    window.generateOutlineWithAI = generateOutlineWithAI;
-    window.fillWordChipOutline = fillWordChipOutline;
-    window.generateParagraphFromOutline = generateParagraphFromOutline;
-
-    window.updateExamQList = updateExamQList;
-    window.previewQuestion = previewQuestion;
-    window.toggleExamManager = toggleExamManager;
-    window.editExamQ = editExamQ;
-    window.deleteExamQ = deleteExamQ;
-    window.saveExamEdit = saveExamEdit;
-    window.cancelExamEdit = cancelExamEdit;
-    window.handleExamRubricUpload = handleExamRubricUpload;
-    window.startExam = startExam;
-    window.submitExam = submitExam;
-    window.performSubmitExam = performSubmitExam;
-    window.changePage = changePage;
-    window.retryExam = retryExam;
-    window.toggleRubricMode = toggleRubricMode;
-
-    window.searchLawDB = searchLawDB;
-    window.compareConceptsWithAI = compareConceptsWithAI;
-    window.processAIConvert = processAIConvert;
-    window.handleFileDisplay = handleFileDisplay;
-    window.toggleInputMode = toggleInputMode;
-    window.cancelConvert = cancelConvert;
-    window.saveConvertedData = saveConvertedData;
-    window.removePreviewItem = removePreviewItem;
-    
-    window.saveApiKey = saveApiKey;
-    window.exportDB = exportDB;
-    window.importDB = importDB;
-    window.doImportDB = doImportDB;
-    window.resetDB = resetDB;
-    
-    window.getAppDB = getAppDB;
-    window.setAppDB = setAppDB;
-
-    window.viewHistory = viewHistory;
-    window.analyzeStudyHistory = analyzeStudyHistory;
-    window.renderDashboard = renderDashboard;
-    window.renderDueFlashcards = renderDueFlashcards;
-
-  </script>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyAkAfhZev3uF9qzAcqfhwBrKWorV10qNWE",
-      authDomain: "nomusa-trainer.firebaseapp.com",
-      projectId: "nomusa-trainer",
-      storageBucket: "nomusa-trainer.firebasestorage.app",
-      messagingSenderId: "361338496072",
-      appId: "1:361338496072:web:798c1a6695cbfab5a7647d"
-    };
-
-    try {
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
-      const firestore = getFirestore(app);
-      let unsubSnapshot = null;
-
-      window.loginWithGoogle = () => {
-        const provider = new GoogleAuthProvider();
-        signInWithPopup(auth, provider).catch(error => {
-          console.error("Login Error:", error);
-          alert("로그인 중 오류가 발생했습니다: " + error.message);
-        });
-      };
-
-      window.logoutGoogle = () => { signOut(auth).then(() => { alert("로그아웃 되었습니다."); }); };
-
-      onAuthStateChanged(auth, (user) => {
-        window.currentUser = user;
-        const statusEl = document.getElementById('auth-status'); 
-        const headerStatus = document.getElementById('header-auth-status');
-        const loginBtn = document.getElementById('login-btn'); 
-        const logoutBtn = document.getElementById('logout-btn');
-
-        if (user) {
-          if (statusEl) statusEl.textContent = user.displayName + " (연동됨)"; 
-          if (headerStatus) { headerStatus.textContent = "Cloud Sync: ON"; headerStatus.classList.replace('text-slate-400', 'text-blue-400'); }
-          if (loginBtn) loginBtn.classList.add('hidden'); 
-          if (logoutBtn) logoutBtn.classList.remove('hidden');
-          
-          if (unsubSnapshot) unsubSnapshot();
-          
-          const docRef = doc(firestore, 'users', user.uid);
-          
-          unsubSnapshot = onSnapshot(docRef, (docSnap) => {
-            if (docSnap.exists()) {
-              const cloudDB = docSnap.data().db;
-              if (cloudDB && Object.keys(cloudDB).length > 0) {
-                if (!window.isFirstSyncDone || JSON.stringify(window.getAppDB()) !== JSON.stringify(cloudDB)) {
-                   window.setAppDB(cloudDB);
-                   try { localStorage.setItem('nomusa_db_v4', JSON.stringify(cloudDB)); } catch(e){}
-                   
-                   if(document.getElementById('page-dashboard').classList.contains('active')) window.renderDashboard();
-                   if(document.getElementById('page-flashcard').classList.contains('active')) window.renderDueFlashcards();
-                   if(document.getElementById('page-exam').classList.contains('active')) window.updateExamQList();
-                   if(document.getElementById('page-blank').classList.contains('active')) window.renderOutlineList();
-                }
-              }
-              window.isFirstSyncDone = true;
-            } else { 
-              window.isFirstSyncDone = true;
-              window.triggerCloudSave(); 
-            }
-          }, (error) => {
-            console.error("Firestore onSnapshot Error:", error);
-          });
-        } else {
-          if (statusEl) statusEl.textContent = "로컬 모드 (로그인 안됨)"; 
-          if (headerStatus) { headerStatus.textContent = "Mode: Local Storage"; headerStatus.classList.replace('text-blue-400', 'text-slate-400'); }
-          if (loginBtn) loginBtn.classList.remove('hidden'); 
-          if (logoutBtn) logoutBtn.classList.add('hidden');
-          if (unsubSnapshot) { unsubSnapshot(); unsubSnapshot = null; }
-        }
-      });
-
-      window.triggerCloudSave = () => {
-        if (window.currentUser && window.getAppDB) {
-          const currentDB = window.getAppDB();
-          if (!currentDB || Object.keys(currentDB).length === 0) return;
-
-          const removeUndefined = (obj) => {
-            if (Array.isArray(obj)) return obj.map(removeUndefined);
-            if (obj !== null && typeof obj === 'object') {
-              return Object.keys(obj).reduce((acc, key) => {
-                if (obj[key] !== undefined) acc[key] = removeUndefined(obj[key]);
-                return acc;
-              }, {});
-            }
-            return obj;
-          };
-
-          const sanitizedDB = removeUndefined(currentDB);
-          
-          setDoc(doc(firestore, 'users', window.currentUser.uid), { db: sanitizedDB }, { merge: true }).catch(err => {
-              console.error("Sync Error:", err);
-          });
-        }
-      };
-    } catch(e) {
-      console.error("Firebase init failed:", e);
-      window.loginWithGoogle = () => alert("로그인 오류: 환경 설정을 확인해주세요.");
-      window.logoutGoogle = () => {};
-      window.triggerCloudSave = () => {};
-    }
-  </script>
-</body>
-</html>
+                        <div class="mb-3 pr-6"><label class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider mb-1 block">문제 (
