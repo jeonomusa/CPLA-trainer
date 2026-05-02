@@ -188,15 +188,18 @@
       </div>
 
       <div class="neo-card p-4 md:p-6 mb-8">
-        <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
+        <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-3 flex-wrap gap-2">
           <h3 class="font-bold text-slate-800 flex items-center gap-2 text-sm md:text-base"><i class="ri-history-line text-emerald-500"></i> 최근 모의고사 기록</h3>
-          <select id="history-filter-subject" onchange="renderHistoryTable()" class="p-1 md:p-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold outline-none focus:ring-2 focus:ring-emerald-500">
-            <option value="all">전체 과목</option>
-            <option value="노동법">노동법</option>
-            <option value="인사노무관리">인사노무관리</option>
-            <option value="행정쟁송법">행정쟁송법</option>
-            <option value="민사소송법">민사소송법</option>
-          </select>
+          <div class="flex items-center gap-2 flex-wrap">
+            <select id="history-filter-subject" onchange="renderHistoryTable()" class="p-1 md:p-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold outline-none focus:ring-2 focus:ring-emerald-500">
+              <option value="all">전체 과목</option>
+              <option value="노동법">노동법</option>
+              <option value="인사노무관리">인사노무관리</option>
+              <option value="행정쟁송법">행정쟁송법</option>
+              <option value="민사소송법">민사소송법</option>
+            </select>
+            <button type="button" onclick="analyzeStudyHistory()" class="px-3 py-1.5 bg-indigo-500 text-white rounded-lg text-[10px] md:text-xs font-bold hover:bg-indigo-600 shadow-sm whitespace-nowrap">✨ AI 취약점 분석</button>
+          </div>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-center">
@@ -210,6 +213,10 @@
             </thead>
             <tbody id="history-tbody"></tbody>
           </table>
+        </div>
+        <div id="ai-analysis-box" class="hidden mt-4 pt-4 border-t border-gray-100">
+          <p class="text-[10px] font-bold text-indigo-600 uppercase tracking-wider mb-2">AI 학습 진단 요약</p>
+          <p id="ai-analysis-content" class="text-[13px] text-slate-700 whitespace-pre-wrap leading-relaxed break-keep"></p>
         </div>
       </div>
     </div>
@@ -525,7 +532,7 @@
           <input type="text" id="law-search-input" placeholder="핵심 키워드 또는 판례번호" class="flex-1 bg-gray-50 p-3 md:p-4 rounded-xl border border-gray-200 outline-none font-bold text-sm focus:ring-2 focus:ring-emerald-500">
           <button onclick="searchLawDB()" class="px-4 md:px-6 bg-slate-900 text-white rounded-xl text-sm font-bold hover:bg-slate-800 transition-all shadow-md"><i class="ri-search-line"></i> 검색</button>
         </div>
-        <div id="law-search-result" class="p-4 md:p-6 bg-slate-50 rounded-xl text-[13px] md:text-sm leading-relaxed text-slate-700 hidden border border-gray-100 shadow-inner"></div>
+        <div id="law-search-result" class="p-4 md:p-6 bg-slate-50 rounded-xl text-[13px] md:text-sm leading-relaxed text-slate-700 hidden whitespace-pre-wrap border border-gray-100 shadow-inner"></div>
       </div>
     </div>
     
@@ -721,11 +728,6 @@
           <button id="logout-btn" onclick="window.logoutGoogle()" class="w-full mt-4 py-2.5 md:py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 flex justify-center items-center gap-2 hidden">로그아웃</button>
         </div>
 
-        <div class="neo-card p-6 md:p-8 border-2 border-emerald-100 bg-emerald-50/30">
-          <h3 class="font-bold text-emerald-700 mb-2 flex items-center gap-2"><i class="ri-key-2-line"></i> Gemini API 키 설정</h3>
-          <div class="flex gap-2"><input type="password" id="api-key-input" class="flex-1 bg-white p-2.5 md:p-3 rounded-xl border border-emerald-200 outline-none text-xs md:text-sm font-mono" placeholder="AIzaSy..."><button onclick="saveApiKey()" class="px-4 md:px-6 bg-emerald-500 text-white font-bold text-xs md:text-sm rounded-xl hover:bg-emerald-600">저장</button></div>
-        </div>
-
         <div class="neo-card p-6 md:p-8">
           <h3 class="font-bold text-slate-800 mb-4">데이터 관리</h3>
           <div class="space-y-2 md:space-y-3">
@@ -767,8 +769,7 @@
             }
           }
         }
-        const savedKey = localStorage.getItem('gemini_api_key');
-        if(savedKey) document.getElementById('api-key-input').value = savedKey;
+        try { localStorage.removeItem('gemini_api_key'); } catch(e) {}
       } catch(e) {}
       updateStreak(); renderDashboard();
     };
@@ -778,16 +779,23 @@
       if (window.triggerCloudSave) window.triggerCloudSave(); 
     }
 
-    const MODEL_NAME = "gemini-2.5-flash";
-    const apiKey = ""; 
     const LINES_PER_PAGE = 22; const MAX_CHARS_PER_LINE = 40; 
     let examState = { subject: '', question: '', rubric: '', time: 0, seconds: 0, totalPage: 5, currPage: 1, timer: null, answers: {}, uploadedRubricText: '' };
     let blankState = { outline: null, lines: [], answers: [], activeInput: null };
     let fcClozeState = { answers: [], activeInput: null };
     let dueCards = []; let dueOutlines = []; let currentCard = null;
+    let fcHintLoading = false;
+    let fcMnemonicLoading = false;
+    let fcTutorLoading = false;
+    let outlineAiLoading = false;
+    let paragraphAiExpandLoading = false;
     let tempConvertResults = [];
     let tempConvertType = '';
     let tempConvertSubject = '';
+    let convertAiLoading = false;
+    let compareConceptLoading = false;
+    let searchLawLoading = false;
+    let analyzeHistoryLoading = false;
 
     function requestFullScreen() {
       const doc = window.document;
@@ -800,16 +808,6 @@
       const doc = window.document;
       const exitFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
       if (exitFullScreen && doc.fullscreenElement) exitFullScreen.call(doc).catch(err => console.log(err));
-    }
-
-    function saveApiKey() {
-      const val = document.getElementById('api-key-input').value.trim();
-      if(val) { try { localStorage.setItem('gemini_api_key', val); } catch(e){} showMsg('API 키가 저장되었습니다.'); } else showMsg('키를 입력해주세요.');
-    }
-    
-    function getApiKey() {
-      let key = ''; try { key = localStorage.getItem('gemini_api_key'); } catch(e){}
-      if(!key) { showMsg("설정 탭에서 Gemini API 키를 먼저 입력해주세요!"); throw new Error("No API Key"); } return key;
     }
 
     function customConfirm(msg, onConfirm) {
@@ -850,6 +848,15 @@
     function hideLoading() { document.getElementById('loading-overlay').style.display = 'none'; }
     function showMsg(text) { const box = document.getElementById('message-box'); if (box) { box.textContent = text; box.style.display = 'block'; setTimeout(() => box.style.display = 'none', 3000); } }
     
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
     function getLocalYYYYMMDD(d) {
         const year = d.getFullYear(); const month = String(d.getMonth() + 1).padStart(2, '0'); const day = String(d.getDate()).padStart(2, '0');
         return `${year}-${month}-${day}`;
@@ -865,36 +872,154 @@
       return rev <= getLocalNow();
     }
 
-    async function callGemini(prompt, schema, images = []) {
-      const activeKey = apiKey || getApiKey();
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${activeKey}`;
-      let parts = [{ text: prompt }];
-      if (images && images.length > 0) { images.slice(0, 3).forEach(imgData => { parts.push({ inlineData: { mimeType: "image/jpeg", data: imgData } }); }); }
-      const payload = { contents: [{ parts: parts }], generationConfig: { responseMimeType: "application/json", responseSchema: schema } };
-
-      for (let i = 0; i <= 3; i++) {
-        try {
-          const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-          if (!res.ok) {
-            if (res.status === 429) throw new Error("무료 API 호출 한도를 초과했습니다. 잠시 후 시도해주세요.");
-            if (res.status === 404) throw new Error("모델을 찾을 수 없습니다.");
-            throw new Error(`HTTP ${res.status}`);
-          }
-          const data = await res.json(); return parseJSON(data.candidates[0].content.parts[0].text);
-        } catch (err) {
-          if (i === 3 || err.message.includes('429')) throw err;
-          await new Promise(r => setTimeout(r, 1000 * Math.pow(2, i)));
-        }
+    async function gradeAnswerViaServer({ subject, question, rubric, fullAnswer }) {
+      const res = await fetch('/api/grade-answer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subject, question, rubric, fullAnswer }),
+      });
+      let data = null;
+      try { data = await res.json(); } catch (e) {}
+      if (!res.ok) {
+        const msg = (data && data.message) ? data.message : `HTTP ${res.status}`;
+        throw new Error(msg);
       }
+      return data;
     }
 
-    function parseJSON(text) {
-      try {
-        const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
-        const jsonMatch = cleanText.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
-        if (!jsonMatch) throw new Error("JSON format not found");
-        return JSON.parse(jsonMatch[0]);
-      } catch (e) { throw new Error("AI 응답 해석 실패"); }
+    async function getFcHintViaServer({ subject, front, back }) {
+      const res = await fetch('/api/fc-hint', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subject, front, back }),
+      });
+      let data = null;
+      try { data = await res.json(); } catch (e) {}
+      if (!res.ok) {
+        const msg = (data && data.message) ? data.message : `HTTP ${res.status}`;
+        throw new Error(msg);
+      }
+      return data;
+    }
+
+    async function getFcMnemonicViaServer({ subject, front, back }) {
+      const res = await fetch('/api/fc-mnemonic', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subject, front, back }),
+      });
+      let data = null;
+      try { data = await res.json(); } catch (e) {}
+      if (!res.ok) {
+        const msg = (data && data.message) ? data.message : `HTTP ${res.status}`;
+        throw new Error(msg);
+      }
+      return data;
+    }
+
+    async function askAiTutorViaServer({ subject, front, back, question }) {
+      const res = await fetch('/api/ai-tutor', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subject, front, back, question }),
+      });
+      let data = null;
+      try { data = await res.json(); } catch (e) {}
+      if (!res.ok) {
+        const msg = (data && data.message) ? data.message : `HTTP ${res.status}`;
+        throw new Error(msg);
+      }
+      return data;
+    }
+
+    async function compareConceptsViaServer({ conceptA, conceptB }) {
+      const res = await fetch('/api/compare-concepts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ conceptA, conceptB }),
+      });
+      let data = null;
+      try { data = await res.json(); } catch (e) {}
+      if (!res.ok) {
+        const msg = (data && data.message) ? data.message : `HTTP ${res.status}`;
+        throw new Error(msg);
+      }
+      return data;
+    }
+
+    async function searchLawViaServer({ query }) {
+      const res = await fetch('/api/search-law', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query }),
+      });
+      let data = null;
+      try { data = await res.json(); } catch (e) {}
+      if (!res.ok) {
+        const msg = (data && data.message) ? data.message : `HTTP ${res.status}`;
+        throw new Error(msg);
+      }
+      return data;
+    }
+
+    async function analyzeStudyHistoryViaServer({ historyText }) {
+      const res = await fetch('/api/analyze-study-history', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ historyText }),
+      });
+      let data = null;
+      try { data = await res.json(); } catch (e) {}
+      if (!res.ok) {
+        const msg = (data && data.message) ? data.message : `HTTP ${res.status}`;
+        throw new Error(msg);
+      }
+      return data;
+    }
+
+    async function generateOutlineViaServer({ subject, title }) {
+      const res = await fetch('/api/generate-outline', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subject, title }),
+      });
+      let data = null;
+      try { data = await res.json(); } catch (e) {}
+      if (!res.ok) {
+        const msg = (data && data.message) ? data.message : `HTTP ${res.status}`;
+        throw new Error(msg);
+      }
+      return data;
+    }
+
+    async function generateParagraphViaServer({ subject, title, outline }) {
+      const res = await fetch('/api/generate-paragraph', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subject, title, outline }),
+      });
+      let data = null;
+      try { data = await res.json(); } catch (e) {}
+      if (!res.ok) {
+        const msg = (data && data.message) ? data.message : `HTTP ${res.status}`;
+        throw new Error(msg);
+      }
+      return data;
+    }
+
+    async function processAiConvertViaServer({ subject, mode, sourceText, images }) {
+      const res = await fetch('/api/process-ai-convert', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subject, mode, sourceText, images }),
+      });
+      let data = null;
+      try { data = await res.json(); } catch (e) {}
+      if (!res.ok) {
+        const msg = (data && data.message) ? data.message : `HTTP ${res.status}`;
+        throw new Error(msg);
+      }
+      return data;
     }
 
     function updateStreak() {
@@ -1053,43 +1178,72 @@
     function viewHistory(id) { const record = db.history.find(h => String(h.id) === String(id)); if(record) { renderExamResult(record); navigate('result'); } }
 
     async function analyzeStudyHistory() {
-      if(db.history.length === 0) { showMsg("기록이 없습니다."); return; }
+      if (analyzeHistoryLoading) return;
+      if (db.history.length === 0) { showMsg("기록이 없습니다."); return; }
+
+      const lines = db.history.slice(-5).map(h => {
+        const missing = (h.feedback && typeof h.feedback.missing === 'string') ? h.feedback.missing : '';
+        return `[${h.subject}] ${h.score}점 - ${missing}`;
+      });
+      const historyText = lines.join('\n').trim();
+      if (!historyText) { showMsg("분석할 기록 정보가 부족합니다."); return; }
+      if (historyText.length > 5000) { showMsg("기록 요약 길이가 너무 깁니다."); return; }
+
+      analyzeHistoryLoading = true;
       showLoading("취약점 스캔 중...");
-      const hist = db.history.slice(-5).map(h => `[${h.subject}] ${h.score}점 - ${h.feedback.missing}`).join('\n');
-      const schema = { type: "OBJECT", properties: { analysis: { type: "STRING" } } };
       try {
-        const res = await callGemini(`학생의 최근 모의고사 기록과 단점입니다.\n${hist}\n취약점을 진단하고 개선 공부법을 3문장으로 요약하세요.`, schema);
-        document.getElementById('ai-analysis-box').classList.remove('hidden'); document.getElementById('ai-analysis-content').textContent = res.analysis;
-      } catch(e) { showMsg(e.message); } finally { hideLoading(); }
+        const data = await analyzeStudyHistoryViaServer({ historyText });
+        const box = document.getElementById('ai-analysis-box');
+        const content = document.getElementById('ai-analysis-content');
+        if (box && content) {
+          box.classList.remove('hidden');
+          content.textContent = data.analysis ?? '';
+        }
+      } catch (e) { showMsg(e.message); } finally { hideLoading(); analyzeHistoryLoading = false; }
     }
 
     async function searchLawDB() {
-      const kw = document.getElementById('law-search-input').value; if(!kw) return;
-      const resEl = document.getElementById('law-search-result'); resEl.style.display = 'block'; resEl.innerHTML = '<div class="spinner w-6 h-6 mx-auto"></div>';
+      if (searchLawLoading) return;
+      const query = document.getElementById('law-search-input').value.trim();
+      if (!query) { showMsg('검색어를 입력해주세요.'); return; }
+      if (query.length > 300) { showMsg('검색어는 300자 이내로 입력해주세요.'); return; }
+
+      searchLawLoading = true;
+      const resEl = document.getElementById('law-search-result');
+      resEl.classList.remove('hidden');
+      resEl.style.display = '';
+      resEl.textContent = '🔍 검색 중...';
+
       try {
-        const schema = { type: "OBJECT", properties: { content: { type: "STRING" } } };
-        const res = await callGemini(`노무사 수험생이 [${kw}]를 검색했습니다. 핵심 판례 요지 또는 관련 법조문을 노무사 2차 답안지에 쓸 수 있는 정제된 문장으로 3~4줄 요약해서 알려주세요.`, schema);
-        resEl.textContent = res.content;
-      } catch(e) { resEl.textContent = e.message; }
+        const data = await searchLawViaServer({ query });
+        resEl.textContent = data.answer ?? '';
+      } catch (e) {
+        resEl.textContent = e.message || '검색 중 오류가 발생했습니다.';
+      } finally {
+        searchLawLoading = false;
+      }
     }
 
     async function compareConceptsWithAI() {
+      if (compareConceptLoading) return;
       const a = document.getElementById('compare-a').value.trim();
       const b = document.getElementById('compare-b').value.trim();
       if (!a || !b) { showMsg("비교할 두 개념을 모두 입력해주세요."); return; }
+      if (a.length > 200 || b.length > 200) { showMsg("입력 길이가 너무 깁니다. (각 200자 이내)"); return; }
 
+      compareConceptLoading = true;
       const resEl = document.getElementById('compare-result');
       resEl.classList.remove('hidden');
       resEl.innerHTML = '<div class="text-center text-indigo-400 font-bold animate-pulse text-xs py-4">✨ AI가 두 개념을 치밀하게 분석하고 있습니다...</div>';
 
       try {
-        const schema = { type: "OBJECT", properties: { comparison: { type: "STRING" } } };
-        const prompt = `노무사 2차 시험 수험생입니다. '${a}'와(과) '${b}'라는 두 쟁점(또는 개념)의 1. 의의, 2. 주요 요건, 3. 법적 효과(또는 학설/판례의 태도)를 비교하는 내용을 작성해주세요. 답안지에 바로 바를 수 있도록 핵심 키워드 위주로 간결하게 비교해주세요.`;
-        const res = await callGemini(prompt, schema);
-        let formatted = res.comparison.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong class="text-indigo-600">$1</strong>');
-        resEl.innerHTML = formatted;
+        const res = await compareConceptsViaServer({ conceptA: a, conceptB: b });
+        const body = escapeHtml(res.comparison).replace(/\n/g, '<br>');
+        resEl.innerHTML = `<div class="text-sm text-slate-700 leading-relaxed break-keep">${body}</div>`;
       } catch(e) {
-        resEl.innerHTML = `<span class="text-red-500">오류 발생: ${e.message}</span>`;
+        resEl.innerHTML = `<span class="text-red-500">오류 발생: ${escapeHtml(e.message)}</span>`;
+      } finally {
+        compareConceptLoading = false;
       }
     }
 
@@ -1110,6 +1264,7 @@
     }
 
     async function processAIConvert() {
+      if (convertAiLoading) return;
       const mode = document.querySelector('input[name="input-mode"]:checked').value;
       let textQ = '';
       let images = [];
@@ -1117,8 +1272,17 @@
       if (mode === 'pdf') {
         const fileQ = document.getElementById('file-q').files[0];
         if (!fileQ) { showMsg('문제 또는 모범답안 PDF를 업로드해주세요.'); return; }
-        showLoading('AI가 PDF 정밀 분석 중입니다...');
-        try {
+      } else {
+        textQ = document.getElementById('text-q').value.trim();
+        if (!textQ) { showMsg('변환할 텍스트를 입력해주세요.'); return; }
+      }
+
+      convertAiLoading = true;
+      try {
+        if (mode === 'pdf') {
+          const fileQ = document.getElementById('file-q').files[0];
+          showLoading('AI가 PDF 정밀 분석 중입니다...');
+          try {
             const bufQ = await fileQ.arrayBuffer(); const pdfQ = await pdfjsLib.getDocument(bufQ).promise;
             for (let i=1; i<=pdfQ.numPages; i++) {
               const page = await pdfQ.getPage(i); const content = await page.getTextContent();
@@ -1129,32 +1293,43 @@
                 images.push(canvas.toDataURL('image/jpeg').split(',')[1]);
               }
             }
-        } catch(e) { hideLoading(); showMsg("PDF 읽기 오류. 정상적인 파일인지 확인해주세요."); return; }
-      } else {
-        textQ = document.getElementById('text-q').value.trim();
-        if (!textQ) { showMsg('변환할 텍스트를 입력해주세요.'); return; }
-        showLoading('AI가 텍스트를 정밀 분석 중입니다...');
-      }
-
-      tempConvertType = document.getElementById('convert-type').value;
-      tempConvertSubject = document.getElementById('convert-subject').value;
-
-      try {
-        let basePrompt = `과목: ${tempConvertSubject}\n\n[학습 자료]\n${textQ.substring(0,3000)}`;
-
-        if (tempConvertType === 'exam') {
-          const schema = { type: "ARRAY", items: { type: "OBJECT", properties: { subject: { type: "STRING" }, question: { type: "STRING" }, rubric: { type: "STRING" } }, required: ["subject", "question", "rubric"] } };
-          const res = await callGemini(basePrompt + `\n\n위 자료를 바탕으로 노무사 2차 시험 '문제'와 '모범답안' 1세트를 추출하세요. 특히 rubric 필드에는 단순 요약이 아닌, 목차와 배점, 핵심 키워드가 포함된 상세한 모범답안을 최대한 원본에 가깝게 작성해주세요.`, schema, images);
-          tempConvertResults = res;
+          } catch(e) {
+            showMsg("PDF 읽기 오류. 정상적인 파일인지 확인해주세요.");
+            return;
+          }
         } else {
-          const schema = { type: "ARRAY", items: { type: "OBJECT", properties: { front: { type: "STRING" }, back: { type: "STRING" } }, required: ["front", "back"] } };
-          const res = await callGemini(basePrompt + `\n\n위 자료에서 암기해야 할 핵심 쟁점이나 판례를 안키형 플래시카드(앞면/뒷면) 5~10개로 만들어주세요.\n중요: 뒷면 내용 중 반드시 암기해야 할 핵심 키워드나 문구는 양쪽에 [대괄호]로 묶어주세요. (예: 근로기준법상 [근로자]란...)`, schema, images);
-          tempConvertResults = res;
+          showLoading('AI가 텍스트를 정밀 분석 중입니다...');
         }
-        
+
+        tempConvertType = document.getElementById('convert-type').value;
+        tempConvertSubject = document.getElementById('convert-subject').value;
+        const subject = String(tempConvertSubject || '').trim();
+        if (!subject || subject.length > 100) {
+          showMsg(!subject ? '과목을 선택해주세요.' : '입력 길이가 너무 깁니다.');
+          return;
+        }
+
+        const sourceText = textQ.trim().substring(0, 3000);
+        if (!sourceText && images.length === 0) {
+          showMsg('분석할 텍스트가 없습니다. PDF인 경우 텍스트 추출이 거의 되지 않았을 수 있습니다.');
+          return;
+        }
+
+        const data = await processAiConvertViaServer({
+          subject,
+          mode: tempConvertType,
+          sourceText,
+          images: images.length ? images.slice(0, 3) : undefined,
+        });
+        tempConvertResults = data.results || [];
         renderConvertPreview();
         showMsg(`✨ 변환 완료! 내용을 검토해주세요.`);
-      } catch(e) { showMsg(e.message); } finally { hideLoading(); }
+      } catch(e) {
+        showMsg(e.message || String(e));
+      } finally {
+        hideLoading();
+        convertAiLoading = false;
+      }
     }
 
     function renderConvertPreview() {
@@ -1170,19 +1345,23 @@
 
         tempConvertResults.forEach((item, index) => {
             if (tempConvertType === 'exam') {
+                const eq = escapeHtml(item.question ?? '');
+                const er = escapeHtml(item.rubric ?? '');
                 list.innerHTML += `
                     <div class="p-4 border border-emerald-200 bg-emerald-50/30 rounded-xl preview-item relative" data-index="${index}">
                         <button onclick="removePreviewItem(${index})" class="absolute top-3 right-3 text-red-400 hover:text-red-600"><i class="ri-delete-bin-line"></i></button>
-                        <div class="mb-3 pr-6"><label class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider mb-1 block">문제 (Question)</label><textarea class="w-full p-3 text-[13px] border border-emerald-100 rounded-lg outline-none resize-y min-h-[80px] edit-q bg-white focus:ring-1 focus:ring-emerald-300 leading-relaxed">${item.question}</textarea></div>
-                        <div><label class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider mb-1 block">채점 기준 및 모범답안 (Rubric)</label><textarea class="w-full p-3 text-[13px] border border-emerald-100 rounded-lg outline-none resize-y min-h-[120px] edit-r bg-white focus:ring-1 focus:ring-emerald-300 leading-relaxed">${item.rubric}</textarea></div>
+                        <div class="mb-3 pr-6"><label class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider mb-1 block">문제 (Question)</label><textarea class="w-full p-3 text-[13px] border border-emerald-100 rounded-lg outline-none resize-y min-h-[80px] edit-q bg-white focus:ring-1 focus:ring-emerald-300 leading-relaxed">${eq}</textarea></div>
+                        <div><label class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider mb-1 block">채점 기준 및 모범답안 (Rubric)</label><textarea class="w-full p-3 text-[13px] border border-emerald-100 rounded-lg outline-none resize-y min-h-[120px] edit-r bg-white focus:ring-1 focus:ring-emerald-300 leading-relaxed">${er}</textarea></div>
                     </div>
                 `;
             } else {
+                const ef = escapeHtml(item.front ?? '');
+                const eb = escapeHtml(item.back ?? '');
                 list.innerHTML += `
                     <div class="p-4 border border-blue-200 bg-blue-50/30 rounded-xl preview-item relative" data-index="${index}">
                         <button onclick="removePreviewItem(${index})" class="absolute top-3 right-3 text-red-400 hover:text-red-600"><i class="ri-delete-bin-line"></i></button>
-                        <div class="mb-3 pr-6"><label class="text-[10px] font-bold text-blue-600 uppercase tracking-wider mb-1 block">앞면 (질문/키워드)</label><input type="text" class="w-full p-2 text-[13px] font-bold border border-blue-100 rounded-lg outline-none edit-f bg-white focus:ring-1 focus:ring-blue-300" value="${item.front}"></div>
-                        <div><label class="text-[10px] font-bold text-blue-600 uppercase tracking-wider mb-1 block">뒷면 (정답 - 빈칸은 [대괄호] 처리)</label><textarea class="w-full p-3 text-[13px] border border-blue-100 rounded-lg outline-none resize-y min-h-[80px] edit-b bg-white focus:ring-1 focus:ring-blue-300 leading-relaxed">${item.back}</textarea></div>
+                        <div class="mb-3 pr-6"><label class="text-[10px] font-bold text-blue-600 uppercase tracking-wider mb-1 block">앞면 (질문/키워드)</label><input type="text" class="w-full p-2 text-[13px] font-bold border border-blue-100 rounded-lg outline-none edit-f bg-white focus:ring-1 focus:ring-blue-300" value="${ef}"></div>
+                        <div><label class="text-[10px] font-bold text-blue-600 uppercase tracking-wider mb-1 block">뒷면 (정답 - 빈칸은 [대괄호] 처리)</label><textarea class="w-full p-3 text-[13px] border border-blue-100 rounded-lg outline-none resize-y min-h-[80px] edit-b bg-white focus:ring-1 focus:ring-blue-300 leading-relaxed">${eb}</textarea></div>
                     </div>
                 `;
             }
@@ -1198,6 +1377,7 @@
     }
 
     function cancelConvert() {
+        convertAiLoading = false;
         tempConvertResults = [];
         document.getElementById('convert-preview-area').classList.add('hidden');
         document.getElementById('file-q').value = '';
@@ -1295,43 +1475,78 @@
     }
 
     async function getFcHint() {
-      if (!currentCard) return;
-      const resEl = document.getElementById('fc-ai-result'); resEl.classList.remove('hidden'); resEl.innerHTML = '<div class="text-center text-purple-400 font-bold animate-pulse text-[11px] py-2">✨ AI가 힌트를 고민하고 있습니다...</div>';
+      if (!currentCard || fcHintLoading) return;
+      fcHintLoading = true;
+
+      const resEl = document.getElementById('fc-ai-result');
+      resEl.classList.remove('hidden');
+      resEl.innerHTML = '<div class="text-center text-purple-400 font-bold animate-pulse text-[11px] py-2">✨ AI가 힌트를 고민하고 있습니다...</div>';
+
       try {
-        const schema = { type: "OBJECT", properties: { hint: { type: "STRING" } } };
-        const prompt = `과목: ${currentCard.subject}\n질문: ${currentCard.front}\n정답: ${currentCard.back}\n\n사용자가 정답을 떠올리지 못하고 있습니다. 정답에 포함된 직접적인 핵심 단어는 절대 노출하지 말고, 정답을 유추할 수 있도록 돕는 아주 결정적인 '힌트'나 '초성'을 1~2문장으로 제공해주세요.`;
-        const res = await callGemini(prompt, schema);
-        resEl.innerHTML = `<strong class="text-purple-600 block mb-1"><i class="ri-lightbulb-flash-line"></i> AI 힌트:</strong> ${res.hint}`;
-      } catch(e) { resEl.innerHTML = `<span class="text-red-500">오류 발생: ${e.message}</span>`; }
+        const res = await getFcHintViaServer({
+          subject: currentCard.subject,
+          front: currentCard.front,
+          back: currentCard.back,
+        });
+        resEl.innerHTML = `<strong class="text-purple-600 block mb-1"><i class="ri-lightbulb-flash-line"></i> AI 힌트:</strong> ${escapeHtml(res.hint)}`;
+      } catch (e) {
+        resEl.innerHTML = `<span class="text-red-500">오류 발생: ${escapeHtml(e.message)}</span>`;
+      } finally {
+        fcHintLoading = false;
+      }
     }
 
     async function getFcMnemonic() {
-      if (!currentCard) return;
-      const resEl = document.getElementById('fc-ai-result'); resEl.classList.remove('hidden'); resEl.innerHTML = '<div class="text-center text-blue-400 font-bold animate-pulse text-[11px] py-2">✨ AI가 암기 비법을 만들고 있습니다...</div>';
+      if (!currentCard || fcMnemonicLoading) return;
+      fcMnemonicLoading = true;
+
+      const resEl = document.getElementById('fc-ai-result');
+      resEl.classList.remove('hidden');
+      resEl.innerHTML = '<div class="text-center text-blue-400 font-bold animate-pulse text-[11px] py-2">✨ AI가 암기 비법을 만들고 있습니다...</div>';
+
       try {
-        const schema = { type: "OBJECT", properties: { mnemonic: { type: "STRING" } } };
-        const prompt = `과목: ${currentCard.subject}\n질문: ${currentCard.front}\n정답: ${currentCard.back}\n\n수험생이 위 내용을 쉽게 외울 수 있도록, 각 키워드의 앞글자를 딴 기발하고 재미있는 '두음문자 암기법(연상법)'을 만들어주세요. 1~2문장으로 짧고 강렬하게 설명해주세요.`;
-        const res = await callGemini(prompt, schema);
-        resEl.innerHTML = `<strong class="text-blue-600 block mb-1"><i class="ri-magic-line"></i> AI 암기비법:</strong> ${res.mnemonic}`;
-      } catch(e) { resEl.innerHTML = `<span class="text-red-500">오류 발생: ${e.message}</span>`; }
+        const res = await getFcMnemonicViaServer({
+          subject: currentCard.subject,
+          front: currentCard.front,
+          back: currentCard.back,
+        });
+        resEl.innerHTML = `<strong class="text-blue-600 block mb-1"><i class="ri-magic-line"></i> AI 암기비법:</strong> ${escapeHtml(res.mnemonic)}`;
+      } catch (e) {
+        resEl.innerHTML = `<span class="text-red-500">오류 발생: ${escapeHtml(e.message)}</span>`;
+      } finally {
+        fcMnemonicLoading = false;
+      }
     }
 
     async function askAITutor() {
-      if (!currentCard) return;
+      if (!currentCard || fcTutorLoading) return;
       const question = document.getElementById('fc-ask-input').value.trim();
       if (!question) { showMsg("질문을 입력해주세요."); return; }
 
+      const subject = String(currentCard.subject || '').trim();
+      const front = String(currentCard.front || '').trim();
+      const back = String(currentCard.back || '').trim();
+      if (!subject || !front || !back) {
+        showMsg('카드 정보가 불완전합니다.');
+        return;
+      }
+      if (subject.length > 100 || front.length > 500 || back.length > 1000 || question.length > 600) {
+        showMsg('입력 길이가 너무 깁니다.');
+        return;
+      }
+
+      fcTutorLoading = true;
       const resEl = document.getElementById('fc-ask-result');
       resEl.classList.remove('hidden');
       resEl.innerHTML = '<div class="text-center text-slate-400 font-bold animate-pulse py-1">✨ AI 튜터가 답변을 작성 중입니다...</div>';
 
       try {
-        const schema = { type: "OBJECT", properties: { answer: { type: "STRING" } } };
-        const prompt = `과목: ${currentCard.subject}\n주제/질문: ${currentCard.front}\n핵심내용: ${currentCard.back}\n\n사용자의 질문: "${question}"\n\n위 플래시카드 내용을 공부하는 수험생의 질문입니다. 노무사 시험 관점에서 정확하고 이해하기 쉽게 2~3문장으로 답변해주세요.`;
-        const res = await callGemini(prompt, schema);
-        resEl.innerHTML = `<strong class="text-slate-800 block mb-1">A.</strong> ${res.answer}`;
+        const res = await askAiTutorViaServer({ subject, front, back, question });
+        resEl.innerHTML = `<strong class="text-slate-800 block mb-1">A.</strong> ${escapeHtml(res.answer).replace(/\n/g, '<br>')}`;
       } catch(e) {
-        resEl.innerHTML = `<span class="text-red-500">오류 발생: ${e.message}</span>`;
+        resEl.innerHTML = `<span class="text-red-500">오류 발생: ${escapeHtml(e.message)}</span>`;
+      } finally {
+        fcTutorLoading = false;
       }
     }
 
@@ -1439,7 +1654,8 @@
 
       if (dueCards.length === 0) { renderDueFlashcards(); return; }
       currentCard = dueCards[0];
-      
+      fcTutorLoading = false;
+
       document.getElementById('fc-buttons').classList.add('hidden');
       document.querySelectorAll('#fc-buttons .sm2-btn').forEach(btn => btn.classList.remove('ring-4', 'ring-offset-2', 'ring-rose-400', 'ring-orange-400', 'ring-blue-400', 'ring-emerald-400', 'animate-pulse'));
       
@@ -1596,18 +1812,20 @@
     }
 
     async function generateOutlineWithAI() {
-      const subject = document.getElementById('outline-subject').value;
+      if (outlineAiLoading) return;
+      const subject = document.getElementById('outline-subject').value.trim();
       const title = document.getElementById('outline-title').value.trim();
       if (!title) { showMsg("주제(제목)를 먼저 입력해주세요!"); return; }
-      
+      if (!subject) { showMsg("과목을 선택해주세요."); return; }
+      if (subject.length > 100 || title.length > 200) { showMsg("입력 길이가 너무 깁니다."); return; }
+
+      outlineAiLoading = true;
       showLoading("AI가 표준 목차 구조를 작성 중입니다...");
       try {
-        const schema = { type: "OBJECT", properties: { outline: { type: "STRING" } } };
-        const prompt = `과목: ${subject}\n주제: ${title}\n\n위 주제에 대해 노무사 2차 시험 답안지에 쓸 수 있는 핵심 표준 목차를 작성해주세요. 반드시 'I. -> 1. -> (1)' 형태의 번호 체계를 엄격하게 사용해야 합니다. 다른 부가 설명 없이 목차 내용만 출력하세요.`;
-        const res = await callGemini(prompt, schema);
+        const res = await generateOutlineViaServer({ subject, title });
         document.getElementById('outline-content').value = res.outline;
         showMsg("✨ AI 목차 자동 생성 완료!");
-      } catch(e) { showMsg("목차 생성 실패: " + e.message); } finally { hideLoading(); }
+      } catch(e) { showMsg("목차 생성 실패: " + e.message); } finally { hideLoading(); outlineAiLoading = false; }
     }
 
     function toggleOutlineAdder() { 
@@ -1680,6 +1898,7 @@
       generateBlankQuiz();
     }
     function closeBlankQuiz() { 
+      paragraphAiExpandLoading = false;
       document.getElementById('blank-quiz-view').classList.add('hidden'); 
       document.getElementById('blank-list-view').classList.remove('hidden'); 
       document.getElementById('quiz-ai-expand-btn').classList.add('hidden');
@@ -1833,17 +2052,31 @@
 
     async function generateParagraphFromOutline() {
       if (!blankState.outline) return;
+      if (paragraphAiExpandLoading) return;
+      const subject = String(blankState.outline.subject || '').trim();
+      const title = String(blankState.outline.title || '').trim();
+      const outline = String(blankState.outline.content || '').trim();
+      if (!subject || !title || !outline) {
+        showMsg('과목·제목·목차 정보가 필요합니다.');
+        return;
+      }
+      if (subject.length > 100 || title.length > 200 || outline.length > 8000) {
+        showMsg('입력 길이가 너무 깁니다.');
+        return;
+      }
+
+      paragraphAiExpandLoading = true;
       const resEl = document.getElementById('quiz-ai-expand-result');
       resEl.classList.remove('hidden');
       resEl.innerHTML = '<div class="text-center text-purple-400 font-bold animate-pulse text-xs py-2">✨ AI가 목차를 바탕으로 답안을 전개 중입니다...</div>';
 
       try {
-        const schema = { type: "OBJECT", properties: { paragraph: { type: "STRING" } } };
-        const prompt = `과목: ${blankState.outline.subject}\n주제: ${blankState.outline.title}\n목차 구조:\n${blankState.outline.content}\n\n당신은 노무사 2차 수석 합격생입니다. 위 뼈대(목차)만 보고, 실제 시험 답안지에 작성할 법한 매끄럽고 논리적인 모범 단락(줄글)을 1~2개로 전개해서 작성해주세요. 수험생이 이 목차에서 어떤 살을 붙여야 하는지 보여주는 용도입니다. 전문적인 법률/인사 용어를 사용하세요.`;
-        const res = await callGemini(prompt, schema);
-        resEl.innerHTML = `<strong class="text-purple-600 block mb-2"><i class="ri-quill-pen-fill"></i> AI 예시 답안:</strong> ${res.paragraph.replace(/\n/g, '<br>')}`;
+        const res = await generateParagraphViaServer({ subject, title, outline });
+        resEl.innerHTML = `<strong class="text-purple-600 block mb-2"><i class="ri-quill-pen-fill"></i> AI 예시 답안:</strong> ${escapeHtml(res.paragraph).replace(/\n/g, '<br>')}`;
       } catch (e) {
-        resEl.innerHTML = `<span class="text-red-500">오류 발생: ${e.message}</span>`;
+        resEl.innerHTML = `<span class="text-red-500">오류 발생: ${escapeHtml(e.message)}</span>`;
+      } finally {
+        paragraphAiExpandLoading = false;
       }
     }
 
@@ -1981,7 +2214,7 @@
       if (!qText) { showMsg("문제를 입력해주세요."); return; }
 
       if (examState.timer) clearInterval(examState.timer);
-      examState = { subject: sub, question: qText, rubric: combinedRubric, time: time, seconds: time * 60, totalPage: Math.floor(time / 5), currPage: 1, answers: {}, timer: null, uploadedRubricText: examState.uploadedRubricText };
+      examState = { subject: sub, question: qText, rubric: combinedRubric, time: time, seconds: time * 60, totalPage: Math.floor(time / 5), currPage: 1, answers: {}, timer: null, uploadedRubricText: examState.uploadedRubricText, isSubmitting: false };
 
       document.getElementById('room-subject').textContent = sub; document.getElementById('room-q-preview').textContent = qText;
       document.getElementById('room-q-full').textContent = qText; document.getElementById('room-total-page').textContent = examState.totalPage;
@@ -2048,6 +2281,8 @@
     }
 
     async function performSubmitExam() {
+      if (examState.isSubmitting) return;
+      examState.isSubmitting = true;
       exitFullScreen();
       
       clearInterval(examState.timer); showLoading("AI 채점관이 답안을 분석 중입니다...");
@@ -2056,12 +2291,8 @@
           const [ap, al] = a.split('-').map(Number); const [bp, bl] = b.split('-').map(Number); return ap !== bp ? ap - bp : al - bl;
         }).map(k => examState.answers[k]).filter(v => v.trim()).join('\n');
 
-      const schema = { type: "OBJECT", properties: { score: { type: "INTEGER" }, details: { type: "OBJECT", properties: { issue: { type: "INTEGER" }, law: { type: "INTEGER" }, logic: { type: "INTEGER" }, conclusion: { type: "INTEGER" }, format: { type: "INTEGER" } }, required: ["issue", "law", "logic", "conclusion", "format"] }, feedback: { type: "STRING" }, good: { type: "STRING" }, missing: { type: "STRING" }, advice: { type: "STRING" }, next3: { type: "ARRAY", items: { type: "STRING" } } }, required: ["score", "details", "feedback", "good", "missing", "advice", "next3"] };
-      
-      const prompt = `과목: ${examState.subject}\n문제: ${examState.question}\n\n${examState.rubric || "[자료 없음]"}\n\n[학생 답안]\n${fullAnswer || "미작성"}\n\n당신은 아주 깐깐한 노무사 2차 시험 채점위원입니다. 학생 답안을 [기본 모범답안]과 한 줄 한 줄 치밀하게 대조하여 100점 만점 기준으로 채점하세요. 특히 [강사 채점평 및 주의사항]이 있다면, 수험생들이 자주 범하는 오류나 누락 포인트에 이 학생도 빠지지 않았는지 최우선으로 검토하고 가차없이 감점하세요. 쟁점25, 법적근거30, 논리25, 결론10, 형식10 기준으로 세부 점수를 매기고, 구체적인 피드백을 제공하세요.`;
-
       try {
-        const result = await callGemini(prompt, schema);
+        const result = await gradeAnswerViaServer({ subject: examState.subject, question: examState.question, rubric: examState.rubric, fullAnswer });
         result.details = result.details || {}; result.details.issue = result.details.issue || 0; result.details.law = result.details.law || 0; result.details.logic = result.details.logic || 0; result.details.conclusion = result.details.conclusion || 0; result.details.format = result.details.format || 0; result.next3 = result.next3 || [];
         
         const record = { id: Date.now(), date: getToday(), subject: examState.subject, question: examState.question, rubric: examState.rubric, score: result.score, feedback: result, fullAnswer: fullAnswer };
@@ -2078,7 +2309,7 @@
         renderExamResult(record);
       } catch(e) {
         showMsg(e.message); document.getElementById('exam-room').style.display = 'none'; document.getElementById('exam-setup').style.display = 'block';
-      } finally { hideLoading(); }
+      } finally { examState.isSubmitting = false; hideLoading(); }
     }
 
     function renderExamResult(data) {
@@ -2222,7 +2453,6 @@
     window.saveConvertedData = saveConvertedData;
     window.removePreviewItem = removePreviewItem;
     
-    window.saveApiKey = saveApiKey;
     window.exportDB = exportDB;
     window.importDB = importDB;
     window.doImportDB = doImportDB;
