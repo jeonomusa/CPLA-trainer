@@ -377,8 +377,8 @@
 
           <div id="fc-ai-tools" class="w-full max-w-[600px] mx-auto mt-2 md:mt-4 mb-4">
             <div class="flex justify-center gap-2 mb-2 md:mb-3">
-              <button onclick="getFcHint()" class="px-3 py-1.5 bg-purple-50 border border-purple-100 text-purple-600 rounded-full text-[10px] md:text-[11px] font-bold hover:bg-purple-100 shadow-sm">✨ AI 힌트</button>
-              <button onclick="getFcMnemonic()" class="px-3 py-1.5 bg-indigo-50 border border-indigo-100 text-indigo-600 rounded-full text-[10px] md:text-[11px] font-bold hover:bg-indigo-100 shadow-sm">✨ AI 암기비법</button>
+              <button type="button" id="fc-hint-btn" onclick="getFcHint()" class="px-3 py-1.5 bg-purple-50 border border-purple-100 text-purple-600 rounded-full text-[10px] md:text-[11px] font-bold hover:bg-purple-100 shadow-sm disabled:opacity-50 disabled:pointer-events-none">✨ AI 힌트</button>
+              <button type="button" id="fc-mnemonic-btn" onclick="getFcMnemonic()" class="px-3 py-1.5 bg-indigo-50 border border-indigo-100 text-indigo-600 rounded-full text-[10px] md:text-[11px] font-bold hover:bg-indigo-100 shadow-sm disabled:opacity-50 disabled:pointer-events-none">✨ AI 암기비법</button>
             </div>
             
             <div class="mt-3 flex gap-2">
@@ -626,7 +626,7 @@
           <div class="bg-white p-3 border border-gray-200 rounded-xl flex items-center justify-between gap-4 md:gap-6 shadow-sm">
             <div class="text-center"><p class="text-[9px] md:text-[10px] font-bold text-gray-400">총 글자수</p><p class="text-base md:text-lg font-extrabold text-emerald-500" id="char-count">0</p></div>
             <div class="text-center"><p class="text-[9px] md:text-[10px] font-bold text-gray-400">페이지</p><p class="text-base md:text-lg font-extrabold text-slate-800"><span id="room-curr-page">1</span> / <span id="room-total-page">20</span></p></div>
-            <button onclick="submitExam(false)" class="px-4 md:px-6 py-2 md:py-3 bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs md:text-sm rounded-lg active:scale-95">제출</button>
+            <button type="button" id="exam-submit-btn" onclick="submitExam(false)" class="px-4 md:px-6 py-2 md:py-3 bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs md:text-sm rounded-lg active:scale-95 disabled:opacity-50 disabled:pointer-events-none">제출</button>
           </div>
         </div>
 
@@ -855,6 +855,105 @@
         .replace(/>/g, '&gt;')
         .replace(/\"/g, '&quot;')
         .replace(/'/g, '&#39;');
+    }
+
+    /**
+     * AI 버튼/요청 공통: 연타 방지 · 로딩 표시 · 사용자용 에러 · 빈 응답 옵션
+     * overlayLoading: true면 전역 로딩 오버레이(#loading-text)만 갱신하고 버튼은 비활성만 유지
+     */
+    async function runAiButtonAction({
+      button = null,
+      statusEl = null,
+      overlayLoading = false,
+      getBusy,
+      setBusy,
+      loadingLabel,
+      execute,
+      onSuccess,
+      onError,
+      emptyFallback = '',
+      isEmptyResult = null,
+    }) {
+      if (getBusy()) return;
+
+      setBusy(true);
+
+      if (button) {
+        button.disabled = true;
+        if (!button.dataset.originalText) button.dataset.originalText = button.textContent;
+      }
+
+      const renderLoading = (text) => {
+        const t = text == null ? '' : String(text);
+        if (overlayLoading) {
+          const lt = document.getElementById('loading-text');
+          if (lt) lt.textContent = t;
+        } else if (statusEl) {
+          statusEl.textContent = t;
+        } else if (button) {
+          button.textContent = t;
+        }
+      };
+
+      let t0 = Date.now();
+      let tick = null;
+
+      if (overlayLoading) {
+        showLoading(typeof loadingLabel === 'function' ? loadingLabel(0) : (loadingLabel || '처리 중입니다...'));
+      }
+
+      if (typeof loadingLabel === 'function') {
+        if (!overlayLoading) renderLoading(loadingLabel(0));
+        tick = setInterval(() => {
+          renderLoading(loadingLabel((Date.now() - t0) / 1000));
+        }, 500);
+      } else if (loadingLabel && !overlayLoading) {
+        renderLoading(loadingLabel);
+      }
+
+      try {
+        const data = await execute();
+
+        let empty =
+          typeof isEmptyResult === 'function'
+            ? !!isEmptyResult(data)
+            : typeof data?.text === 'string' && !data.text.trim();
+
+        if (emptyFallback && empty) {
+          onError(emptyFallback);
+          return;
+        }
+
+        onSuccess(data);
+      } catch (e) {
+        const raw = String(e?.message || '');
+
+        const userMsg =
+          /network|fetch|failed\s+to\s+fetch|load\s+failed|Load failed/i.test(raw)
+            ? '네트워크 상태를 확인한 뒤 다시 시도해주세요.'
+            : /^HTTP\s5\d\d/i.test(raw) || /서버 처리|서버가 잠시|Server error/i.test(raw)
+              ? '서버가 잠시 응답하지 않습니다. 잠시 후 다시 시도해주세요.'
+              : raw || '요청 처리에 실패했습니다. 잠시 후 다시 시도해주세요.';
+
+        onError(userMsg);
+      } finally {
+        if (tick) clearInterval(tick);
+
+        setBusy(false);
+
+        if (overlayLoading) {
+          hideLoading();
+        } else if (statusEl) {
+          statusEl.textContent = '';
+        }
+
+        if (button) {
+          button.disabled = false;
+          if (button.dataset.originalText != null) {
+            button.textContent = button.dataset.originalText;
+          }
+        }
+      }
     }
 
     function getLocalYYYYMMDD(d) {
@@ -1475,47 +1574,67 @@
     }
 
     async function getFcHint() {
-      if (!currentCard || fcHintLoading) return;
-      fcHintLoading = true;
-
+      if (!currentCard) return;
+      const btn = document.getElementById('fc-hint-btn');
       const resEl = document.getElementById('fc-ai-result');
-      resEl.classList.remove('hidden');
-      resEl.innerHTML = '<div class="text-center text-purple-400 font-bold animate-pulse text-[11px] py-2">✨ AI가 힌트를 고민하고 있습니다...</div>';
 
-      try {
-        const res = await getFcHintViaServer({
-          subject: currentCard.subject,
-          front: currentCard.front,
-          back: currentCard.back,
-        });
-        resEl.innerHTML = `<strong class="text-purple-600 block mb-1"><i class="ri-lightbulb-flash-line"></i> AI 힌트:</strong> ${escapeHtml(res.hint)}`;
-      } catch (e) {
-        resEl.innerHTML = `<span class="text-red-500">오류 발생: ${escapeHtml(e.message)}</span>`;
-      } finally {
-        fcHintLoading = false;
-      }
+      await runAiButtonAction({
+        button: btn,
+        getBusy: () => fcHintLoading,
+        setBusy: (v) => { fcHintLoading = v; },
+        loadingLabel: (sec) =>
+          sec < 5 ? '힌트 생성 중…' :
+          sec < 10 ? '조금 더 걸리고 있어요…' :
+                     '응답 대기 중…',
+        execute: async () =>
+          getFcHintViaServer({
+            subject: currentCard.subject,
+            front: currentCard.front,
+            back: currentCard.back,
+          }),
+        isEmptyResult: (r) => !String(r?.hint || '').trim(),
+        emptyFallback: '힌트를 만들지 못했습니다. 잠시 후 다시 시도해주세요.',
+        onSuccess: (res) => {
+          resEl.classList.remove('hidden');
+          resEl.innerHTML = `<strong class="text-purple-600 block mb-1"><i class="ri-lightbulb-flash-line"></i> AI 힌트:</strong> ${escapeHtml(res.hint)}`;
+        },
+        onError: (msg) => {
+          resEl.classList.remove('hidden');
+          resEl.innerHTML = `<span class="text-red-500">${escapeHtml(msg)}</span>`;
+        },
+      });
     }
 
     async function getFcMnemonic() {
-      if (!currentCard || fcMnemonicLoading) return;
-      fcMnemonicLoading = true;
-
+      if (!currentCard) return;
+      const btn = document.getElementById('fc-mnemonic-btn');
       const resEl = document.getElementById('fc-ai-result');
-      resEl.classList.remove('hidden');
-      resEl.innerHTML = '<div class="text-center text-blue-400 font-bold animate-pulse text-[11px] py-2">✨ AI가 암기 비법을 만들고 있습니다...</div>';
 
-      try {
-        const res = await getFcMnemonicViaServer({
-          subject: currentCard.subject,
-          front: currentCard.front,
-          back: currentCard.back,
-        });
-        resEl.innerHTML = `<strong class="text-blue-600 block mb-1"><i class="ri-magic-line"></i> AI 암기비법:</strong> ${escapeHtml(res.mnemonic)}`;
-      } catch (e) {
-        resEl.innerHTML = `<span class="text-red-500">오류 발생: ${escapeHtml(e.message)}</span>`;
-      } finally {
-        fcMnemonicLoading = false;
-      }
+      await runAiButtonAction({
+        button: btn,
+        getBusy: () => fcMnemonicLoading,
+        setBusy: (v) => { fcMnemonicLoading = v; },
+        loadingLabel: (sec) =>
+          sec < 5 ? '암기비법 생성 중…' :
+          sec < 10 ? '조금 더 걸리고 있어요…' :
+                     '응답 대기 중…',
+        execute: async () =>
+          getFcMnemonicViaServer({
+            subject: currentCard.subject,
+            front: currentCard.front,
+            back: currentCard.back,
+          }),
+        isEmptyResult: (r) => !String(r?.mnemonic || '').trim(),
+        emptyFallback: '암기비법을 만들지 못했습니다. 잠시 후 다시 시도해주세요.',
+        onSuccess: (res) => {
+          resEl.classList.remove('hidden');
+          resEl.innerHTML = `<strong class="text-blue-600 block mb-1"><i class="ri-magic-line"></i> AI 암기비법:</strong> ${escapeHtml(res.mnemonic)}`;
+        },
+        onError: (msg) => {
+          resEl.classList.remove('hidden');
+          resEl.innerHTML = `<span class="text-red-500">${escapeHtml(msg)}</span>`;
+        },
+      });
     }
 
     async function askAITutor() {
@@ -2281,35 +2400,71 @@
     }
 
     async function performSubmitExam() {
-      if (examState.isSubmitting) return;
-      examState.isSubmitting = true;
-      exitFullScreen();
-      
-      clearInterval(examState.timer); showLoading("AI 채점관이 답안을 분석 중입니다...");
+      const submitBtn = document.getElementById('exam-submit-btn');
 
-      const fullAnswer = Object.keys(examState.answers).sort((a, b) => {
-          const [ap, al] = a.split('-').map(Number); const [bp, bl] = b.split('-').map(Number); return ap !== bp ? ap - bp : al - bl;
-        }).map(k => examState.answers[k]).filter(v => v.trim()).join('\n');
+      await runAiButtonAction({
+        button: submitBtn,
+        overlayLoading: true,
+        getBusy: () => examState.isSubmitting,
+        setBusy: (v) => { examState.isSubmitting = v; },
+        loadingLabel: (sec) =>
+          sec < 8 ? 'AI 채점관이 답안을 분석 중입니다...' :
+          sec < 16 ? '조금 더 걸리고 있습니다...' :
+                     '응답을 기다리는 중입니다. 잠시만 기다려주세요.',
+        execute: async () => {
+          exitFullScreen();
+          clearInterval(examState.timer);
+          const fullAnswer = Object.keys(examState.answers).sort((a, b) => {
+            const [ap, al] = a.split('-').map(Number); const [bp, bl] = b.split('-').map(Number); return ap !== bp ? ap - bp : al - bl;
+          }).map(k => examState.answers[k]).filter(v => v.trim()).join('\n');
+          const result = await gradeAnswerViaServer({
+            subject: examState.subject,
+            question: examState.question,
+            rubric: examState.rubric,
+            fullAnswer,
+          });
+          return { result, fullAnswer };
+        },
+        isEmptyResult: (payload) => payload?.result == null || typeof payload.result.score !== 'number',
+        emptyFallback: '채점 결과를 받지 못했습니다. 잠시 후 다시 시도해주세요.',
+        onSuccess: ({ result, fullAnswer }) => {
+          result.details = result.details || {};
+          result.details.issue = result.details.issue || 0;
+          result.details.law = result.details.law || 0;
+          result.details.logic = result.details.logic || 0;
+          result.details.conclusion = result.details.conclusion || 0;
+          result.details.format = result.details.format || 0;
+          result.next3 = result.next3 || [];
 
-      try {
-        const result = await gradeAnswerViaServer({ subject: examState.subject, question: examState.question, rubric: examState.rubric, fullAnswer });
-        result.details = result.details || {}; result.details.issue = result.details.issue || 0; result.details.law = result.details.law || 0; result.details.logic = result.details.logic || 0; result.details.conclusion = result.details.conclusion || 0; result.details.format = result.details.format || 0; result.next3 = result.next3 || [];
-        
-        const record = { id: Date.now(), date: getToday(), subject: examState.subject, question: examState.question, rubric: examState.rubric, score: result.score, feedback: result, fullAnswer: fullAnswer };
-        db.history.push(record); 
-        markStudiedToday('exam'); 
-        saveDB();
-        
-        examState.uploadedRubricText = ''; 
-        document.getElementById('exam-rubric-file').value = '';
-        document.getElementById('exam-rubric-name').innerHTML = `<i class="ri-upload-cloud-2-line mr-1"></i>여기를 눌러 PDF 첨부`;
-        document.getElementById('exam-rubric-text').value = '';
+          const record = {
+            id: Date.now(),
+            date: getToday(),
+            subject: examState.subject,
+            question: examState.question,
+            rubric: examState.rubric,
+            score: result.score,
+            feedback: result,
+            fullAnswer,
+          };
+          db.history.push(record);
+          markStudiedToday('exam');
+          saveDB();
 
-        document.getElementById('exam-room').style.display = 'none'; document.getElementById('exam-setup').style.display = 'block';
-        renderExamResult(record);
-      } catch(e) {
-        showMsg(e.message); document.getElementById('exam-room').style.display = 'none'; document.getElementById('exam-setup').style.display = 'block';
-      } finally { examState.isSubmitting = false; hideLoading(); }
+          examState.uploadedRubricText = '';
+          document.getElementById('exam-rubric-file').value = '';
+          document.getElementById('exam-rubric-name').innerHTML = `<i class="ri-upload-cloud-2-line mr-1"></i>여기를 눌러 PDF 첨부`;
+          document.getElementById('exam-rubric-text').value = '';
+
+          document.getElementById('exam-room').style.display = 'none';
+          document.getElementById('exam-setup').style.display = 'block';
+          renderExamResult(record);
+        },
+        onError: (msg) => {
+          showMsg(msg);
+          document.getElementById('exam-room').style.display = 'none';
+          document.getElementById('exam-setup').style.display = 'block';
+        },
+      });
     }
 
     function renderExamResult(data) {
