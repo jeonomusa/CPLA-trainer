@@ -21,6 +21,11 @@ import { logGroundingObservation } from "./_grounding_log.js";
 const DEFAULT_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
+const MAX_QUESTION = 12000;
+const MAX_RUBRIC = 32000;
+const MAX_FULL_ANSWER = 24000;
+const MAX_REQUEST_BODY_BYTES = 4_500_000;
+
 function setCors(res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -40,6 +45,25 @@ function safeInt(n, fallback = 0) {
 
 function clamp(n, min, max) {
   return Math.max(min, Math.min(max, n));
+}
+
+function truncateText(value, maxLen) {
+  const s = typeof value === "string" ? value : String(value ?? "");
+  if (s.length <= maxLen) return s;
+  return s.slice(0, maxLen) + "\n…[길이 제한으로 이후 생략]";
+}
+
+function parseGeminiErrorText(text) {
+  const raw = String(text || "").trim();
+  if (!raw) return "";
+  try {
+    const j = JSON.parse(raw);
+    const msg = j?.error?.message || j?.message;
+    if (typeof msg === "string" && msg.trim()) return msg.trim().slice(0, 800);
+  } catch {
+    /* not JSON */
+  }
+  return raw.slice(0, 800);
 }
 
 function normalizeCoreScores(result) {
@@ -111,8 +135,12 @@ async function callGeminiServer({ prompt, schema }) {
 
       if (!r.ok) {
         const text = await r.text().catch(() => "");
-        const err = new Error(text || `Gemini HTTP ${r.status}`);
-        err.statusCode = r.status === 429 ? 429 : 502;
+        const detail = parseGeminiErrorText(text);
+        const err = new Error(
+          detail || `Gemini HTTP ${r.status}`,
+        );
+        err.statusCode =
+          r.status === 429 ? 429 : r.status >= 500 ? 502 : 502;
         throw err;
       }
 
@@ -129,7 +157,14 @@ async function callGeminiServer({ prompt, schema }) {
         err.statusCode = 502;
         throw err;
       }
-      return JSON.parse(match[0]);
+      try {
+        return JSON.parse(match[0]);
+      } catch (parseErr) {
+        const err = new Error("AI 응답 JSON 파싱 실패");
+        err.statusCode = 502;
+        err.cause = parseErr;
+        throw err;
+      }
     } catch (e) {
       lastErr = e;
       if (i === 2) break;
@@ -289,10 +324,23 @@ export default async function handler(req, res) {
 
   try {
     const body = await readJsonBody(req);
+    const bodyBytes = Buffer.byteLength(JSON.stringify(body || {}), "utf8");
+    if (bodyBytes > MAX_REQUEST_BODY_BYTES) {
+      return sendJson(res, 413, {
+        message: `요청 본문이 너무 큽니다 (${Math.round(bodyBytes / 1024)}KB). 루브릭·답안·첨부 분량을 줄여 주세요.`,
+      });
+    }
+
     const subject = String(body?.subject || "").trim();
-    const question = String(body?.question || "").trim();
-    const rubric = typeof body?.rubric === "string" ? body.rubric : "";
-    const fullAnswer = typeof body?.fullAnswer === "string" ? body.fullAnswer : "";
+    const question = truncateText(body?.question, MAX_QUESTION).trim();
+    const rubric = truncateText(
+      typeof body?.rubric === "string" ? body.rubric : "",
+      MAX_RUBRIC,
+    );
+    const fullAnswer = truncateText(
+      typeof body?.fullAnswer === "string" ? body.fullAnswer : "",
+      MAX_FULL_ANSWER,
+    );
 
     if (!subject || !question) {
       return sendJson(res, 400, {
@@ -457,16 +505,21 @@ export default async function handler(req, res) {
 
     return sendJson(res, 200, payload);
   } catch (e) {
+    console.error("[grade-answer] failed:", e?.stack || e);
     const status =
       typeof e?.statusCode === "number"
         ? e.statusCode
         : String(e?.message || "").includes("429")
           ? 429
           : 500;
-    const message =
-      status === 429
-        ? "무료 API 호출 한도를 초과했습니다. 잠시 후 시도해주세요."
-        : e?.message || "Server error";
+    let message = e?.message || "Server error";
+    if (status === 429) {
+      message = "무료 API 호출 한도를 초과했습니다. 잠시 후 시도해주세요.";
+    } else if (status === 502) {
+      message =
+        message ||
+        "채점 AI 서버가 응답하지 못했습니다. 잠시 후 다시 시도하거나 루브릭·답안 길이를 줄여 보세요.";
+    }
     return sendJson(res, status, { message });
   }
 }

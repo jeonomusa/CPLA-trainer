@@ -11,6 +11,15 @@ Production: `https://cpla-trainer.vercel.app`
 
 GitHub 저장소와 Vercel이 연동되어 있으며, `main` 브랜치에 push하면 자동으로 재배포됩니다.
 
+### Vercel 환경 변수 (필수)
+
+| 변수 | 설명 |
+|------|------|
+| `GEMINI_API_KEY` | Google Gemini API 키 (모든 `/api/*` AI 라우트) |
+| `GEMINI_MODEL` | (선택) 기본 `gemini-2.5-flash` |
+
+채점(`/api/grade-answer`)이 `502`이면 Vercel **Functions → Logs**에서 `[grade-answer] failed:` 로그를 확인하세요. 키 누락 시 `500`과 `GEMINI_API_KEY is missing` 메시지가 납니다.
+
 ---
 
 ## Main Features

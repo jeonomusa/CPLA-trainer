@@ -1129,19 +1129,43 @@
       })).filter(m => m.text.trim().length > 2);
     }
 
-    async function gradeAnswerViaServer(body) {
-      const res = await fetch('/api/grade-answer', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      let data = null;
-      try { data = await res.json(); } catch (e) {}
-      if (!res.ok) {
-        const msg = (data && data.message) ? data.message : `HTTP ${res.status}`;
-        throw new Error(msg);
+    async function gradeAnswerViaServer(body, opts) {
+      const options = opts || {};
+      const postOnce = async (payload) => {
+        const res = await fetch('/api/grade-answer', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        let data = null;
+        try { data = await res.json(); } catch (e) {}
+        if (!res.ok) {
+          const msg = (data && data.message)
+            ? data.message
+            : res.status === 502
+              ? '채점 서버가 응답하지 못했습니다(시간 초과·AI 오류 가능). 잠시 후 다시 시도하거나 루브릭·답안 길이를 줄여 보세요.'
+              : `HTTP ${res.status}`;
+          const err = new Error(msg);
+          err.httpStatus = res.status;
+          throw err;
+        }
+        return data;
+      };
+
+      try {
+        return await postOnce(body);
+      } catch (e) {
+        const canLegacyFallback =
+          options.allowLegacyFallback !== false &&
+          body &&
+          Object.prototype.hasOwnProperty.call(body, 'materials') &&
+          (e.httpStatus === 502 || e.httpStatus === 503 || e.httpStatus === 504);
+        if (!canLegacyFallback) throw e;
+        const { materials, ...legacyBody } = body;
+        void materials;
+        showMsg('자료 기반 채점 서버 오류 — 모범답안 기준(무자료)으로 한 번 더 시도합니다…');
+        return await postOnce(legacyBody);
       }
-      return data;
     }
 
     async function examGroundedExplainViaServer(body) {

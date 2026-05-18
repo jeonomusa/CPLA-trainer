@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "api/grade-answer.js": {
+      "maxDuration": 60
+    },
+    "api/exam-grounded-explain.js": {
+      "maxDuration": 60
+    }
+  }
+}
