@@ -171,7 +171,8 @@
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-6">
         <div class="lg:col-span-2 neo-card p-4 md:p-6">
-          <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2 text-sm md:text-base"><i class="ri-bar-chart-box-line text-blue-500"></i> 최근 7일 학습량</h3>
+          <h3 class="font-bold text-slate-800 mb-1 flex items-center gap-2 text-sm md:text-base"><i class="ri-bar-chart-box-line text-blue-500"></i> 최근 7일 학습량</h3>
+          <p id="weekly-chart-summary" class="text-[11px] text-slate-400 mb-4 font-medium"></p>
           <div class="chart-wrapper"><canvas id="chart-weekly"></canvas></div>
         </div>
         <div class="neo-card p-4 md:p-6">
@@ -1933,18 +1934,124 @@
             if(typeof db.studyLog[date] === 'number') return 0;
             return db.studyLog[date].outline || 0;
         });
-        const labels = last7Days.map(date => date.slice(5).replace('-','/')); 
+        const labels = last7Days.map(date => date.slice(5).replace('-','/'));
+        const maxFc = Math.max(...weeklyDataFc, 0);
+        const maxOutline = Math.max(...weeklyDataOutline, 0);
+        const cardAxisMax = Math.max(20, Math.ceil(maxFc * 1.2 / 10) * 10);
+        const outlineAxisMax = Math.max(5, Math.ceil(maxOutline * 1.2 / 5) * 5);
+        const cardStep = Math.max(10, Math.ceil(cardAxisMax / 5 / 10) * 10);
+        const outlineStep = Math.max(1, Math.ceil(outlineAxisMax / 5));
+
+        const weeklySummaryEl = document.getElementById('weekly-chart-summary');
+        if (weeklySummaryEl) {
+          const sumFc = weeklyDataFc.reduce((a, b) => a + b, 0);
+          const sumOutline = weeklyDataOutline.reduce((a, b) => a + b, 0);
+          weeklySummaryEl.textContent = `최근 7일 목차 ${sumOutline}회 · 카드 ${sumFc}장`;
+        }
 
         if(chartInstances['weekly']) chartInstances['weekly'].destroy();
         chartInstances['weekly'] = new Chart(ctxWeekly, {
+            type: 'bar',
             data: {
                 labels: labels,
                 datasets: [
-                    { type: 'line', label: '목차 (회)', data: weeklyDataOutline, borderColor: '#f59e0b', backgroundColor: '#f59e0b', borderWidth: 2, tension: 0.3, fill: false, pointBackgroundColor: '#f59e0b', order: 1 },
-                    { type: 'bar', label: '카드 (장)', data: weeklyDataFc, backgroundColor: 'rgba(16, 185, 129, 0.8)', borderRadius: 4, order: 2 }
+                    {
+                      type: 'bar',
+                      label: '플래시카드 (장)',
+                      data: weeklyDataFc,
+                      yAxisID: 'y',
+                      backgroundColor: 'rgba(16, 185, 129, 0.78)',
+                      borderColor: 'rgba(16, 185, 129, 1)',
+                      borderWidth: 1,
+                      borderRadius: 8,
+                      barThickness: 28,
+                      order: 2,
+                    },
+                    {
+                      type: 'line',
+                      label: '목차 (회)',
+                      data: weeklyDataOutline,
+                      yAxisID: 'y1',
+                      borderColor: '#f59e0b',
+                      backgroundColor: '#f59e0b',
+                      borderWidth: 3,
+                      tension: 0.35,
+                      fill: false,
+                      pointRadius: 5,
+                      pointHoverRadius: 6,
+                      pointBackgroundColor: '#f59e0b',
+                      pointBorderColor: '#ffffff',
+                      pointBorderWidth: 2,
+                      order: 1,
+                    },
                 ]
             },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'top', labels: { boxWidth: 10, font: { size: 10, family: 'Pretendard' } } } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 }, suggestedMax: 120 } } }
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              interaction: { mode: 'index', intersect: false },
+              plugins: {
+                legend: {
+                  display: true,
+                  position: 'top',
+                  labels: {
+                    usePointStyle: true,
+                    boxWidth: 10,
+                    font: { size: 10, family: 'Pretendard' },
+                    color: '#475569',
+                  },
+                },
+                tooltip: {
+                  callbacks: {
+                    label(context) {
+                      const label = context.dataset.label || '';
+                      const value = context.raw ?? 0;
+                      return `${label}: ${value}`;
+                    },
+                  },
+                },
+              },
+              scales: {
+                x: {
+                  grid: { display: false },
+                  ticks: { color: '#64748b', font: { size: 10, family: 'Pretendard' } },
+                },
+                y: {
+                  position: 'left',
+                  beginAtZero: true,
+                  max: cardAxisMax,
+                  title: {
+                    display: true,
+                    text: '플래시카드 (장)',
+                    color: '#10b981',
+                    font: { size: 10, family: 'Pretendard', weight: '700' },
+                  },
+                  ticks: {
+                    stepSize: cardStep,
+                    precision: 0,
+                    color: '#64748b',
+                  },
+                  grid: { color: 'rgba(148, 163, 184, 0.18)' },
+                },
+                y1: {
+                  position: 'right',
+                  beginAtZero: true,
+                  max: outlineAxisMax,
+                  title: {
+                    display: true,
+                    text: '목차 (회)',
+                    color: '#f59e0b',
+                    font: { size: 10, family: 'Pretendard', weight: '700' },
+                  },
+                  ticks: {
+                    stepSize: outlineStep,
+                    precision: 0,
+                    color: '#64748b',
+                  },
+                  grid: { drawOnChartArea: false },
+                },
+              },
+            },
         });
       }
 
