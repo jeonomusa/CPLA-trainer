@@ -64,6 +64,8 @@
     .word-chip:hover { background: #e2e8f0; color: #0f172a; }
     .word-chip:active { transform: scale(0.95); }
 
+    .fc-preserve-lines { white-space: pre-line; }
+
     .answer-row { display: flex; border-bottom: 1px solid #e2e8f0; height: 44px; position: relative; }
     .row-num { width: 44px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #94a3b8; font-weight: 700; border-right: 1px solid #e2e8f0; background: #f8fafc; flex-shrink: 0; }
     .row-input-wrapper { flex: 1; position: relative; display: flex; align-items: center; background: white; min-width: 0; }
@@ -354,11 +356,11 @@
                   <span class="text-[10px] md:text-xs font-bold text-emerald-500 bg-emerald-50 px-2 md:px-3 py-1 rounded-full truncate max-w-[60%]" id="fc-front-sub"></span>
                   <span class="text-[10px] md:text-xs font-bold px-2 md:px-3 py-1 rounded-full shrink-0" id="fc-front-status"></span>
                 </div>
-                <p class="text-lg md:text-xl font-extrabold text-slate-800 leading-relaxed break-keep" id="fc-front-text"></p>
+                <p class="text-lg md:text-xl font-extrabold text-slate-800 leading-relaxed break-keep fc-preserve-lines" id="fc-front-text"></p>
                 <div class="absolute bottom-4 md:bottom-6 text-[10px] md:text-xs font-bold text-gray-300 flex items-center gap-1"><i class="ri-tap-line"></i> 클릭하여 정답 확인</div>
               </div>
               <div class="fc-back overflow-y-auto no-scrollbar">
-                <p class="text-sm md:text-base font-semibold leading-relaxed break-keep" id="fc-back-text"></p>
+                <p class="text-sm md:text-base font-semibold leading-relaxed break-keep fc-preserve-lines" id="fc-back-text"></p>
               </div>
             </div>
           </div>
@@ -368,8 +370,8 @@
                <div class="text-[10px] md:text-xs font-bold text-emerald-500 inline-block bg-emerald-50 px-2 py-1 rounded-full" id="fc-cloze-sub"></div>
                <div class="text-[10px] md:text-xs font-bold inline-block px-2 py-1 rounded-full" id="fc-cloze-status"></div>
              </div>
-             <div class="text-lg md:text-xl font-extrabold text-slate-800 mb-4 md:mb-6 pb-3 md:pb-4 border-b border-gray-100 break-keep" id="fc-cloze-front"></div>
-             <div class="text-[14px] md:text-[15px] leading-loose text-slate-700 font-medium mb-6 md:mb-8 break-keep" id="fc-cloze-back"></div>
+             <div class="text-lg md:text-xl font-extrabold text-slate-800 mb-4 md:mb-6 pb-3 md:pb-4 border-b border-gray-100 break-keep fc-preserve-lines" id="fc-cloze-front"></div>
+             <div class="text-[14px] md:text-[15px] leading-loose text-slate-700 font-medium mb-6 md:mb-8 break-keep fc-preserve-lines" id="fc-cloze-back"></div>
              <div class="text-center mt-2 md:mt-4">
                <button id="fc-cloze-check-btn" onclick="checkFcClozeAnswers()" class="w-full md:w-auto px-6 py-2.5 bg-emerald-500 text-white rounded-xl text-sm font-bold hover:bg-emerald-600 shadow-sm active:scale-95">정답 확인하기</button>
              </div>
@@ -2717,25 +2719,34 @@
       }
     }
 
+    function normalizeFcClozeBackText(back) {
+      const s = String(back || '').replace(/\r\n/g, '\n');
+      if (!s.includes('\n') && /\d+\.\s/.test(s)) {
+        return s.replace(/\s+(?=\d+\.\s)/g, '\n');
+      }
+      return s;
+    }
+
     function renderFcClozeCard(card) {
       document.getElementById('fc-cloze-sub').textContent = card.subject || ''; document.getElementById('fc-cloze-front').textContent = card.front || '';
       document.getElementById('fc-cloze-check-btn').classList.remove('hidden');
       
       const container = document.getElementById('fc-cloze-back');
+      const backText = normalizeFcClozeBackText(card.back);
       const regex = /\[(.*?)\]/g; let html = ''; let match; let lastIdx = 0; fcClozeState.answers = [];
 
       let matches = []; let tempMatch; const tempRegex = /\[(.*?)\]/g;
-      while ((tempMatch = tempRegex.exec(card.back)) !== null) { matches.push(tempMatch[1]); }
+      while ((tempMatch = tempRegex.exec(backText)) !== null) { matches.push(tempMatch[1]); }
       const maxCharLen = matches.length > 0 ? Math.max(...matches.map(x => x.length)) : 10;
       const uniformWidth = `clamp(60px, ${maxCharLen + 2}ch, 100%)`;
 
-      while ((match = regex.exec(card.back)) !== null) {
-        html += card.back.substring(lastIdx, match.index);
+      while ((match = regex.exec(backText)) !== null) {
+        html += escapeHtml(backText.substring(lastIdx, match.index));
         const ans = match[1].trim(); fcClozeState.answers.push(ans);
-        html += `<input type="text" class="fc-blank-input blank-input" data-answer="${ans}" style="width: ${uniformWidth};" onclick="setFcActiveInput(this)" placeholder="">`;
+        html += `<input type="text" class="fc-blank-input blank-input" data-answer="${escapeHtml(ans)}" style="width: ${uniformWidth};" onclick="setFcActiveInput(this)" placeholder="">`;
         lastIdx = regex.lastIndex;
       }
-      html += card.back.substring(lastIdx); container.innerHTML = html;
+      html += escapeHtml(backText.substring(lastIdx)); container.innerHTML = html;
 
       const bank = document.getElementById('fc-cloze-word-bank'); bank.innerHTML = '';
       const shuffled = [...fcClozeState.answers].sort(() => Math.random() - 0.5);
