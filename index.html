@@ -520,6 +520,13 @@
                 <input type="file" id="exam-rubric-file" class="hidden" accept=".pdf" onchange="handleExamRubricUpload(event)">
                 <span class="font-bold text-[11px] md:text-sm text-emerald-600" id="exam-rubric-name">여기를 눌러 PDF 첨부</span>
               </label>
+              <div id="rubric-preview-area" class="hidden mt-2">
+                <div class="flex justify-between items-center mb-1">
+                  <span class="text-[10px] md:text-xs font-bold text-emerald-700">PDF에서 뽑은 내용 · 고칠 수 있어요</span>
+                  <span class="text-[10px] text-gray-500" id="rubric-preview-count">0자</span>
+                </div>
+                <textarea id="exam-rubric-preview" oninput="syncRubricPreview()" class="w-full h-32 p-3 bg-white rounded-lg border border-emerald-200 outline-none text-xs md:text-[13px] resize-y focus:ring-1 focus:ring-emerald-500 leading-relaxed" placeholder="PDF에서 뽑힌 텍스트가 여기에 표시됩니다."></textarea>
+              </div>
             </div>
             
             <div id="rubric-text-area" class="hidden">
@@ -770,7 +777,7 @@
     <button class="nav-btn flex-1 min-w-[50px]" id="m-nav-settings" onclick="navigate('settings')"><i class="ri-settings-4-line text-lg"></i><span class="text-[9px] whitespace-nowrap">설정</span></button>
   </div>
 
-  <script src="js/app.js?v=20261125i"></script>
+  <script src="js/app.js?v=20261125j"></script>
 
   <script type="module" src="js/firebase.js?v=20261125i"></script>
 </body>

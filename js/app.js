@@ -2425,14 +2425,68 @@
 
     function cancelExamEdit() { editingExamId = null; document.getElementById('exam-edit-form').classList.add('hidden'); }
 
+    // PDF 텍스트 아이템을 y좌표로 줄을 묶어 표 구조를 최대한 살린다.
+    function pdfItemsToText(items) {
+      const lines = [];
+      (items || []).forEach((it) => {
+        const str = it && it.str ? it.str : '';
+        if (!str.trim()) return;
+        const y = it.transform ? it.transform[5] : 0;
+        const x = it.transform ? it.transform[4] : 0;
+        let line = null;
+        for (let i = 0; i < lines.length; i++) { if (Math.abs(lines[i].y - y) <= 3) { line = lines[i]; break; } }
+        if (!line) { line = { y: y, parts: [] }; lines.push(line); }
+        line.parts.push({ x: x, str: str });
+      });
+      lines.sort((a, b) => b.y - a.y);
+      return lines.map((l) => l.parts.sort((a, b) => a.x - b.x).map((p) => p.str).join(' ').replace(/[ \t]+/g, ' ').trim()).filter(Boolean).join('\n');
+    }
+
+    function rubricCharCount(text) { return (text || '').replace(/\s/g, '').length; }
+
+    function renderRubricPreview(text) {
+      const area = document.getElementById('rubric-preview-area');
+      const box = document.getElementById('exam-rubric-preview');
+      const cnt = document.getElementById('rubric-preview-count');
+      if (area) area.classList.remove('hidden');
+      if (box) box.value = text || '';
+      if (cnt) cnt.textContent = rubricCharCount(text) + '자';
+    }
+
+    function syncRubricPreview() {
+      const box = document.getElementById('exam-rubric-preview');
+      const cnt = document.getElementById('rubric-preview-count');
+      if (!box) return;
+      examState.uploadedRubricText = box.value;
+      if (cnt) cnt.textContent = rubricCharCount(box.value) + '자';
+    }
+
     async function handleExamRubricUpload(e) {
       const file = e.target.files[0]; if(!file) return;
-      document.getElementById('exam-rubric-name').innerHTML = `<i class="ri-check-line mr-1"></i>${file.name} 첨부완료`;
+      const nameEl = document.getElementById('exam-rubric-name');
+      if (nameEl) nameEl.innerHTML = `<i class="ri-loader-4-line mr-1"></i>${file.name} 읽는 중...`;
       try {
-        const buf = await file.arrayBuffer(); const pdf = await pdfjsLib.getDocument(buf).promise; let text = '';
-        for (let i=1; i<=pdf.numPages; i++) { const page = await pdf.getPage(i); const content = await page.getTextContent(); text += content.items.map(it => it.str).join(' ') + '\n'; }
+        const buf = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+        const pages = [];
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          pages.push(pdfItemsToText(content.items));
+        }
+        const text = pages.filter(Boolean).join('\n\n').trim();
         examState.uploadedRubricText = text;
-      } catch(err) { showMsg("PDF 읽기 실패. 텍스트로 된 정상적인 PDF인지 확인해주세요."); }
+        renderRubricPreview(text);
+        if (nameEl) nameEl.innerHTML = `<i class="ri-check-line mr-1"></i>${file.name} 첨부완료`;
+        if (rubricCharCount(text) < 50) {
+          showMsg('PDF에서 글자가 거의 안 나왔어요. 스캔본이면 텍스트 입력으로 붙여넣어 주세요.');
+        }
+      } catch(err) {
+        examState.uploadedRubricText = '';
+        renderRubricPreview('');
+        if (nameEl) nameEl.innerHTML = '<i class="ri-error-warning-line mr-1"></i>PDF 읽기 실패 · 텍스트로 붙여넣어 주세요';
+        showMsg('PDF 읽기 실패. 스캔본이면 텍스트 입력으로 붙여넣어 주세요.');
+      }
     }
 
     function startExam() {
@@ -3715,6 +3769,7 @@
     window.saveExamEdit = saveExamEdit;
     window.cancelExamEdit = cancelExamEdit;
     window.handleExamRubricUpload = handleExamRubricUpload;
+    window.syncRubricPreview = syncRubricPreview;
     window.startExam = startExam;
     wireExamFullscreenControls();
     window.submitExam = submitExam;
