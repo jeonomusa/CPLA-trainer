@@ -209,6 +209,7 @@ async function callGeminiServer({ prompt, schema, images }) {
     generationConfig: {
       responseMimeType: "application/json",
       responseSchema: schema,
+      thinkingConfig: { thinkingBudget: 0 },
     },
   };
 
