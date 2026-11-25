@@ -9,7 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
   <script src="js/config.js"></script>
-  <link rel="stylesheet" href="css/app.css?v=20261125d">
+  <link rel="stylesheet" href="css/app.css?v=20261125e">
 </head>
 <body class="pb-24">
 
@@ -564,11 +564,11 @@
           <div class="w-full">
             <div id="answer-sheet" class="bg-white border-2 border-slate-300 rounded-xl overflow-hidden shadow-sm mx-auto w-full">
               <div class="bg-slate-100 p-2 text-center text-[10px] md:text-[11px] font-bold text-slate-500 tracking-widest border-b border-slate-300">노무사 2차 답안지</div>
-              <div id="symbol-palette" class="flex items-center gap-1.5 px-2 py-1.5 bg-slate-50 border-b border-slate-200 text-[11px] md:text-xs">
-                <span class="shrink-0 font-bold text-slate-400 mr-1">기호</span>
+              <div id="symbol-palette" class="flex items-center justify-end gap-1.5 px-2 py-1.5 bg-slate-50 border-b border-slate-200 text-[11px] md:text-xs">
                 <button type="button" class="sym-btn" data-sym-group="roman" onclick="openSymbolMenu('roman', this)">로마자</button>
                 <button type="button" class="sym-btn" data-sym-group="circle" onclick="openSymbolMenu('circle', this)">동그라미 숫자</button>
                 <button type="button" class="sym-btn" data-sym-group="paren" onclick="openSymbolMenu('paren', this)">괄호 숫자</button>
+                <button type="button" class="sym-btn" data-sym-group="custom" onclick="openSymbolMenu('custom', this)">기타</button>
               </div>
               <div id="symbol-menu" class="hidden fixed z-[80] bg-white border border-slate-200 rounded-xl shadow-xl p-2 grid grid-cols-5 gap-1"></div>
               <div id="answer-lines" class="bg-white"></div>
@@ -770,8 +770,8 @@
     <button class="nav-btn flex-1 min-w-[50px]" id="m-nav-settings" onclick="navigate('settings')"><i class="ri-settings-4-line text-lg"></i><span class="text-[9px] whitespace-nowrap">설정</span></button>
   </div>
 
-  <script src="js/app.js?v=20261125d"></script>
+  <script src="js/app.js?v=20261125e"></script>
 
-  <script type="module" src="js/firebase.js?v=20261125d"></script>
+  <script type="module" src="js/firebase.js?v=20261125e"></script>
 </body>
 </html>

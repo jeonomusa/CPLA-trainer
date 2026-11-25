@@ -2569,8 +2569,32 @@
     const SYMBOL_GROUPS = {
       roman: { label: '로마자', items: ['Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ','Ⅵ','Ⅶ','Ⅷ','Ⅸ','Ⅹ'] },
       circle: { label: '동그라미 숫자', items: ['①','②','③','④','⑤','⑥','⑦','⑧','⑨','⑩'] },
-      paren: { label: '괄호 숫자', items: ['⑴','⑵','⑶','⑷','⑸','⑹','⑺','⑻','⑼','⑽'] }
+      paren: { label: '괄호 숫자', items: ['⑴','⑵','⑶','⑷','⑸','⑹','⑺','⑻','⑼','⑽'] },
+      custom: { label: '기타', items: [] }
     };
+
+    const CUSTOM_SYMBOLS_KEY = 'cpla_custom_symbols';
+
+    function getCustomSymbols() {
+      try {
+        const raw = localStorage.getItem(CUSTOM_SYMBOLS_KEY);
+        const arr = raw ? JSON.parse(raw) : [];
+        return Array.isArray(arr) ? arr.slice(0, 30) : [];
+      } catch (e) { return []; }
+    }
+
+    function saveCustomSymbols(arr) {
+      try { localStorage.setItem(CUSTOM_SYMBOLS_KEY, JSON.stringify(arr.slice(0, 30))); } catch (e) {}
+    }
+
+    function addCustomSymbol(ch) {
+      const v = String(ch || '').trim().slice(0, 6);
+      if (!v) return;
+      const arr = getCustomSymbols();
+      if (arr.includes(v)) return;
+      arr.push(v);
+      saveCustomSymbols(arr);
+    }
 
     function closeSymbolMenu() {
       const menu = document.getElementById('symbol-menu');
@@ -2584,12 +2608,37 @@
       if (!menu || !group) return;
       if (menu.dataset.kind === kind && !menu.classList.contains('hidden')) { closeSymbolMenu(); return; }
       menu.innerHTML = '';
-      group.items.forEach(ch => {
+      const items = kind === 'custom' ? getCustomSymbols() : group.items;
+      if (kind === 'custom') {
+        menu.style.gridTemplateColumns = 'repeat(5, minmax(0, 1fr))';
+        menu.style.width = '228px';
+      } else {
+        menu.style.gridTemplateColumns = '';
+        menu.style.width = '';
+      }
+      items.forEach(ch => {
         const b = document.createElement('button');
-        b.type = 'button'; b.className = 'sym-btn'; b.textContent = ch;
+        b.type = 'button'; b.className = 'sym-btn'; b.dataset.sym = ch; b.textContent = ch;
         b.addEventListener('click', () => { insertExamSymbol(ch); closeSymbolMenu(); });
         menu.appendChild(b);
       });
+      if (kind === 'custom') {
+        const row = document.createElement('div');
+        row.className = 'col-span-5 flex items-center gap-1 mt-1';
+        const input = document.createElement('input');
+        input.type = 'text'; input.id = 'sym-input'; input.placeholder = '기호 입력 (예: ㉮)';
+        input.className = 'flex-1 min-w-0 px-2 py-1 border border-slate-200 rounded-md text-[11px] outline-none focus:border-emerald-400';
+        const add = document.createElement('button');
+        add.type = 'button'; add.id = 'sym-add'; add.className = 'sym-btn'; add.textContent = '추가';
+        add.addEventListener('click', () => {
+          addCustomSymbol(input.value);
+          input.value = '';
+          openSymbolMenu('custom', btn);
+        });
+        input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); add.click(); } });
+        row.appendChild(input); row.appendChild(add);
+        menu.appendChild(row);
+      }
       document.querySelectorAll('#symbol-palette .sym-btn').forEach(b => b.classList.remove('is-active'));
       if (btn) btn.classList.add('is-active');
       menu.dataset.kind = kind;
