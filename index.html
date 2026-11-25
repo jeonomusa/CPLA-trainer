@@ -565,11 +565,11 @@
             <div id="answer-sheet" class="bg-white border-2 border-slate-300 rounded-xl overflow-hidden shadow-sm mx-auto w-full">
               <div class="bg-slate-100 p-2 text-center text-[10px] md:text-[11px] font-bold text-slate-500 tracking-widest border-b border-slate-300">노무사 2차 답안지</div>
               <div id="answer-lines" class="bg-white"></div>
-              <div class="p-3 md:p-4 bg-gray-50 flex justify-between border-t border-gray-200">
-                <button onclick="changePage(-1)" class="px-3 md:px-4 py-1.5 md:py-2 bg-white border border-gray-200 rounded-lg text-[11px] md:text-xs font-bold">◀ 이전 장</button>
-                <div class="flex items-center gap-2 md:gap-3">
-                  <span class="text-xs md:text-sm font-extrabold text-slate-700 whitespace-nowrap"><span id="room-curr-page-bottom">1</span> / <span id="room-total-page-bottom">20</span> 장</span>
-                  <button onclick="changePage(1)" class="px-3 md:px-4 py-1.5 md:py-2 bg-white border border-gray-200 rounded-lg text-[11px] md:text-xs font-bold">다음 장 ▶</button>
+              <div class="p-3 md:p-4 bg-gray-50 border-t border-gray-200 grid grid-cols-3 items-center gap-2">
+                <button onclick="changePage(-1)" class="justify-self-start px-3 md:px-4 py-1.5 md:py-2 bg-white border border-gray-200 rounded-lg text-[11px] md:text-xs font-bold">◀ 이전 장</button>
+                <span class="justify-self-center text-xs md:text-sm font-extrabold text-slate-700 whitespace-nowrap"><span id="room-curr-page-bottom">1</span> / <span id="room-total-page-bottom">20</span> 장</span>
+                <button onclick="changePage(1)" class="justify-self-end px-3 md:px-4 py-1.5 md:py-2 bg-white border border-gray-200 rounded-lg text-[11px] md:text-xs font-bold">다음 장 ▶</button>
+              </div>
                 </div>
               </div>
             </div>
