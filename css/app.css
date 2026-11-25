@@ -1,0 +1,74 @@
+    @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;800&display=swap');
+    
+    @font-face {
+        font-family: 'ZEN SERIF';
+        src: url('ZEN-SERIF.otf') format('opentype'), url('ZEN-SERIF.ttf') format('truetype'); 
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    body { 
+        font-family: 'ZEN SERIF', 'Pretendard', sans-serif; 
+        background: #f8fafc; 
+        color: #0f172a; 
+        overflow-x: hidden; 
+    }
+    
+    .nav-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px; color: #64748b; transition: all 0.2s; border-radius: 12px; flex-shrink: 0; }
+    .nav-btn.active { color: #10b981; background: #ecfdf5; font-weight: 800; }
+    .nav-btn:hover { color: #10b981; }
+    
+    .desktop-nav-btn { position: relative; padding: 8px 14px; border-radius: 8px; font-size: 14px; font-weight: 600; color: #94a3b8; transition: all 0.2s ease; background: transparent; white-space: nowrap; height: 40px; display: inline-flex; align-items: center; justify-content: center; }
+    .desktop-nav-btn:hover { color: #e2e8f0; background: rgba(255, 255, 255, 0.05); }
+    .desktop-nav-btn.active { color: #10b981; font-weight: 800; }
+    .desktop-nav-btn.active::after { content: ''; position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%); width: 24px; height: 3px; background: #10b981; border-radius: 4px; box-shadow: 0 0 8px rgba(16, 185, 129, 0.4); }
+    
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    .neo-card { background: white; border: 1px solid #e2e8f0; border-radius: 24px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
+    .page-content { display: none; animation: slideUp 0.3s ease; }
+    .page-content.active { display: block; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    .fc-container { perspective: 1000px; height: 320px; width: 100%; max-width: 600px; margin: 0 auto; }
+    .fc-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; cursor: pointer; }
+    .fc-inner.flipped { transform: rotateY(180deg); }
+    .fc-front, .fc-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); background: white; border: 2px solid #f1f5f9; }
+    .fc-back { background: #0f172a; color: white; transform: rotateY(180deg); border: none; }
+    @media (min-width: 768px) { .fc-front, .fc-back { padding: 40px; } .neo-card { padding: 32px; } }
+
+    .sm2-btn { padding: 12px 8px; border-radius: 16px; font-weight: 800; color: white; text-align: center; transition: all 0.2s; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+    .sm2-btn:active { transform: scale(0.95); }
+
+    .blank-input { border: none; border-bottom: 2px solid #cbd5e1; background: transparent; text-align: center; font-size: inherit; font-weight: inherit; color: #0f172a; outline: none; transition: all 0.2s; padding: 2px 4px; margin: 0 4px; box-sizing: border-box; max-width: 100%; }
+    .blank-input:focus { border-bottom-color: #10b981; background: #f0fdf4; }
+    .blank-input.correct { border-bottom-color: #10b981; color: #10b981; background: #ecfdf5; }
+    .blank-input.wrong { border-bottom-color: #ef4444; color: #ef4444; background: #fef2f2; }
+    
+    .word-chip { padding: 8px 16px; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 20px; font-size: 14px; font-weight: 700; color: #475569; cursor: pointer; transition: all 0.2s; user-select: none; display: inline-block; margin: 4px; word-break: keep-all; white-space: nowrap; }
+    .word-chip:hover { background: #e2e8f0; color: #0f172a; }
+    .word-chip:active { transform: scale(0.95); }
+
+    .fc-preserve-lines { white-space: pre-line; }
+
+    .answer-row { display: flex; border-bottom: 1px solid #e2e8f0; height: 44px; position: relative; }
+    .row-num { width: 44px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #94a3b8; font-weight: 700; border-right: 1px solid #e2e8f0; background: #f8fafc; flex-shrink: 0; }
+    .row-input-wrapper { flex: 1; position: relative; display: flex; align-items: center; background: white; min-width: 0; }
+    .row-input { width: 100%; height: 100%; border: none; outline: none; padding: 0 16px; font-size: 15px; font-family: 'ZEN SERIF', 'Pretendard', monospace; letter-spacing: 1px; }
+    .row-input:focus { background: #f0fdf4; }
+    .char-indicator { position: absolute; right: 12px; font-size: 10px; font-weight: 800; color: #cbd5e1; pointer-events: none; transition: color 0.2s; }
+    .row-input:focus + .char-indicator { color: #10b981; }
+    .char-indicator.full { color: #ef4444; }
+
+    #loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+    .spinner { width: 50px; height: 50px; border: 5px solid #ecfdf5; border-left-color: #10b981; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    #message-box { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 50px; background: #333; color: white; font-size: 14px; font-weight: bold; z-index: 10000; display: none; box-shadow: 0 10px 20px rgba(0,0,0,0.2); white-space: nowrap; }
+    
+    .fc-item-checkbox { width: 18px; height: 18px; border-radius: 4px; border-gray-300; text-emerald-500; cursor: pointer; }
+    .chart-wrapper { position: relative; height: 220px; width: 100%; }
+
+    /* 시험 영역만 전체화면일 때 (요소 자체가 fullscreen) */
+    #exam-room:fullscreen { background: #f8fafc; padding: 20px; overflow-y: auto; min-height: 100%; box-sizing: border-box; }
+    #exam-room:-webkit-full-screen { background: #f8fafc; padding: 20px; overflow-y: auto; min-height: 100%; box-sizing: border-box; }
