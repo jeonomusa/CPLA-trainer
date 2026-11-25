@@ -103,8 +103,9 @@
     #exam-room:-webkit-full-screen #passage-drawer { top: 0 !important; height: 100% !important; }
 
     /* 답안지 기호 버튼 */
-    .sym-btn { flex: 0 0 auto; min-width: 26px; height: 24px; padding: 0 6px; border: 1px solid #e2e8f0; background: #fff; border-radius: 6px; color: #334155; font-weight: 700; line-height: 1; }
-    .sym-btn:hover { background: #ecfdf5; border-color: #6ee7b7; color: #047857; }
+    /* 기호 버튼 글자색은 답안지 제목(노무사 2차 답안지, slate-500 #64748b)과 맞춘다 */
+    .sym-btn { flex: 0 0 auto; min-width: 26px; height: 24px; padding: 0 6px; border: 1px solid #e2e8f0; background: #fff; border-radius: 6px; color: #64748b; font-weight: 700; line-height: 1; }
+    .sym-btn:hover { background: #f1f5f9; border-color: #cbd5e1; color: #64748b; }
     .sym-btn:active { transform: scale(0.96); }
 
-    .sym-btn.is-active { background: #ecfdf5; border-color: #10b981; color: #047857; }
+    .sym-btn.is-active { background: #ecfdf5; border-color: #6ee7b7; color: #64748b; }

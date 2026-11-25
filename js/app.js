@@ -2469,7 +2469,8 @@
       document.getElementById('page-exam').classList.add('exam-running');
 
       renderAnswerSheet();
-      try { if (localStorage.getItem('cpla_passage_open') === '1') toggleExamPassage(true); } catch (e) {}
+      // 시험 시작 시 지문 패널은 기본으로 펼친 상태에서 시작한다.
+      try { toggleExamPassage(true); } catch (e) {}
       updateTimerDisplay();
       syncExamFullscreenButton();
       examState.timer = setInterval(() => {
