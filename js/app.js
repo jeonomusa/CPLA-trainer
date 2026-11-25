@@ -2464,6 +2464,60 @@
       if (examState.seconds < 300) el.classList.add('text-rose-500'); else el.classList.remove('text-rose-500');
     }
 
+    function fitAnswerRowFonts(container) {
+      const wrap = container.querySelector('.row-input-wrapper');
+      if (!wrap) return;
+      const avail = wrap.clientWidth - 84;
+      if (avail <= 0) return;
+      const size = Math.max(12, Math.min(17, Math.floor((avail / (MAX_CHARS_PER_LINE * 1.04)) * 10) / 10));
+      container.querySelectorAll('.row-input').forEach(el => { el.style.fontSize = size + 'px'; });
+    }
+
+    function syncAnswerRowMeta(input) {
+      const val = input.value;
+      examState.answers[input.dataset.key] = val;
+      const ind = input.nextElementSibling;
+      if (ind) {
+        ind.textContent = `${val.length}/${MAX_CHARS_PER_LINE}`;
+        ind.classList.toggle('full', val.length >= MAX_CHARS_PER_LINE);
+      }
+    }
+
+    function refreshAnswerTotal() {
+      const el = document.getElementById('char-count');
+      if (el) el.textContent = Object.values(examState.answers).join('').length;
+    }
+
+    function normalizeAnswerRow(input, idx) {
+      const inputs = Array.from(document.querySelectorAll('#answer-lines .row-input'));
+      let rest = input.value.slice(MAX_CHARS_PER_LINE);
+      if (rest) {
+        input.value = input.value.slice(0, MAX_CHARS_PER_LINE);
+        let lastTouched = input;
+        for (let i = idx + 1; i < inputs.length && rest; i++) {
+          const room = MAX_CHARS_PER_LINE - inputs[i].value.length;
+          if (room <= 0) continue;
+          const take = rest.slice(0, room);
+          inputs[i].value += take;
+          rest = rest.slice(take.length);
+          syncAnswerRowMeta(inputs[i]);
+          lastTouched = inputs[i];
+        }
+        syncAnswerRowMeta(input);
+        refreshAnswerTotal();
+        lastTouched.focus();
+        lastTouched.setSelectionRange(lastTouched.value.length, lastTouched.value.length);
+        return;
+      }
+      syncAnswerRowMeta(input);
+      refreshAnswerTotal();
+      const atEnd = document.activeElement === input && input.selectionStart === input.value.length;
+      if (atEnd && input.value.length >= MAX_CHARS_PER_LINE && idx < inputs.length - 1) {
+        inputs[idx + 1].focus();
+        inputs[idx + 1].setSelectionRange(0, 0);
+      }
+    }
+
     function renderAnswerSheet() {
       const container = document.getElementById('answer-lines'); container.innerHTML = '';
       for (let i = 1; i <= LINES_PER_PAGE; i++) {
@@ -2471,24 +2525,29 @@
         const row = document.createElement('div'); row.className = 'answer-row';
         const numDiv = document.createElement('div'); numDiv.className = 'row-num'; numDiv.textContent = i;
         const wrapDiv = document.createElement('div'); wrapDiv.className = 'row-input-wrapper';
-        const input = document.createElement('input'); input.type = 'text'; input.className = 'row-input'; input.maxLength = MAX_CHARS_PER_LINE; input.dataset.key = key; input.value = savedVal;
+        const input = document.createElement('input'); input.type = 'text'; input.className = 'row-input'; input.dataset.key = key; input.value = savedVal; input.autocomplete = 'off'; input.spellcheck = false;
         const indicator = document.createElement('span'); indicator.className = 'char-indicator'; indicator.textContent = `${savedVal.length}/${MAX_CHARS_PER_LINE}`;
+        if (savedVal.length >= MAX_CHARS_PER_LINE) indicator.classList.add('full');
         wrapDiv.appendChild(input); wrapDiv.appendChild(indicator); row.appendChild(numDiv); row.appendChild(wrapDiv); container.appendChild(row);
       }
       document.getElementById('room-curr-page').textContent = examState.currPage;
+      refreshAnswerTotal();
+      fitAnswerRowFonts(container);
 
       const inputs = container.querySelectorAll('.row-input');
       inputs.forEach((input, idx) => {
+        input.addEventListener('compositionstart', () => { input.dataset.composing = '1'; });
+        input.addEventListener('compositionend', () => { delete input.dataset.composing; normalizeAnswerRow(input, idx); });
         input.addEventListener('input', (e) => {
-          const val = e.target.value; examState.answers[e.target.dataset.key] = val;
-          const ind = e.target.nextElementSibling; ind.textContent = `${val.length}/${MAX_CHARS_PER_LINE}`;
-          if (val.length >= MAX_CHARS_PER_LINE) { ind.classList.add('full'); if (idx < inputs.length - 1) inputs[idx + 1].focus(); } else { ind.classList.remove('full'); }
-          document.getElementById('char-count').textContent = Object.values(examState.answers).join('').length;
+          if (input.dataset.composing) { syncAnswerRowMeta(input); refreshAnswerTotal(); return; }
+          normalizeAnswerRow(input, idx);
         });
         input.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') { e.preventDefault(); if (idx < inputs.length - 1) inputs[idx + 1].focus(); else changePage(1); } 
-          else if (e.key === 'Backspace' && e.target.value === '' && idx > 0) { e.preventDefault(); inputs[idx - 1].focus(); } 
-          else if (e.key === 'ArrowUp' && idx > 0) { e.preventDefault(); inputs[idx - 1].focus(); } 
+          if (e.key === 'Enter') { e.preventDefault(); if (idx < inputs.length - 1) { inputs[idx + 1].focus(); inputs[idx + 1].setSelectionRange(0, 0); } else changePage(1); }
+          else if (e.key === 'Backspace' && e.target.selectionStart === 0 && e.target.selectionEnd === 0 && idx > 0) { e.preventDefault(); const prev = inputs[idx - 1]; prev.focus(); prev.setSelectionRange(prev.value.length, prev.value.length); }
+          else if (e.key === 'ArrowLeft' && e.target.selectionStart === 0 && idx > 0) { e.preventDefault(); const prev = inputs[idx - 1]; prev.focus(); prev.setSelectionRange(prev.value.length, prev.value.length); }
+          else if (e.key === 'ArrowRight' && e.target.selectionStart === e.target.value.length && idx < inputs.length - 1) { e.preventDefault(); inputs[idx + 1].focus(); inputs[idx + 1].setSelectionRange(0, 0); }
+          else if (e.key === 'ArrowUp' && idx > 0) { e.preventDefault(); inputs[idx - 1].focus(); }
           else if (e.key === 'ArrowDown' && idx < inputs.length - 1) { e.preventDefault(); inputs[idx + 1].focus(); }
         });
       });
@@ -3405,6 +3464,10 @@
     
     window.customConfirm = customConfirm;
     window.navigate = navigate;
+    window.addEventListener('resize', () => {
+      const c = document.getElementById('answer-lines');
+      if (c && c.children.length) fitAnswerRowFonts(c);
+    });
     window.examGroundingCta = examGroundingCta;
     window.toggleCsvUploadForm = toggleCsvUploadForm;
     window.cancelCsvUpload = cancelCsvUpload;
