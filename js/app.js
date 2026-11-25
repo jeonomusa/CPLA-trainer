@@ -2566,6 +2566,46 @@
     }
 
     let lastAnswerInput = null;
+    const SYMBOL_GROUPS = {
+      roman: { label: '로마자', items: ['Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ','Ⅵ','Ⅶ','Ⅷ','Ⅸ','Ⅹ'] },
+      circle: { label: '동그라미 숫자', items: ['①','②','③','④','⑤','⑥','⑦','⑧','⑨','⑩'] },
+      paren: { label: '괄호 숫자', items: ['⑴','⑵','⑶','⑷','⑸','⑹','⑺','⑻','⑼','⑽'] }
+    };
+
+    function closeSymbolMenu() {
+      const menu = document.getElementById('symbol-menu');
+      if (menu) { menu.classList.add('hidden'); menu.innerHTML = ''; }
+      document.querySelectorAll('#symbol-palette .sym-btn').forEach(b => b.classList.remove('is-active'));
+    }
+
+    function openSymbolMenu(kind, btn) {
+      const menu = document.getElementById('symbol-menu');
+      const group = SYMBOL_GROUPS[kind];
+      if (!menu || !group) return;
+      if (menu.dataset.kind === kind && !menu.classList.contains('hidden')) { closeSymbolMenu(); return; }
+      menu.innerHTML = '';
+      group.items.forEach(ch => {
+        const b = document.createElement('button');
+        b.type = 'button'; b.className = 'sym-btn'; b.textContent = ch;
+        b.addEventListener('click', () => { insertExamSymbol(ch); closeSymbolMenu(); });
+        menu.appendChild(b);
+      });
+      document.querySelectorAll('#symbol-palette .sym-btn').forEach(b => b.classList.remove('is-active'));
+      if (btn) btn.classList.add('is-active');
+      menu.dataset.kind = kind;
+      menu.classList.remove('hidden');
+      const r = btn ? btn.getBoundingClientRect() : { left: 20, bottom: 80 };
+      const w = menu.offsetWidth || 210;
+      menu.style.left = Math.max(8, Math.min(r.left, window.innerWidth - w - 8)) + 'px';
+      menu.style.top = Math.round(r.bottom + 6) + 'px';
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#symbol-menu') && !e.target.closest('#symbol-palette')) closeSymbolMenu();
+    });
+    window.addEventListener('scroll', () => closeSymbolMenu(), true);
+
+
 
     function insertExamSymbol(sym) {
       const inputs = Array.from(document.querySelectorAll('#answer-lines .row-input'));
