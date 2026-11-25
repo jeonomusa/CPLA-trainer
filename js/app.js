@@ -2465,9 +2465,10 @@
     }
 
     const ANSWER_FONT_PX = 15;
-    function measureAnswerCharWidth() {
+    function measureAnswerCharWidth(fontPx) {
+      fontPx = fontPx || ANSWER_FONT_PX;
       const probe = document.createElement('span');
-      probe.style.cssText = "position:absolute;left:-9999px;top:0;visibility:hidden;white-space:pre;letter-spacing:0;font-size:" + ANSWER_FONT_PX + "px;font-family:'Nanum Gothic Coding','D2Coding','Courier New',monospace";
+      probe.style.cssText = "position:absolute;left:-9999px;top:0;visibility:hidden;white-space:pre;letter-spacing:0;font-size:" + fontPx + "px;font-family:'Nanum Gothic Coding','D2Coding','Courier New',monospace";
       probe.textContent = '가'.repeat(MAX_CHARS_PER_LINE);
       document.body.appendChild(probe);
       const w = probe.getBoundingClientRect().width / MAX_CHARS_PER_LINE;
@@ -2478,11 +2479,15 @@
     function fitAnswerRowFonts(container) {
       const wrap = container.querySelector('.row-input-wrapper');
       if (!wrap) return;
-      const charW = Math.ceil(measureAnswerCharWidth() * 10) / 10;
+      const avail = wrap.parentElement.clientWidth - 44 - 48 - 12;
+      let fontPx = avail / MAX_CHARS_PER_LINE / 0.93;
+      fontPx = Math.max(13, Math.min(26, Math.floor(fontPx * 2) / 2));
+      container.querySelectorAll('.row-input').forEach(el => { el.style.fontSize = fontPx + 'px'; });
+      const charW = Math.ceil(measureAnswerCharWidth(fontPx) * 10) / 10;
       const inputW = Math.ceil(charW * MAX_CHARS_PER_LINE) + 12;
       container.querySelectorAll('.row-input-wrapper').forEach(el => { el.style.width = inputW + 'px'; });
       const sheet = document.getElementById('answer-sheet');
-      if (sheet) sheet.style.maxWidth = (44 + inputW + 48 + 4) + 'px';
+      if (sheet) sheet.style.maxWidth = 'none';
     }
 
     function syncAnswerRowMeta(input) {
@@ -2565,6 +2570,18 @@
       });
       if (inputs.length > 0) inputs[0].focus();
     }
+
+    function toggleExamPassage(force) {
+      const drawer = document.getElementById('passage-drawer');
+      const backdrop = document.getElementById('passage-backdrop');
+      if (!drawer) return;
+      const isOpen = drawer.dataset.open === '1';
+      const next = typeof force === 'boolean' ? force : !isOpen;
+      drawer.dataset.open = next ? '1' : '0';
+      drawer.classList.toggle('-translate-x-full', !next);
+      if (backdrop) backdrop.classList.toggle('hidden', !next);
+    }
+    window.toggleExamPassage = toggleExamPassage;
 
     function changePage(dir) {
       const next = examState.currPage + dir;
@@ -3476,6 +3493,7 @@
     
     window.customConfirm = customConfirm;
     window.navigate = navigate;
+    window.toggleExamPassage = toggleExamPassage;
     window.addEventListener('resize', () => {
       const c = document.getElementById('answer-lines');
       if (c && c.children.length) fitAnswerRowFonts(c);
