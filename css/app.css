@@ -85,17 +85,3 @@
     body.passage-open #page-exam { padding-left: var(--passage-w); }
     body.passage-open #exam-fullscreen-btn { display: none; }
     #exam-passage-btn.is-active { background: #ecfdf5; border-color: #6ee7b7; color: #047857; }
-
-    /* 답안지: 한 페이지짜리 입력창 + 줄 그리드 */
-    .sheet-area { display: flex; background: #fff; }
-    .row-nums { flex: 0 0 44px; width: 44px; border-right: 1px solid #e2e8f0; background: #fcfdff; }
-    .row-nums > div { height: 44px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #94a3b8; }
-    .answer-area {
-      flex: 1 1 auto; min-width: 0; height: 968px; border: 0; outline: none; resize: none;
-      padding: 0 12px; margin: 0; overflow: auto; white-space: pre; overflow-wrap: normal;
-      font-family: 'Nanum Gothic Coding', 'D2Coding', 'Courier New', monospace;
-      font-size: 15px; letter-spacing: 0; line-height: 44px;
-      background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 43px, #e2e8f0 43px, #e2e8f0 44px);
-      background-attachment: local;
-    }
-    .answer-area:focus { background-color: #f7fefb; }
