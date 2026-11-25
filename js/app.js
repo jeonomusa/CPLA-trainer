@@ -2481,7 +2481,8 @@
     function fitAnswerRowFonts(container) {
       const wrap = container.querySelector('.row-input-wrapper');
       if (!wrap) return;
-      const avail = wrap.parentElement.clientWidth - 44 - 48 - 12;
+      const rowInput = container.querySelector('.row-input');
+      const avail = (rowInput ? rowInput.clientWidth : wrap.clientWidth) - 12;
       let fontPx = Math.min(26, Math.floor((avail / MAX_CHARS_PER_LINE / 0.93) * 2) / 2);
       fontPx = Math.max(11, fontPx);
       // 실제 글자 폭으로 검증: 안 들어가면 한 단계씩 줄인다
