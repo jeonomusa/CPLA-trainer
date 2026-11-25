@@ -96,3 +96,8 @@
     #exam-room:-webkit-full-screen.passage-open { padding-left: calc(var(--passage-w) + 24px); }
     #exam-room:fullscreen #passage-drawer,
     #exam-room:-webkit-full-screen #passage-drawer { z-index: 90; }
+
+    /* 지문 패널은 앱 상단바(h-16) 아래에서 시작하고, 전체화면에서는 화면 전체 높이를 쓴다 */
+    #passage-drawer { top: 4rem !important; height: calc(100% - 4rem) !important; }
+    #exam-room:fullscreen #passage-drawer,
+    #exam-room:-webkit-full-screen #passage-drawer { top: 0 !important; height: 100% !important; }
