@@ -567,7 +567,10 @@
               <div id="answer-lines" class="bg-white"></div>
               <div class="p-3 md:p-4 bg-gray-50 flex justify-between border-t border-gray-200">
                 <button onclick="changePage(-1)" class="px-3 md:px-4 py-1.5 md:py-2 bg-white border border-gray-200 rounded-lg text-[11px] md:text-xs font-bold">◀ 이전 장</button>
-                <button onclick="changePage(1)" class="px-3 md:px-4 py-1.5 md:py-2 bg-white border border-gray-200 rounded-lg text-[11px] md:text-xs font-bold">다음 장 ▶</button>
+                <div class="flex items-center gap-2 md:gap-3">
+                  <span class="text-xs md:text-sm font-extrabold text-slate-700 whitespace-nowrap"><span id="room-curr-page-bottom">1</span> / <span id="room-total-page-bottom">20</span> 장</span>
+                  <button onclick="changePage(1)" class="px-3 md:px-4 py-1.5 md:py-2 bg-white border border-gray-200 rounded-lg text-[11px] md:text-xs font-bold">다음 장 ▶</button>
+                </div>
               </div>
             </div>
           </div>

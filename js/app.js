@@ -2566,7 +2566,9 @@
         wrapDiv.appendChild(input); row.appendChild(numDiv); row.appendChild(wrapDiv); row.appendChild(indicator);
         container.appendChild(row);
       }
-      document.getElementById('room-curr-page').textContent = examState.currPage;
+      const currEl = document.getElementById('room-curr-page'); if (currEl) currEl.textContent = examState.currPage;
+      const currBottom = document.getElementById('room-curr-page-bottom'); if (currBottom) currBottom.textContent = examState.currPage;
+      const totalBottom = document.getElementById('room-total-page-bottom'); if (totalBottom) totalBottom.textContent = examState.totalPage;
       refreshAnswerTotal();
       fitAnswerRowFonts(container);
 
