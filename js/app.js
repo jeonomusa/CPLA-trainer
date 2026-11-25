@@ -164,6 +164,12 @@
 
     function navigate(id) {
       exitFullScreen();
+      // 지문 패널은 화면 전체에 떠 있는 고정 패널이라, 모의고사 화면을 떠날 때는 닫아야 한다.
+      if (id !== 'exam') {
+        const pDrawer = document.getElementById('passage-drawer');
+        if (pDrawer && pDrawer.dataset.open === '1') toggleExamPassage(false);
+        try { placePassageForFullscreen(false); } catch (e) {}
+      }
       
       document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
       const target = document.getElementById('page-' + id); if(target) target.classList.add('active');
