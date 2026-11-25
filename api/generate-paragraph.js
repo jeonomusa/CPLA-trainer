@@ -9,10 +9,10 @@
  *
  * Env:
  * - GEMINI_API_KEY (required)
- * - GEMINI_MODEL (optional, default: "gemini-2.5-flash")
+ * - GEMINI_MODEL (optional, default: "gemini-4-hydrogen")
  */
 
-const DEFAULT_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+const DEFAULT_MODEL = process.env.GEMINI_MODEL || "gemini-4-hydrogen";
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 const MAX_PARAGRAPH = 10000;
