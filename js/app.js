@@ -2450,7 +2450,9 @@
       document.getElementById('char-count').textContent = '0';
       document.getElementById('exam-setup').style.display = 'none'; document.getElementById('exam-room').style.display = 'block';
 
-      renderAnswerSheet(); updateTimerDisplay();
+      renderAnswerSheet();
+      try { if (localStorage.getItem('cpla_passage_open') === '1') toggleExamPassage(true); } catch (e) {}
+      updateTimerDisplay();
       syncExamFullscreenButton();
       examState.timer = setInterval(() => {
         examState.seconds--; updateTimerDisplay();
@@ -2480,12 +2482,15 @@
       const wrap = container.querySelector('.row-input-wrapper');
       if (!wrap) return;
       const avail = wrap.parentElement.clientWidth - 44 - 48 - 12;
-      let fontPx = avail / MAX_CHARS_PER_LINE / 0.93;
-      fontPx = Math.max(13, Math.min(26, Math.floor(fontPx * 2) / 2));
+      let fontPx = Math.min(26, Math.floor((avail / MAX_CHARS_PER_LINE / 0.93) * 2) / 2);
+      fontPx = Math.max(11, fontPx);
+      // 실제 글자 폭으로 검증: 안 들어가면 한 단계씩 줄인다
+      let guard = 0;
+      while (fontPx > 10 && Math.ceil(measureAnswerCharWidth(fontPx) * MAX_CHARS_PER_LINE) > avail && guard++ < 40) {
+        fontPx -= 0.5;
+      }
       container.querySelectorAll('.row-input').forEach(el => { el.style.fontSize = fontPx + 'px'; });
-      const charW = Math.ceil(measureAnswerCharWidth(fontPx) * 10) / 10;
-      const inputW = Math.ceil(charW * MAX_CHARS_PER_LINE) + 12;
-      container.querySelectorAll('.row-input-wrapper').forEach(el => { el.style.width = inputW + 'px'; });
+      container.querySelectorAll('.row-input-wrapper').forEach(el => { el.style.width = 'auto'; });
       const sheet = document.getElementById('answer-sheet');
       if (sheet) sheet.style.maxWidth = 'none';
     }
@@ -2573,13 +2578,21 @@
 
     function toggleExamPassage(force) {
       const drawer = document.getElementById('passage-drawer');
-      const backdrop = document.getElementById('passage-backdrop');
       if (!drawer) return;
       const isOpen = drawer.dataset.open === '1';
       const next = typeof force === 'boolean' ? force : !isOpen;
       drawer.dataset.open = next ? '1' : '0';
       drawer.classList.toggle('-translate-x-full', !next);
-      if (backdrop) backdrop.classList.toggle('hidden', !next);
+      document.body.classList.toggle('passage-open', next);
+      const btn = document.getElementById('exam-passage-btn');
+      if (btn) btn.classList.toggle('is-active', next);
+      try { localStorage.setItem('cpla_passage_open', next ? '1' : '0'); } catch (e) {}
+      const relayout = () => {
+        const c = document.getElementById('answer-lines');
+        if (c) fitAnswerRowFonts(c);
+      };
+      relayout();
+      setTimeout(relayout, 240);
     }
     window.toggleExamPassage = toggleExamPassage;
 
