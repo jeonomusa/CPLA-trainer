@@ -90,3 +90,9 @@
     body.passage-open #page-exam { padding-left: var(--passage-w); }
     body.passage-open #exam-fullscreen-btn { display: none; }
     #exam-passage-btn.is-active { background: #ecfdf5; border-color: #6ee7b7; color: #047857; }
+
+    /* 전체화면에서 지문 패널을 열면 답안지 영역이 그만큼 밀린다 */
+    #exam-room:fullscreen.passage-open,
+    #exam-room:-webkit-full-screen.passage-open { padding-left: calc(var(--passage-w) + 24px); }
+    #exam-room:fullscreen #passage-drawer,
+    #exam-room:-webkit-full-screen #passage-drawer { z-index: 90; }

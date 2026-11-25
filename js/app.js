@@ -87,12 +87,28 @@
       return Promise.resolve(exitFn.call(doc)).catch(() => {});
     }
 
+    // 전체화면에서는 전체화면 요소 밖의 요소는 그려지지 않으므로, 지문 패널을 안으로 옮겼다 되돌린다.
+    let passageHomeParent = null;
+    function placePassageForFullscreen(inside) {
+      const drawer = document.getElementById('passage-drawer');
+      const room = getExamRoomEl();
+      if (!drawer || !room) return;
+      if (inside) {
+        if (drawer.parentElement === room) return;
+        passageHomeParent = drawer.parentElement;
+        room.appendChild(drawer);
+      } else {
+        if (drawer.parentElement === room && passageHomeParent) passageHomeParent.appendChild(drawer);
+      }
+    }
+
     async function toggleExamFullscreen() {
       const el = getExamRoomEl();
       if (!el) return;
       try {
         if (document.fullscreenElement === el) {
           await exitFullScreen();
+          placePassageForFullscreen(false);
         } else {
           const req =
             el.requestFullscreen ||
@@ -105,6 +121,7 @@
           }
           const ret = req.call(el);
           if (ret && typeof ret.then === 'function') await ret;
+          placePassageForFullscreen(true);
         }
       } catch (e) {
         console.error('전체화면 전환 실패:', e);
@@ -119,7 +136,7 @@
       if (examFullscreenControlsWired) return;
       examFullscreenControlsWired = true;
       document.getElementById('exam-fullscreen-btn')?.addEventListener('click', toggleExamFullscreen);
-      const sync = () => syncExamFullscreenButton();
+      const sync = () => { syncExamFullscreenButton(); placePassageForFullscreen(isExamRoomFullscreen()); };
       document.addEventListener('fullscreenchange', sync);
       document.addEventListener('webkitfullscreenchange', sync);
       document.addEventListener('mozfullscreenchange', sync);
@@ -2615,6 +2632,8 @@
       drawer.dataset.open = next ? '1' : '0';
       drawer.classList.toggle('-translate-x-full', !next);
       document.body.classList.toggle('passage-open', next);
+      const roomEl = getExamRoomEl();
+      if (roomEl) roomEl.classList.toggle('passage-open', next);
       const btn = document.getElementById('exam-passage-btn');
       if (btn) btn.classList.toggle('is-active', next);
       try { localStorage.setItem('cpla_passage_open', next ? '1' : '0'); } catch (e) {}
