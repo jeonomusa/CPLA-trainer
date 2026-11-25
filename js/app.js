@@ -2565,6 +2565,22 @@
       try { target.setSelectionRange(target.value.length, target.value.length); } catch (e) {}
     }
 
+    let lastAnswerInput = null;
+
+    function insertExamSymbol(sym) {
+      const inputs = Array.from(document.querySelectorAll('#answer-lines .row-input'));
+      if (!inputs.length) return;
+      let input = lastAnswerInput && document.contains(lastAnswerInput) ? lastAnswerInput : document.activeElement;
+      if (!input || !input.classList || !input.classList.contains('row-input')) {
+        input = inputs.find(i => !i.value) || inputs[0];
+      }
+      const idx = inputs.indexOf(input);
+      if (idx < 0) return;
+      input.focus();
+      try { distributePaste(input, idx, sym); } catch (e) { /* 무시 */ }
+      lastAnswerInput = input;
+    }
+
     function renderAnswerSheet() {
       const container = document.getElementById('answer-lines');
       container.innerHTML = '';
@@ -2591,6 +2607,7 @@
 
       const inputs = container.querySelectorAll('.row-input');
       inputs.forEach((input, idx) => {
+        input.addEventListener('focus', () => { lastAnswerInput = input; });
         input.addEventListener('compositionstart', () => { input.dataset.composing = '1'; });
         input.addEventListener('compositionend', () => {
           delete input.dataset.composing;
