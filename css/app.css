@@ -3,7 +3,7 @@
     
     @font-face {
         font-family: 'ZEN SERIF';
-        src: url('ZEN-SERIF.otf') format('opentype'), url('ZEN-SERIF.ttf') format('truetype'); 
+        src: url('../ZEN-SERIF.otf') format('opentype'), url('ZEN-SERIF.ttf') format('truetype'); 
         font-weight: normal;
         font-style: normal;
     }
