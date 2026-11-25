@@ -2464,19 +2464,31 @@
       if (examState.seconds < 300) el.classList.add('text-rose-500'); else el.classList.remove('text-rose-500');
     }
 
+    const ANSWER_FONT_PX = 15;
+    function measureAnswerCharWidth() {
+      const probe = document.createElement('span');
+      probe.style.cssText = "position:absolute;left:-9999px;top:0;visibility:hidden;white-space:pre;letter-spacing:0;font-size:" + ANSWER_FONT_PX + "px;font-family:'Nanum Gothic Coding','D2Coding','Courier New',monospace";
+      probe.textContent = '가'.repeat(MAX_CHARS_PER_LINE);
+      document.body.appendChild(probe);
+      const w = probe.getBoundingClientRect().width / MAX_CHARS_PER_LINE;
+      probe.remove();
+      return w;
+    }
+
     function fitAnswerRowFonts(container) {
       const wrap = container.querySelector('.row-input-wrapper');
       if (!wrap) return;
-      const avail = wrap.clientWidth - 84;
-      if (avail <= 0) return;
-      const size = Math.max(12, Math.min(17, Math.floor((avail / (MAX_CHARS_PER_LINE * 1.04)) * 10) / 10));
-      container.querySelectorAll('.row-input').forEach(el => { el.style.fontSize = size + 'px'; });
+      const charW = Math.ceil(measureAnswerCharWidth() * 10) / 10;
+      const inputW = Math.ceil(charW * MAX_CHARS_PER_LINE) + 12;
+      container.querySelectorAll('.row-input-wrapper').forEach(el => { el.style.width = inputW + 'px'; });
+      const sheet = document.getElementById('answer-sheet');
+      if (sheet) sheet.style.maxWidth = (44 + inputW + 48 + 4) + 'px';
     }
 
     function syncAnswerRowMeta(input) {
       const val = input.value;
       examState.answers[input.dataset.key] = val;
-      const ind = input.nextElementSibling;
+      const ind = input.closest('.answer-row')?.querySelector('.char-indicator');
       if (ind) {
         ind.textContent = `${val.length}/${MAX_CHARS_PER_LINE}`;
         ind.classList.toggle('full', val.length >= MAX_CHARS_PER_LINE);
@@ -2528,7 +2540,7 @@
         const input = document.createElement('input'); input.type = 'text'; input.className = 'row-input'; input.dataset.key = key; input.value = savedVal; input.autocomplete = 'off'; input.spellcheck = false;
         const indicator = document.createElement('span'); indicator.className = 'char-indicator'; indicator.textContent = `${savedVal.length}/${MAX_CHARS_PER_LINE}`;
         if (savedVal.length >= MAX_CHARS_PER_LINE) indicator.classList.add('full');
-        wrapDiv.appendChild(input); wrapDiv.appendChild(indicator); row.appendChild(numDiv); row.appendChild(wrapDiv); container.appendChild(row);
+        wrapDiv.appendChild(input); row.appendChild(numDiv); row.appendChild(wrapDiv); row.appendChild(indicator); container.appendChild(row);
       }
       document.getElementById('room-curr-page').textContent = examState.currPage;
       refreshAnswerTotal();
