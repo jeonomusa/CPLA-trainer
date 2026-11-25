@@ -71,8 +71,13 @@
     .chart-wrapper { position: relative; height: 220px; width: 100%; }
 
     /* 시험 영역만 전체화면일 때 (요소 자체가 fullscreen) */
-    #exam-room:fullscreen { background: #f8fafc; padding: 20px; overflow-y: auto; min-height: 100%; box-sizing: border-box; }
-    #exam-room:-webkit-full-screen { background: #f8fafc; padding: 20px; overflow-y: auto; min-height: 100%; box-sizing: border-box; }
+    #exam-room:fullscreen { background: #f8fafc; padding: 16px 24px 48px; overflow-y: auto; min-height: 100%; box-sizing: border-box; }
+    #exam-room:-webkit-full-screen { background: #f8fafc; padding: 16px 24px 48px; overflow-y: auto; min-height: 100%; box-sizing: border-box; }
+    /* 전체화면에서는 앱 상단바가 없으니 시험 상단 박스가 맨 위에 붙어 답안지를 가리지 않게 한다 */
+    #exam-room:fullscreen #exam-topbar,
+    #exam-room:-webkit-full-screen #exam-topbar { top: 0; margin-bottom: 12px; }
+    #exam-room:fullscreen #answer-sheet,
+    #exam-room:-webkit-full-screen #answer-sheet { margin-bottom: 24px; }
 
     /* 문제 지문 패널 */
     :root { --passage-w: clamp(320px, 34vw, 520px); }
