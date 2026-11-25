@@ -2445,10 +2445,11 @@
       if (examState.timer) clearInterval(examState.timer);
       examState = { subject: sub, question: qText, rubric: combinedRubric, time: time, seconds: time * 60, totalPage: Math.floor(time / 5), currPage: 1, answers: {}, timer: null, uploadedRubricText: examState.uploadedRubricText, isSubmitting: false };
 
-      document.getElementById('room-subject').textContent = sub; document.getElementById('room-q-preview').textContent = qText;
+      document.getElementById('room-subject').textContent = sub;
       document.getElementById('room-q-full').textContent = qText; document.getElementById('room-total-page').textContent = examState.totalPage;
       document.getElementById('char-count').textContent = '0';
       document.getElementById('exam-setup').style.display = 'none'; document.getElementById('exam-room').style.display = 'block';
+      document.getElementById('page-exam').classList.add('exam-running');
 
       renderAnswerSheet();
       try { if (localStorage.getItem('cpla_passage_open') === '1') toggleExamPassage(true); } catch (e) {}
@@ -2479,21 +2480,14 @@
     }
 
     function fitAnswerRowFonts(container) {
-      const wrap = container.querySelector('.row-input-wrapper');
-      if (!wrap) return;
-      const rowInput = container.querySelector('.row-input');
-      const avail = (rowInput ? rowInput.clientWidth : wrap.clientWidth) - 12;
+      const ta = (container && container.querySelector('.answer-area')) || document.getElementById('answer-area');
+      if (!ta) return;
+      const avail = ta.clientWidth - 30;
       let fontPx = Math.min(26, Math.floor((avail / MAX_CHARS_PER_LINE / 0.93) * 2) / 2);
       fontPx = Math.max(11, fontPx);
-      // 실제 글자 폭으로 검증: 안 들어가면 한 단계씩 줄인다
       let guard = 0;
-      while (fontPx > 10 && Math.ceil(measureAnswerCharWidth(fontPx) * MAX_CHARS_PER_LINE) > avail && guard++ < 40) {
-        fontPx -= 0.5;
-      }
-      container.querySelectorAll('.row-input').forEach(el => { el.style.fontSize = fontPx + 'px'; });
-      container.querySelectorAll('.row-input-wrapper').forEach(el => { el.style.width = 'auto'; });
-      const sheet = document.getElementById('answer-sheet');
-      if (sheet) sheet.style.maxWidth = 'none';
+      while (fontPx > 10 && Math.ceil(measureAnswerCharWidth(fontPx) * MAX_CHARS_PER_LINE) > avail && guard++ < 40) fontPx -= 0.5;
+      ta.style.fontSize = fontPx + 'px';
     }
 
     function syncAnswerRowMeta(input) {
@@ -2513,10 +2507,11 @@
 
     function normalizeAnswerRow(input, idx) {
       const inputs = Array.from(document.querySelectorAll('#answer-lines .row-input'));
+      if (input.dataset.composing === '1') return;
       let rest = input.value.slice(MAX_CHARS_PER_LINE);
       if (rest) {
         input.value = input.value.slice(0, MAX_CHARS_PER_LINE);
-        let lastTouched = input;
+        let target = input;
         for (let i = idx + 1; i < inputs.length && rest; i++) {
           const room = MAX_CHARS_PER_LINE - inputs[i].value.length;
           if (room <= 0) continue;
@@ -2524,57 +2519,140 @@
           inputs[i].value += take;
           rest = rest.slice(take.length);
           syncAnswerRowMeta(inputs[i]);
-          lastTouched = inputs[i];
+          target = inputs[i];
         }
         syncAnswerRowMeta(input);
         refreshAnswerTotal();
-        lastTouched.focus();
-        lastTouched.setSelectionRange(lastTouched.value.length, lastTouched.value.length);
+        if (rest) { examState.overflowRest = rest; }
+        moveCaretToEnd(target);
         return;
       }
       syncAnswerRowMeta(input);
       refreshAnswerTotal();
-      const atEnd = document.activeElement === input && input.selectionStart === input.value.length;
-      if (atEnd && input.value.length >= MAX_CHARS_PER_LINE && idx < inputs.length - 1) {
-        inputs[idx + 1].focus();
-        inputs[idx + 1].setSelectionRange(0, 0);
+      // 줄이 꽉 찼고 커서가 끝이면 다음 줄로 넘긴다. 조합 중에는 건드리지 않는다.
+      if (document.activeElement === input && input.selectionStart === input.value.length && input.value.length >= MAX_CHARS_PER_LINE && idx < inputs.length - 1) {
+        moveCaretToStart(inputs[idx + 1]);
       }
     }
 
-    function renderAnswerSheet() {
-      const container = document.getElementById('answer-lines'); container.innerHTML = '';
-      for (let i = 1; i <= LINES_PER_PAGE; i++) {
-        const key = `${examState.currPage}-${i}`; const savedVal = examState.answers[key] || '';
-        const row = document.createElement('div'); row.className = 'answer-row';
-        const numDiv = document.createElement('div'); numDiv.className = 'row-num'; numDiv.textContent = i;
-        const wrapDiv = document.createElement('div'); wrapDiv.className = 'row-input-wrapper';
-        const input = document.createElement('input'); input.type = 'text'; input.className = 'row-input'; input.dataset.key = key; input.value = savedVal; input.autocomplete = 'off'; input.spellcheck = false;
-        const indicator = document.createElement('span'); indicator.className = 'char-indicator'; indicator.textContent = `${savedVal.length}/${MAX_CHARS_PER_LINE}`;
-        if (savedVal.length >= MAX_CHARS_PER_LINE) indicator.classList.add('full');
-        wrapDiv.appendChild(input); row.appendChild(numDiv); row.appendChild(wrapDiv); row.appendChild(indicator); container.appendChild(row);
+    function moveCaretToEnd(el) {
+      if (!el) return;
+      el.focus();
+      try { el.setSelectionRange(el.value.length, el.value.length); } catch (e) {}
+    }
+
+    function moveCaretToStart(el) {
+      if (!el) return;
+      el.focus();
+      try { el.setSelectionRange(0, 0); } catch (e) {}
+    }
+
+    // 조합(한글)이 끝난 뒤에만 정리해서, 넘어가는 순간의 글자가 사라지지 않게 한다.
+    function scheduleRowNormalize(input, idx) {
+      clearTimeout(input._normTimer);
+      input._normTimer = setTimeout(() => {
+        if (input.dataset.composing === '1') { scheduleRowNormalize(input, idx); return; }
+        normalizeAnswerRow(input, idx);
+      }, 0);
+    }
+
+    // 한 줄 40자 규칙을 글로 지키면서, 입력은 textarea 하나로 받는다(한글 조합 중 글자 유실 방지)
+    function applyLineRule(text, maxChars) {
+      const lines = String(text).split('\n');
+      const out = [];
+      let carry = '';
+      for (const line of lines) {
+        let cur = carry + line;
+        carry = '';
+        while (cur.length > maxChars) { out.push(cur.slice(0, maxChars)); cur = cur.slice(maxChars); }
+        out.push(cur);
       }
+      return out;
+    }
+
+    function syncSheetAnswers() {
+      const ta = document.getElementById('answer-area');
+      if (!ta) return;
+      const lines = ta.value.split('\n');
+      for (let i = 1; i <= LINES_PER_PAGE; i++) {
+        examState.answers[`${examState.currPage}-${i}`] = (lines[i - 1] || '').replace(/\s+$/, '');
+      }
+    }
+
+    function enforceSheetRule(ta) {
+      if (!ta || ta.dataset.composing === '1') return;
+      const caret = ta.selectionStart;
+      let lines = applyLineRule(ta.value, MAX_CHARS_PER_LINE);
+      let kept = lines;
+      let overflow = '';
+      if (lines.length > LINES_PER_PAGE) {
+        kept = lines.slice(0, LINES_PER_PAGE);
+        overflow = lines.slice(LINES_PER_PAGE).join('');
+      }
+      if (kept.length && kept[kept.length - 1] === '' && kept.length > 1) { /* 빈 줄은 유지 */ }
+      const newText = kept.join('\n');
+      const caretText = applyLineRule(ta.value.slice(0, caret), MAX_CHARS_PER_LINE).slice(0, LINES_PER_PAGE).join('\n');
+      const newCaret = Math.min(caretText.length, newText.length);
+      if (newText !== ta.value) {
+        ta.value = newText;
+        try { ta.setSelectionRange(newCaret, newCaret); } catch (e) {}
+      }
+      syncSheetAnswers();
+      refreshAnswerTotal();
+      if (overflow) carryOverflowToNextPage(overflow);
+    }
+
+    function carryOverflowToNextPage(rest) {
+      if (!rest) return;
+      if (examState.currPage >= examState.totalPage) return;
+      const nextPage = examState.currPage + 1;
+      let restLeft = rest;
+      for (let i = 1; i <= LINES_PER_PAGE && restLeft; i++) {
+        const key = `${nextPage}-${i}`;
+        const room = MAX_CHARS_PER_LINE - (examState.answers[key] || '').length;
+        if (room <= 0) continue;
+        examState.answers[key] = (examState.answers[key] || '') + restLeft.slice(0, room);
+        restLeft = restLeft.slice(room);
+      }
+      changePage(1);
+    }
+
+    function renderAnswerSheet() {
+      const container = document.getElementById('answer-lines');
+      container.innerHTML = '';
+      let text = [];
+      for (let i = 1; i <= LINES_PER_PAGE; i++) text.push(examState.answers[`${examState.currPage}-${i}`] || '');
+      while (text.length > 1 && text[text.length - 1] === '') text.pop();
+
+      const wrap = document.createElement('div'); wrap.className = 'sheet-area';
+      const nums = document.createElement('div'); nums.className = 'row-nums';
+      for (let i = 1; i <= LINES_PER_PAGE; i++) { const d = document.createElement('div'); d.textContent = i; nums.appendChild(d); }
+
+      const ta = document.createElement('textarea');
+      ta.id = 'answer-area'; ta.className = 'answer-area'; ta.wrap = 'off'; ta.spellcheck = false; ta.autocomplete = 'off';
+      ta.value = text.join('\n');
+
+      wrap.appendChild(nums); wrap.appendChild(ta); container.appendChild(wrap);
+
+      ta.addEventListener('compositionstart', () => { ta.dataset.composing = '1'; clearTimeout(ta._ruleTimer); });
+      ta.addEventListener('compositionend', () => {
+        delete ta.dataset.composing;
+        clearTimeout(ta._ruleTimer);
+        ta._ruleTimer = setTimeout(() => { if (ta.dataset.composing !== '1') enforceSheetRule(ta); }, 0);
+      });
+      ta.addEventListener('input', () => {
+        syncSheetAnswers(); refreshAnswerTotal();
+        if (ta.dataset.composing === '1') return;
+        clearTimeout(ta._ruleTimer);
+        ta._ruleTimer = setTimeout(() => { if (ta.dataset.composing !== '1') enforceSheetRule(ta); }, 0);
+      });
+
       document.getElementById('room-curr-page').textContent = examState.currPage;
       refreshAnswerTotal();
       fitAnswerRowFonts(container);
-
-      const inputs = container.querySelectorAll('.row-input');
-      inputs.forEach((input, idx) => {
-        input.addEventListener('compositionstart', () => { input.dataset.composing = '1'; });
-        input.addEventListener('compositionend', () => { delete input.dataset.composing; normalizeAnswerRow(input, idx); });
-        input.addEventListener('input', (e) => {
-          if (input.dataset.composing) { syncAnswerRowMeta(input); refreshAnswerTotal(); return; }
-          normalizeAnswerRow(input, idx);
-        });
-        input.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') { e.preventDefault(); if (idx < inputs.length - 1) { inputs[idx + 1].focus(); inputs[idx + 1].setSelectionRange(0, 0); } else changePage(1); }
-          else if (e.key === 'Backspace' && e.target.selectionStart === 0 && e.target.selectionEnd === 0 && idx > 0) { e.preventDefault(); const prev = inputs[idx - 1]; prev.focus(); prev.setSelectionRange(prev.value.length, prev.value.length); }
-          else if (e.key === 'ArrowLeft' && e.target.selectionStart === 0 && idx > 0) { e.preventDefault(); const prev = inputs[idx - 1]; prev.focus(); prev.setSelectionRange(prev.value.length, prev.value.length); }
-          else if (e.key === 'ArrowRight' && e.target.selectionStart === e.target.value.length && idx < inputs.length - 1) { e.preventDefault(); inputs[idx + 1].focus(); inputs[idx + 1].setSelectionRange(0, 0); }
-          else if (e.key === 'ArrowUp' && idx > 0) { e.preventDefault(); inputs[idx - 1].focus(); }
-          else if (e.key === 'ArrowDown' && idx < inputs.length - 1) { e.preventDefault(); inputs[idx + 1].focus(); }
-        });
-      });
-      if (inputs.length > 0) inputs[0].focus();
+      ta.focus();
+      const caret = examState.answers[`${examState.currPage}-1`] ? ta.value.length : 0;
+      try { ta.setSelectionRange(caret, caret); } catch (e) {}
     }
 
     function toggleExamPassage(force) {

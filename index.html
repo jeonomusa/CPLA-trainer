@@ -544,20 +544,19 @@
       </div>
       
       <div id="exam-room" class="hidden">
-        <div class="flex flex-col md:flex-row gap-3 mb-4 sticky top-[70px] md:top-[80px] z-40 bg-[#f8fafc] py-2">
-          <div class="flex-1 bg-white p-3 md:p-4 border border-gray-200 rounded-xl flex justify-between items-center shadow-sm">
-            <div>
-              <div class="text-[10px] font-bold text-emerald-500 mb-0.5" id="room-subject">과목명</div>
-              <div class="text-xs md:text-sm font-bold text-slate-800 truncate max-w-[150px] md:max-w-[400px]" id="room-q-preview">문제 내용...</div>
+        <div id="exam-topbar" class="flex flex-col md:flex-row gap-2 md:gap-3 mb-4 sticky top-[70px] md:top-[80px] z-40 bg-[#f8fafc] py-2">
+          <div class="flex-1 min-w-0 bg-white px-3 md:px-4 py-2 md:py-3 border border-gray-200 rounded-xl flex items-center justify-between gap-3 shadow-sm">
+            <div class="flex items-center gap-2 md:gap-3 min-w-0">
+              <button type="button" id="exam-passage-btn" onclick="toggleExamPassage()" title="문제 지문 열기/닫기" class="px-3 md:px-4 py-2 md:py-2.5 bg-white border border-slate-200 text-slate-600 font-bold text-[11px] md:text-xs rounded-lg hover:bg-slate-50 active:scale-95 whitespace-nowrap"><i class="ri-file-text-line"></i> 지문</button>
+              <span class="text-[10px] font-bold text-emerald-500 truncate hidden sm:inline" id="room-subject">과목명</span>
             </div>
-            <div id="timer" class="text-2xl md:text-3xl font-black text-slate-800 font-mono">100:00</div>
+            <div id="timer" class="text-2xl md:text-3xl font-black text-slate-800 font-mono whitespace-nowrap">100:00</div>
           </div>
-          <div class="bg-white p-3 border border-gray-200 rounded-xl flex items-center justify-between gap-4 md:gap-6 shadow-sm">
+          <div class="bg-white px-3 py-2 border border-gray-200 rounded-xl flex items-center justify-between gap-3 md:gap-5 shadow-sm">
             <div class="text-center"><p class="text-[9px] md:text-[10px] font-bold text-gray-400">총 글자수</p><p class="text-base md:text-lg font-extrabold text-emerald-500" id="char-count">0</p></div>
-            <div class="text-center"><p class="text-[9px] md:text-[10px] font-bold text-gray-400">페이지</p><p class="text-base md:text-lg font-extrabold text-slate-800"><span id="room-curr-page">1</span> / <span id="room-total-page">20</span></p></div>
-            <button type="button" id="exam-passage-btn" onclick="toggleExamPassage()" title="문제 지문 열기/닫기" class="px-3 md:px-4 py-2 md:py-2.5 bg-white border border-slate-200 text-slate-600 font-bold text-[10px] md:text-xs rounded-lg hover:bg-slate-50 active:scale-95 whitespace-nowrap">지문</button>
+            <div class="text-center"><p class="text-[9px] md:text-[10px] font-bold text-gray-400">페이지</p><p class="text-base md:text-lg font-extrabold text-slate-800 whitespace-nowrap"><span id="room-curr-page">1</span> / <span id="room-total-page">20</span></p></div>
             <button type="button" id="exam-fullscreen-btn" title="시험 화면만 전체화면" class="px-3 md:px-4 py-2 md:py-2.5 bg-white border border-slate-200 text-slate-600 font-bold text-[10px] md:text-xs rounded-lg hover:bg-slate-50 active:scale-95 whitespace-nowrap">전체화면</button>
-            <button type="button" id="exam-submit-btn" onclick="submitExam(false)" class="px-4 md:px-6 py-2 md:py-3 bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs md:text-sm rounded-lg active:scale-95 disabled:opacity-50 disabled:pointer-events-none">제출</button>
+            <button type="button" id="exam-submit-btn" onclick="submitExam(false)" class="px-4 md:px-6 py-2 md:py-3 bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs md:text-sm rounded-lg active:scale-95 disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap">제출</button>
           </div>
         </div>
 
